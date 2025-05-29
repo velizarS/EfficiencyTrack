@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfficiencyTrack.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class EfficiencyTrackDbContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public EfficiencyTrackDbContext(DbContextOptions<EfficiencyTrackDbContext> options)
             : base(options)
         {
         }
