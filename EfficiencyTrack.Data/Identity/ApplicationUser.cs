@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EfficiencyTrack.Data.Models
+namespace EfficiencyTrack.Data.Identity
 {
-    public class ApllicationUser : IdentityUser<Guid>
+    public class ApplicationUser : IdentityUser<Guid>
     {
-        public ApllicationUser()
+        public ApplicationUser()
         {
             Id = Guid.NewGuid();
         }

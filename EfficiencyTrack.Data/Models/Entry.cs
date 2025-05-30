@@ -1,0 +1,81 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace EfficiencyTrack.Data.Models
+{
+    [Comment("Represents a production entry for an employee, including details about the operation performed, pieces produced, and efficiency metrics.")]
+    public class Entry : BaseEntity
+    {
+        [Required]
+        [Display(Name = "Entry Date")]
+        [Comment("The date when the entry was recorded.")]
+        public DateTime Date { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(Employee))]
+        [Display(Name = "Employee")]
+        [Comment("The employee associated with this entry.")]
+        public Guid EmployeeId { get; set; }
+        public Employee Employee { get; set; } = null!;
+
+        [Required]
+        [ForeignKey(nameof(Routing))]
+        [Display(Name = "Routing")]
+        [Comment("The routing operation associated with this entry.")]
+        public Guid RoutingId { get; set; }
+        public Routing Routing { get; set; } = null!;
+
+        [Required]
+        [ForeignKey(nameof(Shift))]
+        [Display(Name = "Shift")]
+        [Comment("The shift during which this entry was recorded.")]
+        public Guid ShiftId { get; set; }
+        public Shift Shift { get; set; } = null!;
+
+        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Pieces must be zero or a positive number.")]
+        [Display(Name = "Pieces Produced")]
+        [Comment("The number of pieces produced.")]
+        public int Pieces { get; set; }
+
+        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "Scrap must be zero or a positive number.")]
+        [Display(Name = "Scrap Pieces")]
+        [Comment("The number of scrap pieces produced.")]
+        public int Scrap { get; set; }
+
+        [Required]
+        [Range(0, double.MaxValue, ErrorMessage = "Worked minutes must be zero or a positive number.")]
+        [Display(Name = "Worked Minutes")]
+        [Comment("The number of minutes worked during the entry.")]
+        public decimal WorkedMinutes { get; set; }
+
+        [Required]
+        [Range(0, 200, ErrorMessage = "Efficiency must be between 0 and 200.")]
+        [Display(Name = "Efficiency (%)")]
+        [Comment("The efficiency percentage for the operation.")]
+        public decimal EfficiencyForOperation { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Required Minutes")]
+        [Comment("Theoretical required time for this operation.")]
+        public decimal RequiredMinutes => (Pieces + Scrap) * (Routing?.MinutesPerPiece ?? 0);
+
+        [NotMapped]
+        [Display(Name = "Calculated Efficiency (%)")]
+        [Comment("Automatically calculated efficiency based on Routing.MinutesPerPiece.")]
+        public decimal CalculatedEfficiency
+        {
+            get
+            {
+                if (WorkedMinutes == 0 || Routing == null) return 0;
+
+                decimal rawEfficiency = (RequiredMinutes / WorkedMinutes) * 100;
+
+                return rawEfficiency;
+            }
+        }
+
+    }
+}
