@@ -19,5 +19,6 @@ namespace EfficiencyTrack.Data.Models
         public int DurationMinutes { get; set; }
 
         public ICollection<Entry> Entries { get; set; } = new List<Entry>();
+
     }
 }

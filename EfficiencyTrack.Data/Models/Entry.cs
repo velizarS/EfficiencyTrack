@@ -57,12 +57,10 @@ namespace EfficiencyTrack.Data.Models
         [Comment("The efficiency percentage for the operation.")]
         public decimal EfficiencyForOperation { get; set; }
 
-        [NotMapped]
         [Display(Name = "Required Minutes")]
         [Comment("Theoretical required time for this operation.")]
         public decimal RequiredMinutes => (Pieces + Scrap) * (Routing?.MinutesPerPiece ?? 0);
 
-        [NotMapped]
         [Display(Name = "Calculated Efficiency (%)")]
         [Comment("Automatically calculated efficiency based on Routing.MinutesPerPiece.")]
         public decimal CalculatedEfficiency
