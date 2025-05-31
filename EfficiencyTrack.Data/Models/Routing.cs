@@ -22,13 +22,14 @@ namespace EfficiencyTrack.Data.Models
         [Required]
         [Display(Name = "Zone")]
         [Comment("The zone where the routing operation is performed.")]
-        [StringLength(20, ErrorMessage = "Zone cannot be longer than 20 characters.")]
+        [StringLength(100, ErrorMessage = "Zone name cannot be longer than 100 characters.")]
         public string Zone { get; set; } = string.Empty;
 
         [Required]
         [Display(Name = "Minutes Per Piece")]
         [Comment("The time in minutes required to process one piece in this routing operation.")]
         [Range(0.01, 180, ErrorMessage = "Minutes per piece must be between 0.01 and 180 minutes.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal MinutesPerPiece { get; set; }
 
         [Required]

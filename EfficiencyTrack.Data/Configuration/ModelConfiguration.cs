@@ -1,4 +1,5 @@
-﻿using EfficiencyTrack.Data.Models;
+﻿using EfficiencyTrack.Data.Identity;
+using EfficiencyTrack.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfficiencyTrack.Data
@@ -53,6 +54,11 @@ namespace EfficiencyTrack.Data
                 .WithOne(e => e.Employee)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ApplicationUser>()
+       .HasMany(e => e.Claims)
+       .WithOne()
+       .HasForeignKey(c => c.UserId)
+       .IsRequired();
 
 
         }

@@ -61,5 +61,12 @@ namespace EfficiencyTrack.Data.Models
         [InverseProperty(nameof(Entry.Employee))]
         public ICollection<Entry> Entries { get; set; } = new List<Entry>();
 
+
+        [Display(Name = "Application User")]
+        [Comment("Reference to the associated application user.")]
+        public Guid? ApplicationUserId { get; set; }
+
+        [ForeignKey(nameof(ApplicationUserId))]
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

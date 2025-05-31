@@ -10,7 +10,7 @@ namespace EfficiencyTrack.Data.Models
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Comment("When is created")]
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
         [Comment("By who is created")]
         public string CreatedBy { get; set; } = null!;

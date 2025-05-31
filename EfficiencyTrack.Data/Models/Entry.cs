@@ -46,23 +46,27 @@ namespace EfficiencyTrack.Data.Models
         public int Scrap { get; set; }
 
         [Required]
-        [Range(0, double.MaxValue, ErrorMessage = "Worked minutes must be zero or a positive number.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Worked minutes must be a positive number.")]
         [Display(Name = "Worked Minutes")]
         [Comment("The number of minutes worked during the entry.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal WorkedMinutes { get; set; }
 
         [Required]
-        [Range(0, 200, ErrorMessage = "Efficiency must be between 0 and 200.")]
+        [Range(0.01, 200, ErrorMessage = "Efficiency must be between 0.01 and 200.")]
         [Display(Name = "Efficiency (%)")]
         [Comment("The efficiency percentage for the operation.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal EfficiencyForOperation { get; set; }
 
         [Display(Name = "Required Minutes")]
         [Comment("Theoretical required time for this operation.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal RequiredMinutes => (Pieces + Scrap) * (Routing?.MinutesPerPiece ?? 0);
 
         [Display(Name = "Calculated Efficiency (%)")]
         [Comment("Automatically calculated efficiency based on Routing.MinutesPerPiece.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal CalculatedEfficiency
         {
             get

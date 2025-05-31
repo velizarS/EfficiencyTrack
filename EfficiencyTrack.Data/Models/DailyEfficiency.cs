@@ -23,18 +23,21 @@ namespace EfficiencyTrack.Data.Models
         [Range(0, double.MaxValue, ErrorMessage = "Total needed minutes must be zero or a positive number.")]
         [Display(Name = "Total Needed Minutes")]
         [Comment("Sum of the theoretical time required for all tasks performed that day.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal TotalNeededMinutes { get; set; }
 
         [Required]
         [Range(0, double.MaxValue, ErrorMessage = "Total worked minutes must be zero or a positive number.")]
         [Display(Name = "Total Worked Minutes")]
         [Comment("Total actual time worked by the employee on that day.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal TotalWorkedMinutes { get; set; }
 
         [Required]
         [Range(0, 200, ErrorMessage = "Efficiency must be between 0 and 200.")]
         [Display(Name = "Efficiency (%)")]
         [Comment("Calculated efficiency as (TotalNeededMinutes / TotalWorkedMinutes) * 100.")]
+        [Column(TypeName = "decimal(10,4)")]
         public decimal EfficiencyPercentage { get; set; }
     }
 }

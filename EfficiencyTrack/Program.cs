@@ -75,7 +75,7 @@ await app.RunAsync();
 
 static async Task SeedRolesAsync(IServiceProvider serviceProvider)
 {
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
     var roles = new[] { "Manager", "Admin", "UnitRespopnsible", "ShiftLeader", "User" };
 
@@ -83,7 +83,8 @@ static async Task SeedRolesAsync(IServiceProvider serviceProvider)
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            await roleManager.CreateAsync(new IdentityRole<Guid>(role));
         }
     }
 }
+
