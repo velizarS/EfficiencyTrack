@@ -2,32 +2,35 @@ using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using EfficiencyTrack.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<EfficiencyTrackDbContext>(options =>
-    options.UseSqlServer(connectionString));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddDbContext<EfficiencyTrackDbContext>((serviceProvider, options) =>
+{
+    options.UseSqlServer(connectionString);
+}, ServiceLifetime.Scoped);
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 8;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-    options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false;
-    options.SignIn.RequireConfirmedAccount = false;
-
-})
-        .AddRoles<IdentityRole<Guid>>()
-        .AddEntityFrameworkStores<EfficiencyTrackDbContext>();
-
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = true;
+        options.User.RequireUniqueEmail = true;
+        options.SignIn.RequireConfirmedEmail = false;
+        options.SignIn.RequireConfirmedAccount = false;
+    })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<EfficiencyTrackDbContext>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -55,6 +58,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 using (var scope = app.Services.CreateScope())
@@ -87,4 +91,3 @@ static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         }
     }
 }
-

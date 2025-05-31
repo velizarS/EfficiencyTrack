@@ -25,7 +25,7 @@ namespace EfficiencyTrack.Data.Models
         public bool IsDeleted { get; set; } = false;
 
         [Comment("By who is deleted")]
-        public string DeletedBy { get; set; } =null!;
+        public string? DeletedBy { get; set; } 
     }
     
 }
