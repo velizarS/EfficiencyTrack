@@ -23,6 +23,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped(typeof(ICrudService<>), typeof(CrudService<>));
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IEntryService, EntryService>();
+builder.Services.AddScoped<IDailyEfficiencyService, DailyEfficiencyService>();
+
 
 
 builder.Services
