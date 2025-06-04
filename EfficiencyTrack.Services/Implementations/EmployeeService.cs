@@ -1,0 +1,76 @@
+﻿using EfficiencyTrack.Data.Data;
+using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+
+namespace EfficiencyTrack.Services
+{
+    public class EmployeeService : CrudService<Employee>, IEmployeeService
+    {
+        private readonly EfficiencyTrackDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public EmployeeService(EfficiencyTrackDbContext context, IHttpContextAccessor httpContextAccessor)
+            : base(context, httpContextAccessor)
+        {
+            _context = context;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+       
+
+        public async Task<List<Employee>> GetAllActiveAsync()
+        {
+            return await _context.Employees
+                .Where(e => e.IsActive)
+                .Include(e => e.Department)
+                .ToListAsync();
+        }
+
+        public async Task<List<Employee>> GetByDepartmentAsync(Guid departmentId)
+        {
+            return await _context.Employees
+                .Where(e => e.DepartmentId == departmentId && e.IsActive)
+                .ToListAsync();
+        }
+
+        public async Task<List<Employee>> GetByLeaderIdAsync(Guid leaderId)
+        {
+            return await _context.Employees
+                .Where(e => e.LeaderId == leaderId && e.IsActive)
+                .ToListAsync();
+        }
+
+        public async Task<Employee?> GetByApplicationUserIdAsync(Guid userId)
+        {
+            return await _context.Employees
+                .FirstOrDefaultAsync(e => e.ApplicationUserId == userId);
+        }
+
+        public async Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null)
+        {
+            return !await _context.Employees
+                .AnyAsync(e => e.Code == code && (!excludeId.HasValue || e.Id != excludeId.Value));
+        }
+
+        public async Task DeactivateAsync(Guid employeeId)
+        {
+            var employee = await _context.Employees.FindAsync(employeeId);
+            if (employee == null) return;
+
+            employee.IsActive = false;
+
+            var teamMembers = await _context.Employees
+                .Where(e => e.LeaderId == employeeId)
+                .ToListAsync();
+
+            foreach (var member in teamMembers)
+            {
+                member.LeaderId = null;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+    }
+}
