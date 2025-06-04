@@ -1,7 +1,11 @@
 using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Identity;
+using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.Services.Interfaces;
+using EfficiencyTrack.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using EfficiencyTrack.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,10 @@ builder.Services.AddDbContext<EfficiencyTrackDbContext>((serviceProvider, option
 }, ServiceLifetime.Scoped);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddScoped(typeof(ICrudService<>), typeof(CrudService<>));
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IEntryService, EntryService>();
+
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
