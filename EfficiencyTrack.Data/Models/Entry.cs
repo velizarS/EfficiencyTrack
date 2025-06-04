@@ -7,6 +7,15 @@ namespace EfficiencyTrack.Data.Models
     [Comment("Represents a production entry for an employee, including details about the operation performed, pieces produced, and efficiency metrics.")]
     public class Entry : BaseEntity
     {
+
+        public static decimal CalculateEfficiencyForOperation(decimal RequiredMinutes, int WorkedMinutes)
+        {
+            decimal efficiencyForOperation = 0m;
+            efficiencyForOperation = (RequiredMinutes / WorkedMinutes) * 100;
+
+            return efficiencyForOperation;
+        }
+
         [Required]
         [Display(Name = "Entry Date")]
         [Comment("The date when the entry was recorded.")]
@@ -52,32 +61,19 @@ namespace EfficiencyTrack.Data.Models
         [Column(TypeName = "decimal(10,4)")]
         public decimal WorkedMinutes { get; set; }
 
-        [Required]
-        [Range(0.01, 200, ErrorMessage = "Efficiency must be between 0.01 and 200.")]
-        [Display(Name = "Efficiency (%)")]
-        [Comment("The efficiency percentage for the operation.")]
-        [Column(TypeName = "decimal(10,4)")]
-        public decimal EfficiencyForOperation { get; set; }
-
         [Display(Name = "Required Minutes")]
         [Comment("Theoretical required time for this operation.")]
         [Column(TypeName = "decimal(10,4)")]
         public decimal RequiredMinutes => (Pieces + Scrap) * (Routing?.MinutesPerPiece ?? 0);
 
-        [Display(Name = "Calculated Efficiency (%)")]
-        [Comment("Automatically calculated efficiency based on Routing.MinutesPerPiece.")]
+        [Required]
+        [Range(0.01, 200, ErrorMessage = "Efficiency must be between 0.01 and 200.")]
+        [Display(Name = "Efficiency (%)")]
+        [Comment("The efficiency percentage for the operation.")]
         [Column(TypeName = "decimal(10,4)")]
-        public decimal CalculatedEfficiency
-        {
-            get
-            {
-                if (WorkedMinutes == 0 || Routing == null) return 0;
-
-                decimal rawEfficiency = (RequiredMinutes / WorkedMinutes) * 100;
-
-                return rawEfficiency;
-            }
-        }
+        public decimal EfficiencyForOperation { get;  set; }
 
     }
+
 }
+
