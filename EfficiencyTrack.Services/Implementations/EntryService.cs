@@ -13,7 +13,7 @@ namespace EfficiencyTrack.Services.Implementations
 
         public void SetEfficiency(Entry entry)
         {
-            entry.EfficiencyForOperation = Entry.CalculateEfficiencyForOperation(entry.RequiredMinutes, (int)entry.WorkedMinutes);
+            entry.EfficiencyForOperation = Entry.CalculateEfficiencyForOperation(entry.RequiredMinutes, entry.WorkedMinutes);
         }
     }
 }

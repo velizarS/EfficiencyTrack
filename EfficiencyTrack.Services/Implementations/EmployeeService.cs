@@ -18,11 +18,10 @@ namespace EfficiencyTrack.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-       
-
         public async Task<List<Employee>> GetAllActiveAsync()
         {
             return await _context.Employees
+                .AsNoTracking()
                 .Where(e => e.IsActive)
                 .Include(e => e.Department)
                 .ToListAsync();
@@ -30,27 +29,27 @@ namespace EfficiencyTrack.Services
 
         public async Task<List<Employee>> GetByDepartmentAsync(Guid departmentId)
         {
-            return await _context.Employees
+            return await _context.Employees.AsNoTracking()
                 .Where(e => e.DepartmentId == departmentId && e.IsActive)
                 .ToListAsync();
         }
 
         public async Task<List<Employee>> GetByLeaderIdAsync(Guid leaderId)
         {
-            return await _context.Employees
+            return await _context.Employees.AsNoTracking()
                 .Where(e => e.LeaderId == leaderId && e.IsActive)
                 .ToListAsync();
         }
 
         public async Task<Employee?> GetByApplicationUserIdAsync(Guid userId)
         {
-            return await _context.Employees
+            return await _context.Employees.AsNoTracking()
                 .FirstOrDefaultAsync(e => e.ApplicationUserId == userId);
         }
 
         public async Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null)
         {
-            return !await _context.Employees
+            return !await _context.Employees.AsNoTracking()
                 .AnyAsync(e => e.Code == code && (!excludeId.HasValue || e.Id != excludeId.Value));
         }
 

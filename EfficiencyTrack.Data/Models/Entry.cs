@@ -8,7 +8,7 @@ namespace EfficiencyTrack.Data.Models
     public class Entry : BaseEntity
     {
 
-        public static decimal CalculateEfficiencyForOperation(decimal RequiredMinutes, int WorkedMinutes)
+        public static decimal CalculateEfficiencyForOperation(decimal RequiredMinutes, decimal WorkedMinutes)
         {
             decimal efficiencyForOperation = 0m;
             efficiencyForOperation = (RequiredMinutes / WorkedMinutes) * 100;
