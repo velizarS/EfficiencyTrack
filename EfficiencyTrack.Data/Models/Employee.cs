@@ -1,7 +1,7 @@
 ﻿using EfficiencyTrack.Data.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EfficiencyTrack.Data.Models
 {
@@ -39,16 +39,12 @@ namespace EfficiencyTrack.Data.Models
         [Comment("Indicates if the employee is currently active.")]
         public bool IsActive { get; set; } = true;
 
-        [Display(Name = "Leader")]
-        [Comment("Reference to the employee's leader.")]
-        public Guid? LeaderId { get; set; }
+        [Display(Name = "Shift Manager")]
+        [Comment("Reference to the employee's shift manager (ApplicationUser).")]
+        public Guid? ShiftManagerUserId { get; set; }
 
-        [ForeignKey(nameof(LeaderId))]
-        public Employee? Leader { get; set; }
-
-        [InverseProperty(nameof(Leader))]
-        [Comment("The collection of employees who report to this employee.")]
-        public ICollection<Employee> Team { get; set; } = new List<Employee>();
+        [ForeignKey(nameof(ShiftManagerUserId))]
+        public ApplicationUser? ShiftManagerUser { get; set; }
 
         [Required]
         [Display(Name = "Department")]
@@ -60,7 +56,6 @@ namespace EfficiencyTrack.Data.Models
 
         [InverseProperty(nameof(Entry.Employee))]
         public ICollection<Entry> Entries { get; set; } = new List<Entry>();
-
 
         [Display(Name = "Application User")]
         [Comment("Reference to the associated application user.")]

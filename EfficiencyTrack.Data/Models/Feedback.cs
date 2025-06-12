@@ -1,7 +1,6 @@
-﻿using EfficiencyTrack.Data.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 [Comment("Represents user feedback in the system.")]
 public class Feedback
@@ -9,16 +8,10 @@ public class Feedback
     [Key]
     public Guid Id { get; set; }
 
-    [ForeignKey(nameof(User))]
-    [Display(Name = "User")]
-    [Comment("The user who provided the feedback.")]
-    public Guid? UserId { get; set; }
-
-    [StringLength(20, ErrorMessage = "Code cannot be longer than 20 characters.")]
-    [Display(Name = "Employee Code")]
-    [Comment("The unique code for the employee.")]
-    [RegularExpression(@"^[A-Z0-9]+$", ErrorMessage = "Code must consist of uppercase letters and numbers only.")]
-    public string? EmployeeCode { get; set; }
+    [StringLength(100, ErrorMessage = "Employee name cannot be longer than 100 characters.")]
+    [Display(Name = "Employee Name")]
+    [Comment("The full name of the employee providing the feedback.")]
+    public string? EmployeeName { get; set; }
 
     [Required(ErrorMessage = "Message is required.")]
     [StringLength(4000, ErrorMessage = "Message cannot be longer than 4000 characters.")]
@@ -38,6 +31,4 @@ public class Feedback
     [Display(Name = "Handled At")]
     [Comment("The date and time when the feedback was handled.")]
     public DateTime? HandledAt { get; set; }
-
-    public ApplicationUser? User { get; set; }
 }
