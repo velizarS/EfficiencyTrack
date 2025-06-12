@@ -9,8 +9,6 @@ namespace EfficiencyTrack.Data.Identity
     {
         public ApplicationUser()
         {
-            Id = Guid.NewGuid();
-
             Roles = new HashSet<IdentityUserRole<Guid>>();
             Claims = new HashSet<IdentityUserClaim<Guid>>();
             Logins = new HashSet<IdentityUserLogin<Guid>>();
@@ -21,11 +19,9 @@ namespace EfficiencyTrack.Data.Identity
         public DateTime? ModifiedOn { get; set; }
 
         public virtual ICollection<IdentityUserRole<Guid>> Roles { get; set; }
-
         public virtual ICollection<IdentityUserClaim<Guid>> Claims { get; set; }
-
         public virtual ICollection<IdentityUserLogin<Guid>> Logins { get; set; }
 
-        public ICollection<Employee> Employees { get; set; }
+        public virtual ICollection<Employee> Employees { get; set; }
     }
 }

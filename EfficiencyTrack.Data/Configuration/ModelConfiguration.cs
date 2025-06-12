@@ -34,6 +34,7 @@ namespace EfficiencyTrack.Data
                 .IsUnique()
                 .HasDatabaseName("IX_DailyEfficiency_Date_Employee");
 
+
             modelBuilder.Entity<Shift>()
                 .HasMany(s => s.Entries)
                 .WithOne(e => e.Shift)
@@ -55,11 +56,28 @@ namespace EfficiencyTrack.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ApplicationUser>()
-       .HasMany(e => e.Claims)
-       .WithOne()
-       .HasForeignKey(c => c.UserId)
-       .IsRequired();
+                .HasMany(u => u.Employees)
+                .WithOne(e => e.ApplicationUser)
+                .HasForeignKey(e => e.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Claims)
+                .WithOne()
+                .HasForeignKey(c => c.UserId)
+                .IsRequired();
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Roles)
+                .WithOne()
+                .HasForeignKey(r => r.UserId)
+                .IsRequired();
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Logins)
+                .WithOne()
+                .HasForeignKey(l => l.UserId)
+                .IsRequired();
 
         }
     }
