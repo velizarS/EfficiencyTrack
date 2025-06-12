@@ -6,8 +6,7 @@ namespace EfficiencyTrack.Services.Interfaces
     {
         Task<List<Employee>> GetAllActiveAsync();
         Task<List<Employee>> GetByDepartmentAsync(Guid departmentId);
-        Task<List<Employee>> GetByLeaderIdAsync(Guid leaderId);
-        Task<Employee?> GetByApplicationUserIdAsync(Guid userId);
+        Task<List<Employee>> GetByShiftManagerUserIdAsync(Guid leaderId);
         Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null);
         Task DeactivateAsync(Guid employeeId);
     }

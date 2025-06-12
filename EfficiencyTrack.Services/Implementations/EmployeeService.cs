@@ -34,17 +34,11 @@ namespace EfficiencyTrack.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Employee>> GetByLeaderIdAsync(Guid leaderId)
+        public async Task<List<Employee>> GetByShiftManagerUserIdAsync(Guid leaderId)
         {
             return await _context.Employees.AsNoTracking()
-                .Where(e => e.LeaderId == leaderId && e.IsActive)
+                .Where(e => e.ShiftManagerUserId == leaderId && e.IsActive)
                 .ToListAsync();
-        }
-
-        public async Task<Employee?> GetByApplicationUserIdAsync(Guid userId)
-        {
-            return await _context.Employees.AsNoTracking()
-                .FirstOrDefaultAsync(e => e.ApplicationUserId == userId);
         }
 
         public async Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null)
@@ -59,15 +53,6 @@ namespace EfficiencyTrack.Services
             if (employee == null) return;
 
             employee.IsActive = false;
-
-            var teamMembers = await _context.Employees
-                .Where(e => e.LeaderId == employeeId)
-                .ToListAsync();
-
-            foreach (var member in teamMembers)
-            {
-                member.LeaderId = null;
-            }
 
             await _context.SaveChangesAsync();
         }
