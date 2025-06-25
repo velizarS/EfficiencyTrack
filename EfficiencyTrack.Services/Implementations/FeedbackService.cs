@@ -1,4 +1,5 @@
 ﻿using EfficiencyTrack.Data.Data;
+using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
