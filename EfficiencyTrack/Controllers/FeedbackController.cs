@@ -80,7 +80,6 @@ namespace EfficiencyTrack.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-      
         public async Task<IActionResult> Delete(Guid id)
         {
             var feedback = await _service.GetFeedbackByIdAsync(id);
