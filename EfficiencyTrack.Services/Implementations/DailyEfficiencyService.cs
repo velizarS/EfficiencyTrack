@@ -1,32 +1,44 @@
 ﻿using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Models;
-using EfficiencyTrack.Services.DTOs.EfficiencyTrack.Services.DTOs;
 using EfficiencyTrack.Services.DTOs;
+using EfficiencyTrack.Services.DTOs.EfficiencyTrack.Services.DTOs;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfficiencyTrack.Services.Implementations
 {
-    public class DailyEfficiencyService : CrudService<DailyEfficiency>, IDailyEfficiencyService
+    public class DailyEfficiencyService : IDailyEfficiencyService
     {
         private readonly EfficiencyTrackDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DailyEfficiencyService(
             EfficiencyTrackDbContext context,
             IHttpContextAccessor httpContextAccessor)
-            : base(context, httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<DailyEfficiencyDto?> GetDailyEfficiencyDtoAsync(Guid employeeId, DateTime date)
+        public async Task<IEnumerable<DailyEfficiency>> GetAllAsync()
         {
-            var dailyEfficiency = await _context.DailyEfficiencies
+            return await _context.DailyEfficiencies
                 .AsNoTracking()
+                .Where(e => !e.IsDeleted)
+                .OrderByDescending(e => e.Date)
+                .ToListAsync();
+        }
+
+        public async Task<DailyEfficiencyDto?> GetByIdAsync(Guid id)
+        {
+            if (id == Guid.Empty)
+                throw new ArgumentException("Invalid ID provided.", nameof(id));
+
+            var dailyEfficiency = await _context.DailyEfficiencies
                 .Include(de => de.Employee)
                 .Include(de => de.Shift)
-                .FirstOrDefaultAsync(de => de.EmployeeId == employeeId && de.Date.Date == date.Date && !de.IsDeleted);
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
             if (dailyEfficiency == null)
                 return null;
@@ -34,7 +46,7 @@ namespace EfficiencyTrack.Services.Implementations
             var entries = await _context.Entries
                 .AsNoTracking()
                 .Include(e => e.Routing)
-                .Where(e => e.EmployeeId == employeeId && e.Date.Date == date.Date && !e.IsDeleted)
+                .Where(e => e.EmployeeId == dailyEfficiency.EmployeeId && e.Date.Date == dailyEfficiency.Date.Date && !e.IsDeleted)
                 .ToListAsync();
 
             return new DailyEfficiencyDto
@@ -52,28 +64,31 @@ namespace EfficiencyTrack.Services.Implementations
                     EmployeeId = e.EmployeeId,
                     RoutingId = e.RoutingId,
                     RoutingName = e.Routing?.Code,
-                    EfficiencyForOperation = e.RequiredMinutes
+                    EfficiencyForOperation = (decimal)e.EfficiencyForOperation
                 }).ToList()
             };
         }
 
-
-        public async Task<decimal> CalculateDailyEfficiencyAsync(Guid employeeId, DateTime date)
+        public async Task UpdateDailyEfficiencyAsync(Guid employeeId, DateTime date)
         {
-            var entriesOfDay = await _context.Entries
-                .AsNoTracking()
-                .Where(e => e.EmployeeId == employeeId
-                         && e.Date.Date == date.Date
-                         && !e.IsDeleted)
+            var entriesOfDay = await _context.Entries.AsNoTracking()
+                .Where(e => e.EmployeeId == employeeId && e.Date.Date == date.Date && !e.IsDeleted)
                 .ToListAsync();
 
             if (!entriesOfDay.Any())
             {
-                return 0m;
+                var existing = await _context.DailyEfficiencies
+                    .FirstOrDefaultAsync(de => de.EmployeeId == employeeId && de.Date.Date == date.Date);
+
+                if (existing != null)
+                {
+                    _context.DailyEfficiencies.Remove(existing);
+                    await _context.SaveChangesAsync();
+                }
+                return;
             }
 
-            decimal totalNeededMinutes = entriesOfDay
-                .Sum(e => e.RequiredMinutes);
+            decimal totalNeededMinutes = (decimal)entriesOfDay.Sum(e => e.RequiredMinutes);
 
             var shiftId = entriesOfDay.First().ShiftId;
 
@@ -84,13 +99,35 @@ namespace EfficiencyTrack.Services.Implementations
                 .FirstOrDefaultAsync();
 
             if (shiftDuration == 0)
-            {
-                return 0m;
-            }
+                shiftDuration = 1;
 
             decimal efficiencyPercent = (totalNeededMinutes / shiftDuration) * 100;
 
-            return efficiencyPercent;
+            var dailyEfficiency = await _context.DailyEfficiencies.AsNoTracking()
+                .FirstOrDefaultAsync(de => de.EmployeeId == employeeId && de.Date.Date == date.Date);
+
+            if (dailyEfficiency == null)
+            {
+                dailyEfficiency = new DailyEfficiency
+                {
+                    Id = Guid.NewGuid(),
+                    EmployeeId = employeeId,
+                    Date = date.Date,
+                    ShiftId = shiftId,
+                    EfficiencyPercentage = efficiencyPercent,
+                    ComputedOn = DateTime.UtcNow
+                };
+                _context.DailyEfficiencies.Add(dailyEfficiency);
+            }
+            else
+            {
+                dailyEfficiency.EfficiencyPercentage = efficiencyPercent;
+                dailyEfficiency.ComputedOn = DateTime.UtcNow;
+                dailyEfficiency.ShiftId = shiftId;
+                _context.DailyEfficiencies.Update(dailyEfficiency);
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
