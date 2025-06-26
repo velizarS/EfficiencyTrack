@@ -17,6 +17,9 @@ namespace EfficiencyTrack.ViewModels.EntryViewModel
         [Display(Name = "Операция (Routing)")]
         public Guid RoutingId { get; set; }
 
+        [Display(Name = "Код на операцията")]
+        public string? RoutingName { get; set; }  // ← добавено
+
         [Display(Name = "Произведени бройки")]
         public int Pieces { get; set; }
 
