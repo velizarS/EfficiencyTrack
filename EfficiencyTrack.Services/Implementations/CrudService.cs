@@ -26,7 +26,7 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
                          .AsNoTracking()
                          .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
-    public async Task AddAsync(T entity)
+    public virtual async Task AddAsync(T entity)
     {
         entity.CreatedOn = DateTime.UtcNow;
         entity.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
@@ -35,7 +35,7 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(T entity)
+    public virtual async Task UpdateAsync(T entity)
     {
         entity.ModifiedOn = DateTime.UtcNow;
         entity.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
@@ -44,7 +44,7 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public virtual async Task DeleteAsync(Guid id)
     {
         var entity = await _context.Set<T>().FindAsync(id);
         if (entity != null)
