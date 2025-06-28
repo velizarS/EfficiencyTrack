@@ -2,6 +2,7 @@
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.Routing;
 using EfficiencyTrack.Web.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class RoutingController : BaseCrudController<
@@ -101,4 +102,37 @@ public class RoutingController : BaseCrudController<
                 break;
         }
     }
+
+    public override async Task<IActionResult> Create()
+    {
+        var model = new RoutingCreateViewModel();
+        await PrepareDropdownsAsync(model);
+        return View(model);
+    }
+
+    protected override List<RoutingViewModel> FilterAndSort(List<RoutingViewModel> items, string? searchTerm, string? sortBy, bool sortAsc)
+    {
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            items = items
+                .Where(x => x.Code.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        items = sortBy switch
+        {
+            "code" => sortAsc
+                ? items.OrderBy(x => x.Code).ToList()
+                : items.OrderByDescending(x => x.Code).ToList(),
+
+            "minutes" => sortAsc
+                ? items.OrderBy(x => x.MinutesPerPiece).ToList()
+                : items.OrderByDescending(x => x.MinutesPerPiece).ToList(),
+
+            _ => items
+        };
+
+        return items;
+    }
+
 }

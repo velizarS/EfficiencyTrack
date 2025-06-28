@@ -1,0 +1,35 @@
+﻿@model EfficiencyTrack.ViewModels.Routing.RoutingDetailViewModel
+
+@{
+    ViewData["Title"] = "Детайли за роутинг";
+}
+
+<main class="container mt-4">
+    <header class="mb-4">
+        <h1>@ViewData["Title"]</h1>
+    </header>
+
+    <section aria-labelledby="routing-details">
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Code)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Code)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Zone)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Zone)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MinutesPerPiece)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.MinutesPerPiece)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DepartmentName)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.DepartmentName)</dd>
+        </dl>
+    </section>
+
+    <footer class="mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
+        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    </footer>
+</main>

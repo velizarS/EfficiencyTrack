@@ -1,0 +1,41 @@
+﻿@model EfficiencyTrack.ViewModels.Routing.RoutingDetailViewModel
+
+@{
+    ViewData["Title"] = "Потвърди изтриване";
+}
+
+<main class="container mt-5">
+    <header class="mb-4">
+        <h1 class="text-danger">Потвърди изтриване</h1>
+        <p class="lead">Сигурни ли сте, че искате да изтриете този роутинг?</p>
+    </header>
+
+    <section aria-labelledby="routing-info">
+        <dl class="row">
+            <dt class="col-sm-3">Код</dt>
+            <dd class="col-sm-9">@Model.Code</dd>
+
+            <dt class="col-sm-3">Описание</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+
+            <dt class="col-sm-3">Зона</dt>
+            <dd class="col-sm-9">@Model.Zone</dd>
+
+            <dt class="col-sm-3">Време за бройка</dt>
+            <dd class="col-sm-9">@Model.MinutesPerPiece мин.</dd>
+
+            <dt class="col-sm-3">Отдел</dt>
+            <dd class="col-sm-9">@Model.DepartmentName</dd>
+        </dl>
+    </section>
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        @Html.AntiForgeryToken()
+
+        <footer class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-danger">Изтрий</button>
+            <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        </footer>
+    </form>
+</main>

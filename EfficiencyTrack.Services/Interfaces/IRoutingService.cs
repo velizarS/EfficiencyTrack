@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Interfaces
 {
-    public interface IDepartmentService : ICrudService<Department>
+    public interface IRoutingService : ICrudService<Routing>
     {
-        Task<Department?> GetDepartmentWithEmployeesAsync(Guid id);
-        
+        Task<Routing> GetRoutingByCodeAsync(string routingCode);
 
     }
-
 }
