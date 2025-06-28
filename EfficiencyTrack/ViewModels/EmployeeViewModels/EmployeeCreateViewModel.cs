@@ -13,23 +13,20 @@ namespace EfficiencyTrack.ViewModels.Employee
 
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^[\p{L}\s\-']+$", ErrorMessage = "Name must consist of letters, spaces, hyphens or apostrophes.")]
+        [RegularExpression(@"^[a-zA-Z\d\s\-']+$", ErrorMessage = "Името може да съдържа само букви, цифри, интервали, тирета и апострофи.")]
         [Display(Name = "Име")]
         public string FirstName { get; set; } = null!;
 
         [StringLength(100)]
-        [RegularExpression(@"^[\p{L}\s\-']+$", ErrorMessage = "Name must consist of letters, spaces, hyphens or apostrophes.")]
+        [RegularExpression(@"^[a-zA-Z\d\s\-']+$", ErrorMessage = "Името може да съдържа само букви, цифри, интервали, тирета и апострофи.")]
         [Display(Name = "Презиме")]
         public string? MiddleName { get; set; }
 
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^[\p{L}\s\-']+$", ErrorMessage = "Name must consist of letters, spaces, hyphens or apostrophes.")]
+        [RegularExpression(@"^[a-zA-Z\d\s\-']+$", ErrorMessage = "Името може да съдържа само букви, цифри, интервали, тирета и апострофи.")]
         [Display(Name = "Фамилия")]
         public string LastName { get; set; } = null!;
-
-        [Display(Name = "Активен")]
-        public bool IsActive { get; set; } = true;
 
         [Display(Name = "Началник смяна")]
         public Guid? ShiftManagerUserId { get; set; }

@@ -1,0 +1,32 @@
+﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeDetailViewModel
+
+@{
+    ViewData["Title"] = "Детайли за служител";
+}
+
+<main class="container mt-4">
+    <h1>Детайли за служител</h1>
+
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Code)</dt>
+        <dd class="col-sm-9">@Model.Code</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.FirstName)</dt>
+        <dd class="col-sm-9">@Model.FirstName</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.MiddleName)</dt>
+        <dd class="col-sm-9">@Model.MiddleName ?? "-" </dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.LastName)</dt>
+        <dd class="col-sm-9">@Model.LastName</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.DepartmentName)</dt>
+        <dd class="col-sm-9">@Model.DepartmentName</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ShiftManagerUserName)</dt>
+        <dd class="col-sm-9">@Model.ShiftManagerUserName ?? "-" </dd>
+    </dl>
+
+    <a asp-action="Index" class="btn btn-secondary">Обратно към списъка</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редактирай</a>
+</main>

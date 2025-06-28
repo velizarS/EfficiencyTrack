@@ -1,0 +1,56 @@
+﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeEditViewModel
+
+@{
+    ViewData["Title"] = "Редактиране на служител";
+}
+
+<main class="container mt-4">
+    <h1>Редактиране на служител</h1>
+
+    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Code" class="form-label"></label>
+            <input asp-for="Code" class="form-control" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MiddleName" class="form-label"></label>
+            <input asp-for="MiddleName" class="form-control" />
+            <span asp-validation-for="MiddleName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DepartmentId" class="form-label"></label>
+            <select asp-for="DepartmentId" asp-items="ViewBag.Departments" class="form-select"></select>
+            <span asp-validation-for="DepartmentId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ShiftManagerUserId" class="form-label"></label>
+            <select asp-for="ShiftManagerUserId" asp-items="ViewBag.ShiftManagers" class="form-select"></select>
+            <span asp-validation-for="ShiftManagerUserId" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Запази</button>
+        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

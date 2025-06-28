@@ -5,6 +5,8 @@ namespace EfficiencyTrack.ViewModels.Employee
 {
     public class EmployeeViewModel
     {
+        public Guid Id { get; set; }
+
         [Display(Name = "Код на служител")]
         public string Code { get; set; } = null!;
 
@@ -14,7 +16,9 @@ namespace EfficiencyTrack.ViewModels.Employee
         [Display(Name = "Отдел")]
         public string DepartmentName { get; set; } = null!;
 
-        [Display(Name = "Активен")]
-        public bool IsActive { get; set; }
+        [Display(Name = "Ръководител")]
+        public string ShiftLeader { get; set; } = null!;
+
+        
     }
 }

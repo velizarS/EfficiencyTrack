@@ -36,10 +36,6 @@ namespace EfficiencyTrack.Data.Models
         [RegularExpression(@"^[\p{L}\s\-']+$", ErrorMessage = "Name must consist of letters, spaces, hyphens or apostrophes.")]
         public string LastName { get; set; } = null!;
 
-        [Display(Name = "Is Active")]
-        [Comment("Indicates if the employee is currently active.")]
-        public bool IsActive { get; set; } = true;
-
         [Display(Name = "Shift Manager")]
         [Comment("Reference to the employee's shift manager (ApplicationUser).")]
         public Guid? ShiftManagerUserId { get; set; }

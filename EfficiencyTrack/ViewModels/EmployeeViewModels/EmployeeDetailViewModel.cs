@@ -18,9 +18,6 @@ namespace EfficiencyTrack.ViewModels.Employee
         [Display(Name = "Фамилия")]
         public string LastName { get; set; } = null!;
 
-        [Display(Name = "Активен")]
-        public bool IsActive { get; set; }
-
         public Guid? ShiftManagerUserId { get; set; }
 
         [Display(Name = "Началник смяна")]

@@ -1,0 +1,26 @@
+﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeViewModel
+
+@{
+    ViewData["Title"] = "Изтриване на служител";
+}
+
+<main class="container">
+    <h2>Сигурен ли си, че искаш да изтриеш този служител?</h2>
+
+    <dl class="row">
+        <dt class="col-sm-2">Код</dt>
+        <dd class="col-sm-10">@Model.Code</dd>
+
+        <dt class="col-sm-2">Име</dt>
+        <dd class="col-sm-10">@Model.FullName</dd>
+
+        <dt class="col-sm-2">Отдел</dt>
+        <dd class="col-sm-10">@Model.DepartmentName</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Изтрий</button>
+        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+    </form>
+</main>

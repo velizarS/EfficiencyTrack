@@ -1,0 +1,96 @@
+﻿@model EfficiencyTrack.ViewModels.EmployeeViewModels.EmployeeListViewModel
+
+@{
+    ViewData["Title"] = "Служители";
+
+    var searchTerm = ViewBag.SearchTerm as string;
+    var sortBy = ViewBag.SortBy as string;
+    var sortAsc = (bool)(ViewBag.SortAsc ?? true);
+
+    string GetSortIcon(string field) => sortBy == field
+        ? (sortAsc ? "↑" : "↓")
+        : "";
+}
+
+<main class="container mt-4">
+    <h1>Служители</h1>
+
+    <section aria-label="Търсене">
+        <form asp-action="Index" method="get" class="mb-3" role="search">
+            <div class="form-group d-flex gap-2">
+                <input type="text" name="searchTerm" value="@searchTerm" class="form-control"
+                       placeholder="Търси по код..." aria-label="Търси по код" />
+                <button type="submit" class="btn btn-primary">Търси</button>
+                <a asp-action="Index" class="btn btn-secondary">Изчисти</a>
+            </div>
+        </form>
+    </section>
+
+    <nav aria-label="Създаване">
+        <a asp-action="Create" class="btn btn-success mb-3">+ Нов служител</a>
+    </nav>
+
+    <section aria-label="Списък със служители">
+        <table class="table table-bordered table-striped">
+            <caption>Списък със служители</caption>
+            <thead>
+                <tr>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="code"
+                           asp-route-sortAsc="@(sortBy == "code" ? !sortAsc : true)">
+                            Код @GetSortIcon("code")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="fullName"
+                           asp-route-sortAsc="@(sortBy == "fullName" ? !sortAsc : true)">
+                            Име @GetSortIcon("fullName")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="department"
+                           asp-route-sortAsc="@(sortBy == "department" ? !sortAsc : true)">
+                            Отдел @GetSortIcon("department")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="shiftManager"
+                           asp-route-sortAsc="@(sortBy == "shiftManager" ? !sortAsc : true)">
+                            Началник смяна @GetSortIcon("shiftManager")
+                        </a>
+                    </th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Employees.Any())
+                {
+                    foreach (var emp in Model.Employees)
+                    {
+                        <tr>
+                            <td>@emp.Code</td>
+                            <td>@emp.FullName</td>
+                            <td>@emp.DepartmentName</td>
+                            <td>@emp.ShiftLeader</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@emp.Id" class="btn btn-sm btn-info">Детайли</a>
+                                <a asp-action="Edit" asp-route-id="@emp.Id" class="btn btn-sm btn-warning">Редактирай</a>
+                                <a asp-action="Delete" asp-route-id="@emp.Id" class="btn btn-sm btn-danger">Изтрий</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">Няма намерени служители.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+</main>
