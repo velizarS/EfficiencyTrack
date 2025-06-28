@@ -1,0 +1,58 @@
+﻿@model EfficiencyTrack.ViewModels.EntryViewModel.EntryEditViewModel
+
+@{
+    ViewData["Title"] = "Редакция на запис";
+}
+
+<main class="container">
+    <header>
+        <h1>Редакция на запис</h1>
+    </header>
+
+    <form asp-action="Edit" method="post" class="needs-validation">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="EmployeeId" class="form-label"></label>
+            <select asp-for="EmployeeId" asp-items="ViewBag.Employees" class="form-select"></select>
+            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RoutingId" class="form-label"></label>
+            <select asp-for="RoutingId" asp-items="ViewBag.Routings" class="form-select"></select>
+            <span asp-validation-for="RoutingId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ShiftId" class="form-label"></label>
+            <select asp-for="ShiftId" asp-items="ViewBag.Shifts" class="form-select"></select>
+            <span asp-validation-for="ShiftId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Pieces" class="form-label"></label>
+            <input asp-for="Pieces" class="form-control" />
+            <span asp-validation-for="Pieces" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Scrap" class="form-label"></label>
+            <input asp-for="Scrap" class="form-control" />
+            <span asp-validation-for="Scrap" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="WorkedMinutes" class="form-label"></label>
+            <input asp-for="WorkedMinutes" class="form-control" />
+            <span asp-validation-for="WorkedMinutes" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Запази промените</button>
+        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

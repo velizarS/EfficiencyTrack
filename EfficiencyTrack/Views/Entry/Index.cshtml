@@ -1,0 +1,90 @@
+﻿@model EfficiencyTrack.ViewModels.EntryViewModel.EntryListViewModel
+
+@{
+    ViewData["Title"] = "Записи за ефективност";
+    var searchTerm = ViewBag.SearchTerm as string;
+    var sortBy = ViewBag.SortBy as string;
+    var sortAsc = (bool)(ViewBag.SortAsc ?? true);
+
+    string GetSortIcon(string field) => sortBy == field
+        ? (sortAsc ? "↑" : "↓")
+        : "";
+}
+
+<main class="container">
+    <header>
+        <h1>Списък с работни записи</h1>
+    </header>
+
+    <section aria-label="Търсене">
+        <form asp-action="Index" method="get" class="mb-3" role="search">
+            <div class="form-group d-flex gap-2">
+                <input type="text" name="searchTerm" value="@searchTerm" class="form-control"
+                       placeholder="Търси по код на служител..." aria-label="Търси по код" />
+                <button type="submit" class="btn btn-primary">Търси</button>
+                <a asp-action="Index" class="btn btn-secondary">Изчисти</a>
+            </div>
+        </form>
+    </section>
+
+    <nav aria-label="Създаване">
+        <a asp-action="Create" class="btn btn-success mb-3">+ Нов запис</a>
+    </nav>
+
+    <section aria-label="Списък с работни записи">
+        <table class="table table-bordered table-striped">
+            <caption>Списък с работни записи</caption>
+            <thead>
+                <tr>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="date"
+                           asp-route-sortAsc="@(sortBy == "date" ? !sortAsc : true)">
+                            Дата @GetSortIcon("date")
+                        </a>
+                    </th>
+                    <th>Код</th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="employeeName"
+                           asp-route-sortAsc="@(sortBy == "employeeName" ? !sortAsc : true)">
+                            Служител @GetSortIcon("employeeName")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="routingName"
+                           asp-route-sortAsc="@(sortBy == "routingName" ? !sortAsc : true)">
+                            Рутинг @GetSortIcon("routingName")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="efficiency"
+                           asp-route-sortAsc="@(sortBy == "efficiency" ? !sortAsc : true)">
+                            Ефективност (%) @GetSortIcon("efficiency")
+                        </a>
+                    </th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model.Entries)
+                {
+                    <tr>
+                        <td>@entry.Date.ToString("dd.MM.yyyy")</td>
+                        <td>@entry.EmployeeCode</td>
+                        <td>@entry.EmployeeName</td>
+                        <td>@entry.RoutingName</td>
+                        <td>@entry.EfficiencyForOperation</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@entry.Id" class="btn btn-sm btn-info">Детайли</a>
+                            <a asp-action="Edit" asp-route-id="@entry.Id" class="btn btn-sm btn-warning">Редакция</a>
+                            <a asp-action="Delete" asp-route-id="@entry.Id" class="btn btn-sm btn-danger">Изтриване</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+</main>

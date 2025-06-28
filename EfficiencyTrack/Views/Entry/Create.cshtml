@@ -1,0 +1,56 @@
+﻿@model EfficiencyTrack.ViewModels.EntryViewModel.EntryCreateViewModel
+
+@{
+    ViewData["Title"] = "Нов запис";
+}
+
+<main class="container">
+    <header>
+        <h1>Създай нов запис</h1>
+    </header>
+
+    <form asp-action="Create" method="post" class="needs-validation">
+        <div class="mb-3">
+            <label asp-for="EmployeeCode" class="form-label"></label>
+            <input asp-for="EmployeeCode" class="form-control" />
+            <span asp-validation-for="EmployeeCode" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RoutingCode" class="form-label"></label>
+            <input asp-for="RoutingCode" class="form-control" />
+            <span asp-validation-for="RoutingCode" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ShiftId" class="form-label"></label>
+            <select asp-for="ShiftId" asp-items="ViewBag.Shifts" class="form-select"></select>
+            <span asp-validation-for="ShiftId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Pieces" class="form-label"></label>
+            <input asp-for="Pieces" class="form-control" />
+            <span asp-validation-for="Pieces" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Scrap" class="form-label"></label>
+            <input asp-for="Scrap" class="form-control" value="0" />
+            <span asp-validation-for="Scrap" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="WorkedMinutes" class="form-label"></label>
+            <input asp-for="WorkedMinutes" class="form-control" />
+            <span asp-validation-for="WorkedMinutes" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Запази</button>
+        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

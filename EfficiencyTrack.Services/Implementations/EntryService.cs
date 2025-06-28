@@ -3,6 +3,9 @@ using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -16,7 +19,22 @@ namespace EfficiencyTrack.Services.Implementations
         {
             _dailyEfficiencyService = dailyEfficiencyService;
             _context = context ?? throw new ArgumentNullException(nameof(context));
+        }
 
+        public async Task<List<Entry>> GetAllWithIncludesAsync()
+        {
+            return await _context.Entries
+                .Include(e => e.Employee)
+                .Include(e => e.Routing)
+                .ToListAsync();
+        }
+
+        public async Task<Entry?> GetByIdWithIncludesAsync(Guid id)
+        {
+            return await _context.Entries
+                .Include(e => e.Employee)
+                .Include(e => e.Routing)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public override async Task AddAsync(Entry entity)
@@ -69,6 +87,5 @@ namespace EfficiencyTrack.Services.Implementations
         {
             await SetEfficiencyAsync(entry);
         }
-
     }
 }
