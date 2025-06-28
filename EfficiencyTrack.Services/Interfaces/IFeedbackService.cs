@@ -15,7 +15,7 @@ namespace EfficiencyTrack.Services.Interfaces
 
         Task<Feedback?> GetFeedbackByIdAsync(Guid id);
 
-        Task<Feedback?> MarkAsHandledAsync(Guid id);
+        Task<Feedback?> ToggleHandledAsync(Guid id);
 
         Task<bool> DeleteFeedbackAsync(Guid id);
     }

@@ -1,0 +1,39 @@
+﻿@model EfficiencyTrack.ViewModels.FeedbackViewModels.FeedbackDetailViewModel
+
+@{
+    ViewData["Title"] = "Потвърждение за изтриване";
+}
+
+<main class="container">
+    <h1>Изтриване на обратна връзка</h1>
+
+    <p class="text-danger mt-4">
+        Сигурни ли сте, че искате да изтриете тази обратна връзка? Това действие не може да бъде отменено.
+    </p>
+
+    <dl class="row mt-3">
+        <dt class="col-sm-3">Име на служител</dt>
+        <dd class="col-sm-9">@Model.EmployeeName</dd>
+
+        <dt class="col-sm-3">Съобщение</dt>
+        <dd class="col-sm-9">@Model.Message</dd>
+
+        <dt class="col-sm-3">Дата на създаване</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+
+        <dt class="col-sm-3">Обработено</dt>
+        <dd class="col-sm-9">@((Model.IsHandled) ? "Да" : "Не")</dd>
+
+        @if (Model.IsHandled && Model.HandledAt.HasValue)
+        {
+            <dt class="col-sm-3">Дата на обработка</dt>
+            <dd class="col-sm-9">@Model.HandledAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
+        }
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Изтрий</button>
+        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+    </form>
+</main>

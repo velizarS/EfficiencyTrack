@@ -1,0 +1,34 @@
+﻿@model EfficiencyTrack.ViewModels.FeedbackViewModels.FeedbackCreateViewModel
+
+@{
+    ViewData["Title"] = "Нова обратна връзка";
+}
+
+<main class="container">
+    <h1>Нова обратна връзка</h1>
+
+    <form asp-action="Create" method="post" class="mt-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="EmployeeName" class="form-label"></label>
+            <input asp-for="EmployeeName" class="form-control" />
+            <span asp-validation-for="EmployeeName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Message" class="form-label"></label>
+            <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Message" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">Изпрати</button>
+            <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        </div>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

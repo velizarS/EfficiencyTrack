@@ -52,21 +52,27 @@ namespace EfficiencyTrack.Services.Implementations
                 .FirstOrDefaultAsync(f => f.Id == id);
         }
 
-        public async Task<Feedback?> MarkAsHandledAsync(Guid id)
+        public async Task<Feedback?> ToggleHandledAsync(Guid id)
         {
             var feedback = await _context.Feedbacks.FirstOrDefaultAsync(f => f.Id == id);
             if (feedback == null)
                 return null;
 
-            if (!feedback.IsHandled) 
+            feedback.IsHandled = !feedback.IsHandled;
+
+            if (feedback.IsHandled)
             {
-                feedback.IsHandled = true;
                 feedback.HandledAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                feedback.HandledAt = null;
             }
 
+            await _context.SaveChangesAsync();
             return feedback;
         }
+
 
         public async Task<bool> DeleteFeedbackAsync(Guid id)
         {

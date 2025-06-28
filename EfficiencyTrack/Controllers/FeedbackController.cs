@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EfficiencyTrack.Data.Models;
@@ -18,21 +17,60 @@ namespace EfficiencyTrack.Web.Controllers
             _service = service;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
         {
             var feedbacks = await _service.GetAllFeedbacksAsync();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                feedbacks = feedbacks.Where(f => f.EmployeeName != null && f.EmployeeName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            feedbacks = sortBy switch
+            {
+                "name" => sortAsc
+                    ? feedbacks.OrderBy(f => f.EmployeeName)
+                    : feedbacks.OrderByDescending(f => f.EmployeeName),
+                "date" => sortAsc
+                    ? feedbacks.OrderBy(f => f.CreatedAt)
+                    : feedbacks.OrderByDescending(f => f.CreatedAt),
+                "handled" => sortAsc
+                    ? feedbacks.OrderBy(f => f.IsHandled) 
+                    : feedbacks.OrderByDescending(f => f.IsHandled),
+                _ => feedbacks.OrderByDescending(f => f.CreatedAt),
+            };
 
             var viewModel = new FeedbackListViewModel
             {
                 Feedbacks = feedbacks.Select(f => new FeedbackViewModel
                 {
+                    Id = f.Id,
                     EmployeeName = f.EmployeeName,
                     CreatedAt = f.CreatedAt,
-                    Message = f.Message
+                    Message = f.Message,
+                    IsHandled = f.IsHandled
                 }).ToList()
             };
 
+            ViewBag.SearchTerm = searchTerm;
+            ViewBag.SortBy = sortBy;
+            ViewBag.SortAsc = sortAsc;
+
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleHandled(Guid id)
+        {
+            var updated = await _service.ToggleHandledAsync(id);
+            if (updated == null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+
         }
 
         public async Task<IActionResult> Details(Guid id)
