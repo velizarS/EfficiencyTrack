@@ -1,0 +1,27 @@
+﻿@model EfficiencyTrack.ViewModels.Shift.ShiftDetailViewModel
+
+@{
+    ViewData["Title"] = "Детайли за смяна";
+}
+
+<main class="max-w-xl mx-auto px-4 py-8">
+    <section aria-labelledby="details-heading" class="bg-white shadow-md rounded-xl p-6 border border-gray-200">
+        <h1 id="details-heading" class="text-2xl font-semibold text-gray-800 mb-6">Детайли за смяна</h1>
+
+        <dl class="space-y-4">
+            <div>
+                <dt class="text-sm font-medium text-gray-600">@Html.DisplayNameFor(m => m.Name)</dt>
+                <dd class="mt-1 text-lg text-gray-900">@Model.Name</dd>
+            </div>
+
+            <div>
+                <dt class="text-sm font-medium text-gray-600">@Html.DisplayNameFor(m => m.DurationMinutes)</dt>
+                <dd class="mt-1 text-lg text-gray-900">@Model.DurationMinutes</dd>
+            </div>
+        </dl>
+
+        <div class="mt-6">
+            <a asp-action="Index" class="inline-block text-indigo-600 hover:underline">Назад към списъка</a>
+        </div>
+    </section>
+</main>

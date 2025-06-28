@@ -1,0 +1,15 @@
+﻿@model EfficiencyTrack.ViewModels.Shift.ShiftDetailViewModel
+
+<h2>Потвърждение за изтриване</h2>
+
+<div>
+    <h3>@Model.Name</h3>
+    <p>Продължителност: @Model.DurationMinutes минути</p>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Изтрий</button>
+    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+</form>

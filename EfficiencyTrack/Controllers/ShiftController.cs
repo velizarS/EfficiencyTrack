@@ -2,6 +2,10 @@
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.Shift;
 using EfficiencyTrack.Web.Controllers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 public class ShiftController : BaseCrudController<
     Shift,
@@ -28,7 +32,7 @@ public class ShiftController : BaseCrudController<
             Id = entity.Id,
             Name = entity.Name,
             DurationMinutes = entity.DurationMinutes
-        };                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+        };
 
     protected override Shift MapToEntity(ShiftCreateViewModel model)
         => new()
@@ -58,4 +62,24 @@ public class ShiftController : BaseCrudController<
         {
             Shifts = items
         };
+
+    protected override List<ShiftViewModel> FilterAndSort(List<ShiftViewModel> items, string? searchTerm, string? sortBy, bool sortAsc)
+    {
+        IEnumerable<ShiftViewModel> query = items;
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(x => x.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+        }
+
+        query = sortBy switch
+        {
+            "name" => sortAsc ? query.OrderBy(x => x.Name) : query.OrderByDescending(x => x.Name),
+            "duration" => sortAsc ? query.OrderBy(x => x.DurationMinutes) : query.OrderByDescending(x => x.DurationMinutes),
+            _ => query
+        };
+
+        return query.ToList();
+    }
+
 }
