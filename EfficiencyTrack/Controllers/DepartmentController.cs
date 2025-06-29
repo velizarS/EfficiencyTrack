@@ -3,6 +3,7 @@ using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.Department;
 using EfficiencyTrack.ViewModels.DepartmentViewModels;
 using EfficiencyTrack.ViewModels.DepartmentViewModels.EfficiencyTrack.ViewModels.Department;
+using EfficiencyTrack.ViewModels.Routing;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EfficiencyTrack.Web.Controllers;
@@ -81,4 +82,28 @@ public class DepartmentController : BaseCrudController<
         {
             Departments = items
         };
+
+
+    protected override List<DepartmentViewModel> FilterAndSort(List<DepartmentViewModel> items, string? searchTerm, string? sortBy, bool sortAsc)
+    {
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            items = items
+                .Where(x => x.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        items = sortBy switch
+        {
+            "name" => sortAsc
+                ? items.OrderBy(x => x.Name).ToList()
+                : items.OrderByDescending(x => x.Name).ToList(),
+
+
+            _ => items
+        };
+
+        return items;
+    }
+
 }

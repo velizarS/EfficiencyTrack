@@ -1,0 +1,46 @@
+﻿@model EfficiencyTrack.ViewModels.Department.DepartmentDetailViewModel
+
+@{
+    ViewData["Title"] = "Потвърди изтриване";
+}
+
+<main class="container mt-5">
+    <header class="mb-4">
+        <h1 class="text-danger">Потвърди изтриване</h1>
+        <p class="lead">Сигурни ли сте, че искате да изтриете този отдел?</p>
+    </header>
+
+    <section aria-labelledby="department-info">
+        <dl class="row">
+            <dt class="col-sm-3">Име на отдел</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
+
+            <dt class="col-sm-3">Служители</dt>
+            <dd class="col-sm-9">
+                @if (Model.EmployeeNames.Any())
+                {
+                    <ul>
+                        @foreach (var emp in Model.EmployeeNames)
+                        {
+                            <li>@emp</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span class="text-muted">(няма служители)</span>
+                }
+            </dd>
+        </dl>
+    </section>
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        @Html.AntiForgeryToken()
+
+        <footer class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-danger">Изтрий</button>
+            <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        </footer>
+    </form>
+</main>

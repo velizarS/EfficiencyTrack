@@ -26,6 +26,8 @@ builder.Services.AddScoped<IEntryService, EntryService>();
 builder.Services.AddScoped<IDailyEfficiencyService, DailyEfficiencyService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IRoutingService, RoutingService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
 
 
 

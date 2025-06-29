@@ -1,0 +1,26 @@
+﻿@model EfficiencyTrack.ViewModels.Department.DepartmentEditViewModel
+
+@{
+    ViewData["Title"] = "Редакция на отдел";
+}
+
+<main class="container mt-4">
+    <h1>Редактиране на отдел</h1>
+
+    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Запази</button>
+        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

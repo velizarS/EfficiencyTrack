@@ -1,0 +1,34 @@
+﻿@model EfficiencyTrack.ViewModels.Department.DepartmentDetailViewModel
+
+@{
+    ViewData["Title"] = "Детайли за отдел";
+}
+
+<main class="container mt-4">
+    <h1>Детайли за отдел</h1>
+
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Служители</dt>
+        <dd class="col-sm-9">
+            @if (Model.EmployeeNames.Any())
+            {
+                <ul>
+                    @foreach (var name in Model.EmployeeNames)
+                    {
+                        <li>@name</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Няма служители</span>
+            }
+        </dd>
+    </dl>
+
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
+    <a asp-action="Index" class="btn btn-secondary">Обратно</a>
+</main>

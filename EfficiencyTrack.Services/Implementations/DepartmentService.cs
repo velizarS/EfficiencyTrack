@@ -31,6 +31,5 @@ namespace EfficiencyTrack.Services.Implementations
                                  .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
         }
 
-       
     }
 }

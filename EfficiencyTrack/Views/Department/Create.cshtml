@@ -1,0 +1,24 @@
+﻿@model EfficiencyTrack.ViewModels.Department.DepartmentCreateViewModel
+
+@{
+    ViewData["Title"] = "Създаване на отдел";
+}
+
+<main class="container mt-4">
+    <h1>Създаване на нов отдел</h1>
+
+    <form asp-action="Create" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Създай</button>
+        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+    </form>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

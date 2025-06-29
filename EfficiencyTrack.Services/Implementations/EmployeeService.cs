@@ -30,7 +30,7 @@ namespace EfficiencyTrack.Services
 
         public async Task<List<ApplicationUser>> GetAllShiftManagersAsync()
         {
-            var users = await _userManager.GetUsersInRoleAsync("ShiftManagerUser");
+            var users = await _userManager.GetUsersInRoleAsync("ShiftLeader");
             return users.ToList();
         }
 
