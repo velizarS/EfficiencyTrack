@@ -1,0 +1,72 @@
+﻿@model EfficiencyTrack.ViewModels.DailyEfficiencyViewModels.DailyDetailEfficiencyViewModel
+
+@{
+    ViewData["Title"] = "Детайли за дневна ефективност";
+}
+
+<main class="container">
+    <header>
+        <h1>Детайли за дневна ефективност</h1>
+    </header>
+
+    <section aria-label="Обща информация">
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Date)</dt>
+            <dd class="col-sm-9">@Model.Date.ToString("dd.MM.yyyy")</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EmployeeCode)</dt>
+            <dd class="col-sm-9">@Model.EmployeeCode</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EmployeeFullName)</dt>
+            <dd class="col-sm-9">@Model.EmployeeFullName</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.TotalWorkedMinutes)</dt>
+            <dd class="col-sm-9">@Model.TotalWorkedMinutes</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ShiftName)</dt>
+            <dd class="col-sm-9">@Model.ShiftName</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EfficiencyPercentage)</dt>
+            <dd class="col-sm-9">@Model.EfficiencyPercentage.ToString("F2") %</dd>
+        </dl>
+    </section>
+
+    <section aria-label="Детайли на операциите" class="mt-4">
+        <h2>@Html.DisplayNameFor(m => m.DetailEntries)</h2>
+
+        @if (Model.DetailEntries.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Идентификатор на служител</th>
+                        <th>Идентификатор на маршрут</th>
+                        <th>Име на маршрут</th>
+                        <th>Ефективност за операцията (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entry in Model.DetailEntries)
+                    {
+                        <tr>
+                            <td>@entry.Date.ToString("dd.MM.yyyy")</td>
+                            <td>@entry.EmployeeId</td>
+                            <td>@entry.RoutingId</td>
+                            <td>@entry.RoutingName</td>
+                            <td>@entry.EfficiencyForOperation.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Няма детайли за операции.</p>
+        }
+    </section>
+
+    <nav class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">Назад към списъка</a>
+    </nav>
+</main>

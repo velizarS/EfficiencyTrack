@@ -1,4 +1,5 @@
-﻿using EfficiencyTrack.Services.Interfaces;
+﻿using EfficiencyTrack.Services.DTOs.EfficiencyTrack.Services.DTOs;
+using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.DailyEfficiencyViewModels;
 using EfficiencyTrack.ViewModels.EntryViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -14,28 +15,36 @@ namespace EfficiencyTrack.Web.Controllers
             _dailyEfficiencyService = dailyEfficiencyService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
         {
             var efficiencies = await _dailyEfficiencyService.GetAllAsync();
 
-            var viewModel = new DailyEfficiencyListViewModel
+            var viewModels = efficiencies.Select(e => new DailyEfficiencyViewModel
             {
-                DailyEfficiencies = efficiencies.Select(e => new DailyEfficiencyViewModel
-                {
-                    Id = e.Id,
-                    Date = e.Date,
-                    EmployeeCode = e.Employee?.Code ?? "N/A",
-                    EmployeeFullName = string.Join(" ", e.Employee?.FirstName, e.Employee?.MiddleName, e.Employee?.LastName).Trim(),
-                    TotalWorkedMinutes = e.TotalWorkedMinutes,
-                    ShiftName = e.Shift?.Name ?? "N/A",
-                    EfficiencyPercentage = e.EfficiencyPercentage
-                }).ToList()
+                Id = e.Id,
+                Date = e.Date,
+                EmployeeCode = e.Employee?.Code ?? "N/A",
+                EmployeeFullName = string.Join(" ", e.Employee?.FirstName, e.Employee?.MiddleName, e.Employee?.LastName).Trim(),
+                TotalWorkedMinutes = e.TotalWorkedMinutes,
+                ShiftName = e.Shift?.Name ?? "N/A",
+                EfficiencyPercentage = e.EfficiencyPercentage
+            }).ToList();
+
+            var filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+
+            ViewBag.SearchTerm = searchTerm;
+            ViewBag.SortBy = sortBy;
+            ViewBag.SortAsc = sortAsc;
+
+            var listViewModel = new DailyEfficiencyListViewModel
+            {
+                DailyEfficiencies = filteredSorted
             };
 
-            return View(viewModel);
+            return View(listViewModel);
         }
 
-        // GET: DailyEfficiency/Details/{id}
+
         public async Task<IActionResult> Details(Guid id)
         {
             var dto = await _dailyEfficiencyService.GetByIdAsync(id);
@@ -63,5 +72,43 @@ namespace EfficiencyTrack.Web.Controllers
 
             return View(viewModel);
         }
+
+        protected List<DailyEfficiencyViewModel> FilterAndSort(List<DailyEfficiencyViewModel> items, string? searchTerm, string? sortBy, bool sortAsc)
+        {
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                items = items
+                    .Where(x => x.EmployeeCode.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            items = sortBy?.ToLower() switch
+            {
+                "date" => sortAsc
+                    ? items.OrderBy(x => x.Date).ToList()
+                    : items.OrderByDescending(x => x.Date).ToList(),
+
+                "employee" => sortAsc
+                    ? items.OrderBy(x => x.EmployeeFullName).ToList()
+                    : items.OrderByDescending(x => x.EmployeeFullName).ToList(),
+
+                "minutes" => sortAsc
+                    ? items.OrderBy(x => x.TotalWorkedMinutes).ToList()
+                    : items.OrderByDescending(x => x.TotalWorkedMinutes).ToList(),
+
+                "shift" => sortAsc
+                    ? items.OrderBy(x => x.ShiftName).ToList()
+                    : items.OrderByDescending(x => x.ShiftName).ToList(),
+
+                "efficiency" => sortAsc
+                    ? items.OrderBy(x => x.EfficiencyPercentage).ToList()
+                    : items.OrderByDescending(x => x.EfficiencyPercentage).ToList(),
+
+                _ => items
+            };
+
+            return items;
+        }
+
     }
 }
