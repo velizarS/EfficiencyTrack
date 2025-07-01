@@ -1,9 +1,9 @@
 ﻿@model EfficiencyTrack.ViewModels.Routing.RoutingListViewModel
 @{
-    ViewData["Title"] = "Роутинги";
+    ViewData["Title"] = "Рутинги";
     var searchTerm = ViewBag.SearchTerm as string;
     var sortBy = ViewBag.SortBy as string;
-    var sortAsc = (bool)(ViewBag.SortAsc ?? true);
+    var sortAsc = ViewBag.SortAsc as bool? ?? true;
 
     string GetSortIcon(string field) => sortBy == field
         ? (sortAsc ? "↑" : "↓")
@@ -12,14 +12,14 @@
 
 <main class="container">
     <header>
-        <h1>Роутинги</h1>
+        <h1>Рутинги</h1>
     </header>
 
     <section aria-label="Търсене">
         <form asp-action="Index" method="get" class="mb-3" role="search">
             <div class="form-group d-flex gap-2">
                 <input type="text" name="searchTerm" value="@searchTerm" class="form-control"
-                       placeholder="Търси по код..." aria-label="Търси по код" />
+                       placeholder="Търси по код или отдел..." aria-label="Търси по код или отдел" />
                 <button type="submit" class="btn btn-primary">Търси</button>
                 <a asp-action="Index" class="btn btn-secondary">Изчисти</a>
             </div>
@@ -27,26 +27,40 @@
     </section>
 
     <nav aria-label="Създаване">
-        <a asp-action="Create" class="btn btn-success mb-3">+ Нов роутинг</a>
+        <a asp-action="Create" class="btn btn-success mb-3">+ Нов рутинг</a>
     </nav>
 
     <section aria-label="Списък с роутинги">
         <table class="table table-bordered table-striped">
-            <caption>Списък с роутинги</caption>
+            <caption>Списък с рутинги</caption>
             <thead>
                 <tr>
                     <th scope="col">
                         <a asp-action="Index" asp-route-searchTerm="@searchTerm"
                            asp-route-sortBy="code"
-                           asp-route-sortAsc="@(sortBy == "code" ? !sortAsc : true)">
+                           asp-route-sortAsc="@( (sortBy == "code") ? (!sortAsc).ToString().ToLower() : "true" )">
                             Код @GetSortIcon("code")
                         </a>
                     </th>
                     <th scope="col">
                         <a asp-action="Index" asp-route-searchTerm="@searchTerm"
                            asp-route-sortBy="minutes"
-                           asp-route-sortAsc="@(sortBy == "minutes" ? !sortAsc : true)">
+                           asp-route-sortAsc="@( (sortBy == "minutes") ? (!sortAsc).ToString().ToLower() : "true" )">
                             Мин./бр. @GetSortIcon("minutes")
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="department"
+                           asp-route-sortAsc="@( (sortBy == "department") ? (!sortAsc).ToString().ToLower() : "true" )">
+                            Отдел @GetSortIcon("department")
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="zone"
+                           asp-route-sortAsc="@( (sortBy == "zone") ? (!sortAsc).ToString().ToLower() : "true" )">
+                            Зона @GetSortIcon("zone")
                         </a>
                     </th>
                     <th scope="col">Действия</th>
@@ -58,6 +72,8 @@
                     <tr>
                         <td>@item.Code</td>
                         <td>@item.MinutesPerPiece</td>
+                        <td>@item.DepartmentName</td>
+                        <td>@item.Zone</td>
                         <td>
                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детайли</a>
                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редакция</a>

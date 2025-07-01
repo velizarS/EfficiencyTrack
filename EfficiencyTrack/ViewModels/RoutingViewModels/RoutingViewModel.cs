@@ -11,5 +11,11 @@ namespace EfficiencyTrack.ViewModels.Routing
 
         [Display(Name = "Време за една бройка")]
         public decimal MinutesPerPiece { get; set; }
+
+        [Display(Name = "Отдел")]
+        public string DepartmentName { get; set; } = null!;
+
+        [Display(Name = "Зона")]
+        public string Zone { get; set; } = null!;
     }
 }
