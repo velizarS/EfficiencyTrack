@@ -34,6 +34,25 @@ namespace EfficiencyTrack.Services
             return users.ToList();
         }
 
+        public override async Task<IEnumerable<Employee>> GetAllAsync()
+        {
+            return await _context.Employees
+                .AsNoTracking()
+                .Include(e => e.Department)
+                .Include(e => e.ShiftManagerUser)
+                .Where(e => !e.IsDeleted)
+                .ToListAsync(); 
+        }
+
+        public override async Task<Employee> GetByIdAsync(Guid id)
+        {
+            return await _context.Employees
+                .Include(e => e.Department)
+                .Include(e => e.ShiftManagerUser)
+                .Where(e => !e.IsDeleted && e.Id == id)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Employee> GetByCodeAsync(string employeeCode)
         {
             return await _context.Employees

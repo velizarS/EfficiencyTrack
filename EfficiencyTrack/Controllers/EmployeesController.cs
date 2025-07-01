@@ -27,9 +27,12 @@ public class EmployeesController : BaseCrudController<
     protected override EmployeeViewModel MapToViewModel(Employee e)
         => new()
         {
+            Id = e.Id,
             Code = e.Code,
             FullName = $"{e.FirstName} {e.MiddleName} {e.LastName}".Replace("  ", " ").Trim(),
             DepartmentName = e.Department?.Name ?? "(няма отдел)",
+            ShiftLeader = e.ShiftManagerUser?.UserName ?? ""
+
         };
 
     protected override EmployeeDetailViewModel MapToDetailModel(Employee e)
