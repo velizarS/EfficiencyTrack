@@ -10,6 +10,12 @@ namespace EfficiencyTrack.ViewModels.Department
         [Display(Name = "Име на отдел")]
         public string Name { get; set; } = null!;
 
-        public List<string> EmployeeNames { get; set; } = new();
+        public List<EmployeeSimpleViewModel> Employees { get; set; } = new();
+    }
+
+    public class EmployeeSimpleViewModel
+    {
+        public string Code { get; set; } = null!;
+        public string FullName { get; set; } = null!;
     }
 }

@@ -17,12 +17,12 @@
 
             <dt class="col-sm-3">Служители</dt>
             <dd class="col-sm-9">
-                @if (Model.EmployeeNames.Any())
+                @if (Model.Employees != null && Model.Employees.Any())
                 {
                     <ul>
-                        @foreach (var emp in Model.EmployeeNames)
+                        @foreach (var emp in Model.Employees)
                         {
-                            <li>@emp</li>
+                            <li>@emp.FullName (@emp.Code)</li>
                         }
                     </ul>
                 }

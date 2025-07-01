@@ -107,8 +107,6 @@ namespace EfficiencyTrack.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-
         protected abstract TViewModel MapToViewModel(T entity);
         protected abstract TDetailModel MapToDetailModel(T entity);
         protected abstract T MapToEntity(TCreateModel model);

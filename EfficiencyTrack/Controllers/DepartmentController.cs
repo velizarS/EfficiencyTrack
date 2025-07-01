@@ -39,22 +39,15 @@ public class DepartmentController : BaseCrudController<
         {
             Id = entity.Id,
             Name = entity.Name,
-            EmployeeNames = entity.Employees
-                .Select(e => $"{e.FirstName} {e.LastName}")
+            Employees = entity.Employees
+                .Where(e => !e.IsDeleted)
+                .Select(e => new EmployeeSimpleViewModel
+                {
+                    Code = e.Code,
+                    FullName = $"{e.FirstName} {e.LastName}"
+                })
                 .ToList()
         };
-    }
-
-    public override async Task<IActionResult> Details(Guid id)
-    {
-        var departmentWithEmployees = await _departmentService.GetDepartmentWithEmployeesAsync(id);
-
-        if (departmentWithEmployees == null)
-            return NotFound();
-
-        var viewModel = MapToDetailModel(departmentWithEmployees);
-
-        return View(viewModel);
     }
 
     protected override Department MapToEntity(DepartmentCreateViewModel model)
@@ -83,7 +76,6 @@ public class DepartmentController : BaseCrudController<
             Departments = items
         };
 
-
     protected override List<DepartmentViewModel> FilterAndSort(List<DepartmentViewModel> items, string? searchTerm, string? sortBy, bool sortAsc)
     {
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -106,4 +98,25 @@ public class DepartmentController : BaseCrudController<
         return items;
     }
 
+    public override async Task<IActionResult> Details(Guid id)
+    {
+        var departmentWithEmployees = await _departmentService.GetDepartmentWithEmployeesAsync(id);
+
+        if (departmentWithEmployees == null)
+            return NotFound();
+
+        var viewModel = MapToDetailModel(departmentWithEmployees);
+
+        return View(viewModel);
+    }
+
+    public override async Task<IActionResult> Delete(Guid id)
+    {
+        var departmentWithEmployees = await _departmentService.GetDepartmentWithEmployeesAsync(id);
+        if (departmentWithEmployees == null)
+            return NotFound();
+
+        var viewModel = MapToDetailModel(departmentWithEmployees);
+        return View(viewModel);
+    }
 }
