@@ -171,13 +171,42 @@ namespace EfficiencyTrack.Web.Controllers
             }
 
             var entry = MapToEntity(model);
-
             entry.EmployeeId = employee.Id;
             entry.RoutingId = routing.Id;
 
-            await _entryService.SetEfficiencyAsync(entry);
-            await _service.AddAsync(entry);
+            await _entryService.AddAsync(entry);
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public override async Task<IActionResult> Edit(EntryEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var existingEntry = await _entryService.GetByIdWithIncludesAsync(model.Id);
+            if (existingEntry == null)
+                return NotFound();
+
+            existingEntry.EmployeeId = model.EmployeeId;
+            existingEntry.RoutingId = model.RoutingId;
+            existingEntry.ShiftId = model.ShiftId;
+            existingEntry.Pieces = model.Pieces;
+            existingEntry.Scrap = model.Scrap;
+            existingEntry.WorkedMinutes = model.WorkedMinutes;
+
+            await _entryService.UpdateAsync(existingEntry);
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public override async Task<IActionResult> Delete(Guid id)
+        {
+            await _entryService.DeleteAsync(id); 
             return RedirectToAction(nameof(Index));
         }
 
@@ -190,28 +219,6 @@ namespace EfficiencyTrack.Web.Controllers
                 Text = s.Name,
                 Value = s.Id.ToString()
             }).ToList();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public override async Task<IActionResult> Edit(EntryEditViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var entry = MapToEntity(model);
-            await _entryService.SetEfficiencyAsync(entry);
-
-            await _service.UpdateAsync(entry);
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public override async Task<IActionResult> Delete(Guid id)
-        {
-            await _service.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
         }
     }
 }

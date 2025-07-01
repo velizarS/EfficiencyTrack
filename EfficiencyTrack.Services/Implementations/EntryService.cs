@@ -24,9 +24,10 @@ namespace EfficiencyTrack.Services.Implementations
         public async Task<List<Entry>> GetAllWithIncludesAsync()
         {
             return await _context.Entries
-                .Include(e => e.Employee)
-                .Include(e => e.Routing)
-                .ToListAsync();
+                 .Include(e => e.Employee)
+                 .Include(e => e.Routing)
+                 .Where(e => !e.IsDeleted)
+                 .ToListAsync();
         }
 
         public async Task<Entry?> GetByIdWithIncludesAsync(Guid id)
@@ -34,7 +35,7 @@ namespace EfficiencyTrack.Services.Implementations
             return await _context.Entries
                 .Include(e => e.Employee)
                 .Include(e => e.Routing)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
         }
 
         public override async Task AddAsync(Entry entity)
