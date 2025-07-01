@@ -15,13 +15,13 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public virtual async Task<IEnumerable<T>> GetAllAsync()
         => await _context.Set<T>()
                          .AsNoTracking()
                          .Where(e => !e.IsDeleted)
                          .ToListAsync();
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(Guid id)
         => await _context.Set<T>()
                          .AsNoTracking()
                          .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
