@@ -20,7 +20,7 @@
         <form asp-action="Index" method="get" class="mb-3" role="search">
             <div class="form-group d-flex gap-2">
                 <input type="text" name="searchTerm" value="@searchTerm" class="form-control"
-                       placeholder="Търси по код на служител..." aria-label="Търси по код" />
+                       placeholder="Търси по код на служител или рутинг..." aria-label="Търси по код" />
                 <button type="submit" class="btn btn-primary">Търси</button>
                 <a asp-action="Index" class="btn btn-secondary">Изчисти</a>
             </div>
@@ -51,13 +51,7 @@
                             Служител @GetSortIcon("employeeName")
                         </a>
                     </th>
-                    <th>
-                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                           asp-route-sortBy="routingName"
-                           asp-route-sortAsc="@(sortBy == "routingName" ? !sortAsc : true)">
-                            Рутинг @GetSortIcon("routingName")
-                        </a>
-                    </th>
+                    <th>Рутинг</th>
                     <th>
                         <a asp-action="Index" asp-route-searchTerm="@searchTerm"
                            asp-route-sortBy="efficiency"

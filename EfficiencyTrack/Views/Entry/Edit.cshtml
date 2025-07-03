@@ -13,15 +13,15 @@
         <input type="hidden" asp-for="Id" />
 
         <div class="mb-3">
-            <label asp-for="EmployeeId" class="form-label"></label>
-            <select asp-for="EmployeeId" asp-items="ViewBag.Employees" class="form-select"></select>
-            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            <label asp-for="EmployeeCode" class="form-label"></label>
+            <input asp-for="EmployeeCode" class="form-control" />
+            <span asp-validation-for="EmployeeCode" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="RoutingId" class="form-label"></label>
-            <select asp-for="RoutingId" asp-items="ViewBag.Routings" class="form-select"></select>
-            <span asp-validation-for="RoutingId" class="text-danger"></span>
+            <label asp-for="RoutingCode" class="form-label"></label>
+            <input asp-for="RoutingCode" class="form-control" />
+            <span asp-validation-for="RoutingCode" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
