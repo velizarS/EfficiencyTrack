@@ -40,9 +40,7 @@ public class EmployeesController : BaseCrudController<
         {
             Id = e.Id,
             Code = e.Code,
-            FirstName = e.FirstName,
-            MiddleName = e.MiddleName,
-            LastName = e.LastName,
+            FullName = $"{e.FirstName} {e.MiddleName} {e.LastName}".Replace("  ", " ").Trim(),
             ShiftManagerUserId = e.ShiftManagerUserId,
             ShiftManagerUserName = e.ShiftManagerUser?.UserName,
             DepartmentId = e.DepartmentId,

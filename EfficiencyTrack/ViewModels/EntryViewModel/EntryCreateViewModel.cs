@@ -7,12 +7,10 @@ namespace EfficiencyTrack.ViewModels.EntryViewModel
     {
         [Required]
         [StringLength(20, ErrorMessage = "Code cannot be longer than 20 characters.")]
-        [RegularExpression(@"^[A-Z0-9]+$", ErrorMessage = "Code must consist of uppercase letters and numbers only.")]
         [Display(Name = "Код на служител")]
         public string EmployeeCode { get; set; } = null!;
 
         [Required(ErrorMessage = "Код на операцията е задължителен.")]
-        [RegularExpression(@"^[A-Z0-9]+$", ErrorMessage = "Code must consist of uppercase letters and numbers only.")]
         [Display(Name = "Код на операцията")]
         public string RoutingCode { get; set; } = null!;
 

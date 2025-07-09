@@ -110,13 +110,4 @@ public class DepartmentController : BaseCrudController<
         return View(viewModel);
     }
 
-    public override async Task<IActionResult> Delete(Guid id)
-    {
-        var departmentWithEmployees = await _departmentService.GetDepartmentWithEmployeesAsync(id);
-        if (departmentWithEmployees == null)
-            return NotFound();
-
-        var viewModel = MapToDetailModel(departmentWithEmployees);
-        return View(viewModel);
-    }
 }

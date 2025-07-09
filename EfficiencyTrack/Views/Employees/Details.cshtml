@@ -11,14 +11,8 @@
         <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Code)</dt>
         <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Code) ? Model.Code : "-")</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.FirstName)</dt>
-        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.FirstName) ? Model.FirstName : "-")</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.MiddleName)</dt>
-        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.MiddleName) ? Model.MiddleName : "-")</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.LastName)</dt>
-        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.LastName) ? Model.LastName : "-")</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.FullName)</dt>
+        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.FullName) ? Model.FullName : "-")</dd>
 
         <dt class="col-sm-3">@Html.DisplayNameFor(m => m.DepartmentName)</dt>
         <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.DepartmentName) ? Model.DepartmentName : "-")</dd>

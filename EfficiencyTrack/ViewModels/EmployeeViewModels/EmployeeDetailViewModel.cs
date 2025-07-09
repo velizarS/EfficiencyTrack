@@ -10,13 +10,7 @@ namespace EfficiencyTrack.ViewModels.Employee
         public string Code { get; set; } = null!;
 
         [Display(Name = "Име")]
-        public string FirstName { get; set; } = null!;
-
-        [Display(Name = "Презиме")]
-        public string? MiddleName { get; set; }
-
-        [Display(Name = "Фамилия")]
-        public string LastName { get; set; } = null!;
+        public string FullName { get; set; } = null!;
 
         public Guid? ShiftManagerUserId { get; set; }
 
