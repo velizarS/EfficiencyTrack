@@ -31,7 +31,12 @@ namespace EfficiencyTrack.Data.Models
         [Column(TypeName = "decimal(10,4)")]
         public decimal TotalWorkedMinutes { get; set; }
 
-        
+        [Display(Name = "Total needed Minutes")]
+        [Comment("Total needed time .")]
+        [Column(TypeName = "decimal(10,4)")]
+        public decimal TotalNeededMinutes { get; set; }
+
+
         [Display(Name = "Efficiency (%)")]
         [Comment("Calculated efficiency as (total needed minutes based on operations / shift time) * 100.")]
         [Column(TypeName = "decimal(10,4)")]
