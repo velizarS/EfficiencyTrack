@@ -1,4 +1,4 @@
-﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeViewModel
+﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeDetailViewModel
 
 @{
     ViewData["Title"] = "Изтриване на служител";
@@ -18,7 +18,8 @@
         <dd class="col-sm-10">@Model.DepartmentName</dd>
     </dl>
 
-    <form asp-action="Delete" method="post">
+    <form asp-action="DeleteConfirmed" method="post">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
         <button type="submit" class="btn btn-danger">Изтрий</button>
         <a asp-action="Index" class="btn btn-secondary">Отказ</a>

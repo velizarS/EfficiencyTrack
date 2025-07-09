@@ -34,9 +34,11 @@
         <dd class="col-sm-9">@Model.EfficiencyForOperation.ToString("0.##")%</dd>
     </dl>
 
-    <form asp-action="Delete" method="post">
+    <form asp-action="DeleteConfirmed" method="post">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
         <button type="submit" class="btn btn-danger">Изтрий</button>
         <a asp-action="Index" class="btn btn-secondary">Отказ</a>
     </form>
+
 </main>
