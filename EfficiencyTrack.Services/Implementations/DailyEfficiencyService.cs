@@ -26,6 +26,8 @@ namespace EfficiencyTrack.Services.Implementations
             return await _context.DailyEfficiencies
                 .AsNoTracking()
                 .Where(e => !e.IsDeleted)
+                .Include(de => de.Employee)
+                .Include(de => de.Shift)
                 .OrderByDescending(e => e.Date)
                 .ToListAsync();
         }
@@ -56,6 +58,7 @@ namespace EfficiencyTrack.Services.Implementations
                 EmployeeCode = dailyEfficiency.Employee?.Code ?? "N/A",
                 EmployeeFullName = string.Join(" ", dailyEfficiency.Employee?.FirstName, dailyEfficiency.Employee?.MiddleName, dailyEfficiency.Employee?.LastName).Trim(),
                 TotalWorkedMinutes = dailyEfficiency.TotalWorkedMinutes,
+                TotalNeddedMinutes = dailyEfficiency.TotalNeededMinutes,
                 ShiftName = dailyEfficiency.Shift?.Name ?? "N/A",
                 EfficiencyPercentage = dailyEfficiency.EfficiencyPercentage,
                 Entries = entries.Select(e => new EntryDto
@@ -64,6 +67,8 @@ namespace EfficiencyTrack.Services.Implementations
                     EmployeeId = e.EmployeeId,
                     RoutingId = e.RoutingId,
                     RoutingName = e.Routing?.Code,
+                    Pieces = e.Pieces,
+                    WorkedMinutes = e.WorkedMinutes,
                     EfficiencyForOperation = (decimal)e.EfficiencyForOperation
                 }).ToList()
             };
@@ -88,7 +93,14 @@ namespace EfficiencyTrack.Services.Implementations
                 return;
             }
 
-            decimal totalNeededMinutes = (decimal)entriesOfDay.Sum(e => e.RequiredMinutes);
+            decimal totalNeededMinutes = 0;
+            foreach (var entry in entriesOfDay)
+            {
+                var routing = await _context.Routings
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(r => r.Id == entry.RoutingId && !r.IsDeleted);
+                totalNeededMinutes += (entry.Pieces + entry.Scrap) * routing.MinutesPerPiece;
+            }
 
             var shiftId = entriesOfDay.First().ShiftId;
 
@@ -105,7 +117,7 @@ namespace EfficiencyTrack.Services.Implementations
 
             var dailyEfficiency = await _context.DailyEfficiencies.AsNoTracking()
                 .FirstOrDefaultAsync(de => de.EmployeeId == employeeId && de.Date.Date == date.Date);
-
+            var totalTime = entriesOfDay.Sum(e => e.WorkedMinutes);
             if (dailyEfficiency == null)
             {
                 dailyEfficiency = new DailyEfficiency
@@ -115,6 +127,8 @@ namespace EfficiencyTrack.Services.Implementations
                     Date = date.Date,
                     ShiftId = shiftId,
                     EfficiencyPercentage = efficiencyPercent,
+                    TotalWorkedMinutes = totalTime,
+                    TotalNeededMinutes = totalNeededMinutes,
                     ComputedOn = DateTime.UtcNow
                 };
                 _context.DailyEfficiencies.Add(dailyEfficiency);
@@ -124,6 +138,8 @@ namespace EfficiencyTrack.Services.Implementations
                 dailyEfficiency.EfficiencyPercentage = efficiencyPercent;
                 dailyEfficiency.ComputedOn = DateTime.UtcNow;
                 dailyEfficiency.ShiftId = shiftId;
+                dailyEfficiency.TotalWorkedMinutes = totalTime;
+                dailyEfficiency.TotalNeededMinutes = totalNeededMinutes;
                 _context.DailyEfficiencies.Update(dailyEfficiency);
             }
 

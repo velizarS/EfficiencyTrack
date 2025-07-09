@@ -58,6 +58,7 @@ namespace EfficiencyTrack.Web.Controllers
                 EmployeeCode = dto.EmployeeCode,
                 EmployeeFullName = dto.EmployeeFullName,
                 TotalWorkedMinutes = dto.TotalWorkedMinutes,
+                TotalNeddedMinutes = dto.TotalNeddedMinutes,
                 ShiftName = dto.ShiftName,
                 EfficiencyPercentage = dto.EfficiencyPercentage,
                 DetailEntries = dto.Entries.Select(e => new EntryDetailsViewModel
@@ -66,6 +67,8 @@ namespace EfficiencyTrack.Web.Controllers
                     EmployeeId = e.EmployeeId,
                     RoutingId = e.RoutingId,
                     RoutingName = e.RoutingName,
+                    Pieces = e.Pieces,
+                    WorkedMinutes = e.WorkedMinutes,
                     EfficiencyForOperation = e.EfficiencyForOperation
                 }).ToList()
             };

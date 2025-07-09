@@ -23,6 +23,9 @@
             <dt class="col-sm-3">@Html.DisplayNameFor(m => m.TotalWorkedMinutes)</dt>
             <dd class="col-sm-9">@Model.TotalWorkedMinutes</dd>
 
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.TotalNeddedMinutes)</dt>
+            <dd class="col-sm-9">@Model.TotalNeddedMinutes</dd>
+
             <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ShiftName)</dt>
             <dd class="col-sm-9">@Model.ShiftName</dd>
 
@@ -40,9 +43,9 @@
                 <thead>
                     <tr>
                         <th>Дата</th>
-                        <th>Идентификатор на служител</th>
-                        <th>Идентификатор на маршрут</th>
-                        <th>Име на маршрут</th>
+                        <th>Рутинг</th>
+                        <th>Бройки</th>
+                        <th>Време за операция</th>
                         <th>Ефективност за операцията (%)</th>
                     </tr>
                 </thead>
@@ -51,9 +54,9 @@
                     {
                         <tr>
                             <td>@entry.Date.ToString("dd.MM.yyyy")</td>
-                            <td>@entry.EmployeeId</td>
-                            <td>@entry.RoutingId</td>
                             <td>@entry.RoutingName</td>
+                            <td>@entry.Pieces</td>
+                            <td>@entry.WorkedMinutes.ToString("F2")</td>
                             <td>@entry.EfficiencyForOperation.ToString("F2")</td>
                         </tr>
                     }

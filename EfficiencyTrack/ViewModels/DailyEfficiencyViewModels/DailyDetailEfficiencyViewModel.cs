@@ -19,6 +19,9 @@ namespace EfficiencyTrack.ViewModels.DailyEfficiencyViewModels
         [DisplayName("Общо отработени минути")]
         public decimal TotalWorkedMinutes { get; set; }
 
+        [DisplayName("Общо необходими минути")]
+        public decimal TotalNeddedMinutes { get; set; }
+
         [DisplayName("Смяна")]
         public string ShiftName { get; set; } = null!;
 

@@ -1,4 +1,6 @@
-﻿namespace EfficiencyTrack.Services.DTOs
+﻿using EfficiencyTrack.Data.Models;
+
+namespace EfficiencyTrack.Services.DTOs
 {
     public class EntryDto
     {
@@ -9,6 +11,10 @@
         public Guid RoutingId { get; set; }
 
         public string? RoutingName { get; set; }
+
+        public int Pieces { get; set; }
+
+        public decimal WorkedMinutes { get; set; }
 
         public decimal EfficiencyForOperation { get; set; }
     }
