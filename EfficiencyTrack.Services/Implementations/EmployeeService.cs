@@ -53,6 +53,18 @@ namespace EfficiencyTrack.Services
                 .FirstOrDefaultAsync();
         }
 
+        public override async Task AddAsync(Employee entity)
+        {
+            await EnsureEmployIsUniqueAsync(entity);
+            await base.AddAsync(entity);
+        }
+
+        public override async Task UpdateAsync(Employee entity)
+        {
+            await EnsureEmployIsUniqueForUpdateAsync(entity);
+            await base.UpdateAsync(entity);
+        }
+
         public async Task<Employee> GetByCodeAsync(string employeeCode)
         {
             return await _context.Employees
@@ -84,6 +96,20 @@ namespace EfficiencyTrack.Services
                 .AnyAsync(e => e.Code == code && (!excludeId.HasValue || e.Id != excludeId.Value));
         }
 
+        private async Task EnsureEmployIsUniqueForUpdateAsync(Employee entity)
+        {
+            var exists = await _context.Employees.AsNoTracking()
+                .AnyAsync(e => e.Code == entity.Code && e.Id != entity.Id && !e.IsDeleted);
 
+            if (exists)
+                throw new InvalidOperationException($"Another Employ with code {entity.Code} already exists.");
+        }
+
+        private async Task EnsureEmployIsUniqueAsync(Employee entity)
+        {
+            var exists = await _context.Employees.AsNoTracking().AnyAsync(e => e.Code == entity.Code && !e.IsDeleted);
+            if (exists)
+                throw new InvalidOperationException($"Routing with code {entity.Code} already exists.");
+        }
     }
 }

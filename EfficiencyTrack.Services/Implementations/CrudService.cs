@@ -28,6 +28,8 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
 
     public virtual async Task AddAsync(T entity)
     {
+        if (entity == null)
+            throw new ArgumentNullException(nameof(entity));
         entity.CreatedOn = DateTime.UtcNow;
         entity.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 

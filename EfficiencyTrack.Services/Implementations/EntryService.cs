@@ -13,21 +13,26 @@ namespace EfficiencyTrack.Services.Implementations
     {
         private readonly IDailyEfficiencyService _dailyEfficiencyService;
         private readonly EfficiencyTrackDbContext _context;
+        private readonly EntryValidator _validator;
 
-        public EntryService(EfficiencyTrackDbContext context, IHttpContextAccessor httpContextAccessor, IDailyEfficiencyService dailyEfficiencyService)
+        public EntryService(
+            EfficiencyTrackDbContext context,
+            IHttpContextAccessor httpContextAccessor,
+            IDailyEfficiencyService dailyEfficiencyService)
             : base(context, httpContextAccessor)
         {
-            _dailyEfficiencyService = dailyEfficiencyService;
+            _dailyEfficiencyService = dailyEfficiencyService ?? throw new ArgumentNullException(nameof(dailyEfficiencyService));
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _validator = new EntryValidator(_context);
         }
 
         public async Task<List<Entry>> GetAllWithIncludesAsync()
         {
             return await _context.Entries
-                 .Include(e => e.Employee)
-                 .Include(e => e.Routing)
-                 .Where(e => !e.IsDeleted)
-                 .ToListAsync();
+                .Include(e => e.Employee)
+                .Include(e => e.Routing)
+                .Where(e => !e.IsDeleted)
+                .ToListAsync();
         }
 
         public async Task<Entry?> GetByIdWithIncludesAsync(Guid id)
@@ -40,6 +45,12 @@ namespace EfficiencyTrack.Services.Implementations
 
         public override async Task AddAsync(Entry entity)
         {
+            var validationResult = await _validator.ValidateAsync(entity);
+            if (!validationResult.IsValid)
+            {
+                throw new InvalidOperationException(string.Join(Environment.NewLine, validationResult.Errors));
+            }
+
             await SetEfficiencyAsync(entity);
             await base.AddAsync(entity);
             await _dailyEfficiencyService.UpdateDailyEfficiencyAsync(entity.EmployeeId, entity.Date);
@@ -47,6 +58,12 @@ namespace EfficiencyTrack.Services.Implementations
 
         public override async Task UpdateAsync(Entry entity)
         {
+            var validationResult = await _validator.ValidateAsync(entity);
+            if (!validationResult.IsValid)
+            {
+                throw new InvalidOperationException(string.Join(Environment.NewLine, validationResult.Errors));
+            }
+
             await SetEfficiencyAsync(entity);
             await base.UpdateAsync(entity);
             await _dailyEfficiencyService.UpdateDailyEfficiencyAsync(entity.EmployeeId, entity.Date);
@@ -65,7 +82,7 @@ namespace EfficiencyTrack.Services.Implementations
         private decimal CalculateEfficiency(decimal requiredMinutes, decimal workedMinutes)
         {
             if (workedMinutes <= 0)
-                throw new InvalidOperationException("Worked minutes must be greater than zero.");
+                return 0; // Без изключение, просто връщаме 0
 
             return (requiredMinutes / workedMinutes) * 100;
         }
@@ -84,9 +101,52 @@ namespace EfficiencyTrack.Services.Implementations
             entry.EfficiencyForOperation = CalculateEfficiency(requiredMinutes, entry.WorkedMinutes);
         }
 
+        // Ако искаш, можеш да оставиш това като част от интерфейса:
         async Task IEntryService.SetEfficiencyAsync(Entry entry)
         {
             await SetEfficiencyAsync(entry);
+        }
+
+        public async Task<string> Greetings(Entry entry)
+        {
+            var todayEntries = await _context.Entries
+                .AsNoTracking()
+                .Where(x => x.EmployeeId == entry.EmployeeId && x.Date.Date == DateTime.UtcNow.Date)
+                .ToListAsync();
+
+            string message = "Успешен запис!\n";
+
+            if (todayEntries.Count == 1)
+            {
+                var workerName = (await _context.Employees
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == entry.EmployeeId))?.FirstName;
+
+                if (!string.IsNullOrEmpty(workerName))
+                {
+                    message += $"Здравейте, {workerName}!\n";
+                    message += "Пожелавам ви лека работа и успешен ден!\n";
+                }
+            }
+
+            if (entry.EfficiencyForOperation >= 100)
+            {
+                message += "Представянето надминава очакванията ни със супер резултатите Ви. Благодарим!\n";
+            }
+            else if (entry.EfficiencyForOperation >= 90)
+            {
+                message += "Представянето оправдава очакванията ни с добрите Ви резултати. Благодарим!\n";
+            }
+            else if (entry.EfficiencyForOperation >= 85)
+            {
+                message += "Представянето частично отговаря на очакванията ни, необходимо е подобрение.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n";
+            }
+            else
+            {
+                message += "Незадоволително представяне.\nНеобходими са навременни коригиращи действия.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n";
+            }
+
+            return message;
         }
     }
 }

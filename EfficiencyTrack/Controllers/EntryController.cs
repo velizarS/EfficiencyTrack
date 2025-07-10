@@ -40,9 +40,9 @@ public class EntryController : BaseCrudController<
     {
         Id = entity.Id,
         Date = entity.Date,
-        EmployeeCode = entity.Employee?.Code ?? "",
-        EmployeeName = $"{entity.Employee?.FirstName ?? ""} {entity.Employee?.LastName ?? ""}".Trim(),
-        RoutingName = entity.Routing?.Code ?? "",
+        EmployeeCode = entity.Employee?.Code ?? string.Empty,
+        EmployeeName = $"{entity.Employee?.FirstName} {entity.Employee?.LastName}".Trim(),
+        RoutingName = entity.Routing?.Code ?? string.Empty,
         Pieces = entity.Pieces,
         Scrap = entity.Scrap,
         WorkedMinutes = entity.WorkedMinutes,
@@ -54,11 +54,11 @@ public class EntryController : BaseCrudController<
         Id = entity.Id,
         Date = entity.Date,
         EmployeeId = entity.EmployeeId,
-        EmployeeCode = entity.Employee?.Code ?? "",
-        EmployeeName = $"{entity.Employee?.FirstName ?? ""} {entity.Employee?.LastName ?? ""}".Trim(),
+        EmployeeCode = entity.Employee?.Code ?? string.Empty,
+        EmployeeName = $"{entity.Employee?.FirstName} {entity.Employee?.LastName}".Trim(),
         ShiftId = entity.ShiftId,
         RoutingId = entity.RoutingId,
-        RoutingName = entity.Routing?.Code ?? "",
+        RoutingName = entity.Routing?.Code ?? string.Empty,
         Pieces = entity.Pieces,
         Scrap = entity.Scrap,
         WorkedMinutes = entity.WorkedMinutes,
@@ -66,76 +66,60 @@ public class EntryController : BaseCrudController<
         EfficiencyForOperation = entity.EfficiencyForOperation
     };
 
-    protected override Entry MapToEntity(EntryCreateViewModel model)
+    protected override Entry MapToEntity(EntryCreateViewModel model) => new()
     {
-        return new Entry
-        {
-            Id = Guid.NewGuid(),
-            Date = DateTime.UtcNow,
-            EmployeeId = model.EmployeeId,
-            RoutingId = model.RoutingId,
-            ShiftId = model.ShiftId,
-            Pieces = model.Pieces,
-            Scrap = model.Scrap,
-            WorkedMinutes = model.WorkedMinutes
-        };
-    }
+        Id = Guid.NewGuid(),
+        Date = DateTime.UtcNow,
+        EmployeeId = model.EmployeeId,
+        RoutingId = model.RoutingId,
+        ShiftId = model.ShiftId,
+        Pieces = model.Pieces,
+        Scrap = model.Scrap,
+        WorkedMinutes = model.WorkedMinutes
+    };
 
-    protected override Entry MapToEntity(EntryEditViewModel model)
+    protected override Entry MapToEntity(EntryEditViewModel model) => new()
     {
-        return new Entry
-        {
-            Id = model.Id,
-            EmployeeId = model.EmployeeId,
-            RoutingId = model.RoutingId,
-            ShiftId = model.ShiftId,
-            Pieces = model.Pieces,
-            Scrap = model.Scrap,
-            WorkedMinutes = model.WorkedMinutes
-        };
-    }
+        Id = model.Id,
+        EmployeeId = model.EmployeeId,
+        RoutingId = model.RoutingId,
+        ShiftId = model.ShiftId,
+        Pieces = model.Pieces,
+        Scrap = model.Scrap,
+        WorkedMinutes = model.WorkedMinutes
+    };
 
-    protected override EntryEditViewModel MapToEditModel(Entry entity)
+    protected override EntryEditViewModel MapToEditModel(Entry entity) => new()
     {
-        return new EntryEditViewModel
-        {
-            Id = entity.Id,
-            EmployeeId = entity.EmployeeId,
-            EmployeeCode = entity.Employee?.Code ?? "",
-            RoutingId = entity.RoutingId,
-            RoutingCode = entity.Routing?.Code ?? "",
-            ShiftId = entity.ShiftId,
-            Pieces = entity.Pieces,
-            Scrap = entity.Scrap,
-            WorkedMinutes = entity.WorkedMinutes
-        };
-    }
+        Id = entity.Id,
+        EmployeeId = entity.EmployeeId,
+        EmployeeCode = entity.Employee?.Code ?? string.Empty,
+        RoutingId = entity.RoutingId,
+        RoutingCode = entity.Routing?.Code ?? string.Empty,
+        ShiftId = entity.ShiftId,
+        Pieces = entity.Pieces,
+        Scrap = entity.Scrap,
+        WorkedMinutes = entity.WorkedMinutes
+    };
 
-    protected override EntryListViewModel BuildListViewModel(List<EntryViewModel> items)
-    {
-        return new EntryListViewModel { Entries = items };
-    }
+    protected override EntryListViewModel BuildListViewModel(List<EntryViewModel> items) => new() { Entries = items };
 
     public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
     {
-        var entries = await _entryService.GetAllWithIncludesAsync(); 
+        var entries = await _entryService.GetAllWithIncludesAsync();
         var viewModels = entries.Select(MapToViewModel).ToList();
         var sortedFiltered = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
-        var listViewModel = BuildListViewModel(sortedFiltered);
-
         ViewBag.SearchTerm = searchTerm;
         ViewBag.SortBy = sortBy;
         ViewBag.SortAsc = sortAsc;
-
-        return View(listViewModel);
+        return View(BuildListViewModel(sortedFiltered));
     }
 
     public override async Task<IActionResult> Details(Guid id)
     {
-        var entity = await _entryService.GetByIdWithIncludesAsync(id); 
+        var entity = await _entryService.GetByIdWithIncludesAsync(id);
         if (entity == null) return NotFound();
-        var viewModel = MapToDetailModel(entity);
-        return View(viewModel);
+        return View(MapToDetailModel(entity));
     }
 
     [HttpGet]
@@ -190,10 +174,8 @@ public class EntryController : BaseCrudController<
     {
         var entity = await _entryService.GetByIdWithIncludesAsync(id);
         if (entity == null) return NotFound();
-
-        var model = MapToEditModel(entity);
         await LoadSelectLists();
-        return View(model);
+        return View(MapToEditModel(entity));
     }
 
     [HttpPost]
@@ -206,48 +188,36 @@ public class EntryController : BaseCrudController<
             return View(model);
         }
 
-        var entity = MapToEntity(model);
-        await _entryService.UpdateAsync(entity);
+        await _entryService.UpdateAsync(MapToEntity(model));
         return RedirectToAction(nameof(Index));
     }
 
     private async Task LoadSelectLists()
     {
         var shifts = await _shiftService.GetAllAsync();
-
         ViewBag.Shifts = shifts.Select(s => new SelectListItem
         {
             Text = s.Name,
             Value = s.Id.ToString()
-        });
+        }).ToList();
     }
 
     protected override List<EntryViewModel> FilterAndSort(List<EntryViewModel> items, string? searchTerm, string? sortBy, bool sortAsc)
     {
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            items = items
-                .Where(x =>
-                    (x.EmployeeCode?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (x.RoutingName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false))
-                .ToList();
+            searchTerm = searchTerm.Trim();
+            items = items.Where(x =>
+                (!string.IsNullOrEmpty(x.EmployeeCode) && x.EmployeeCode.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrEmpty(x.RoutingName) && x.RoutingName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
         }
 
-        items = sortBy switch
+        items = sortBy?.ToLowerInvariant() switch
         {
-            "date" => sortAsc
-               ? items.OrderBy(x => x.Date).ToList()
-               : items.OrderByDescending(x => x.Date).ToList(),
-
-            "employeeName" => sortAsc
-                ? items.OrderBy(x => x.EmployeeName).ToList()
-                : items.OrderByDescending(x => x.EmployeeName).ToList(),
-
-           
-            "efficiency" => sortAsc
-                ? items.OrderBy(x => x.EfficiencyForOperation).ToList()
-                : items.OrderByDescending(x => x.EfficiencyForOperation).ToList(),
-
+            "date" => sortAsc ? items.OrderBy(x => x.Date).ToList() : items.OrderByDescending(x => x.Date).ToList(),
+            "employeename" => sortAsc ? items.OrderBy(x => x.EmployeeName).ToList() : items.OrderByDescending(x => x.EmployeeName).ToList(),
+            "efficiency" => sortAsc ? items.OrderBy(x => x.EfficiencyForOperation).ToList() : items.OrderByDescending(x => x.EfficiencyForOperation).ToList(),
             _ => items
         };
 

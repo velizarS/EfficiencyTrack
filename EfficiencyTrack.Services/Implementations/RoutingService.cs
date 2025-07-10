@@ -19,6 +19,18 @@ namespace EfficiencyTrack.Services.Implementations
             _context = context;
         }
 
+        public override async Task AddAsync(Routing entity)
+        {
+            await EnsureRoutingIsUniqueAsync(entity);
+            await base.AddAsync(entity);
+        }
+
+        public override async Task UpdateAsync(Routing entity)
+        {
+            await EnsureRoutingIsUniqueForUpdateAsync(entity);
+            await base.UpdateAsync(entity);
+        }
+
         public async Task<Routing?> GetByIdWithDepartmentAsync(Guid id)
         {
             return await _context.Routings
@@ -42,5 +54,22 @@ namespace EfficiencyTrack.Services.Implementations
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        private async Task EnsureRoutingIsUniqueAsync(Routing entity)
+        {
+            var exists = await _context.Routings.AsNoTracking().AnyAsync(r => r.Code == entity.Code && !r.IsDeleted);
+            if (exists)
+                throw new InvalidOperationException($"Routing with code {entity.Code} already exists.");
+        }
+
+        private async Task EnsureRoutingIsUniqueForUpdateAsync(Routing entity)
+        {
+            var exists = await _context.Routings.AsNoTracking()
+                .AnyAsync(r => r.Code == entity.Code && r.Id != entity.Id && !r.IsDeleted);
+
+            if (exists)
+                throw new InvalidOperationException($"Another Routing with code {entity.Code} already exists.");
+        }
+
     }
 }
