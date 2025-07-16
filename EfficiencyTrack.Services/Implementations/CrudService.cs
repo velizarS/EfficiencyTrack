@@ -19,6 +19,7 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
         => await _context.Set<T>()
                          .AsNoTracking()
                          .Where(e => !e.IsDeleted)
+                         .OrderByDescending(e => e.CreatedOn)
                          .ToListAsync();
 
     public virtual async Task<T?> GetByIdAsync(Guid id)

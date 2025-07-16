@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -21,8 +22,8 @@ namespace EfficiencyTrack.Services.Implementations
             IDailyEfficiencyService dailyEfficiencyService)
             : base(context, httpContextAccessor)
         {
-            _dailyEfficiencyService = dailyEfficiencyService ?? throw new ArgumentNullException(nameof(dailyEfficiencyService));
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _dailyEfficiencyService = dailyEfficiencyService ?? throw new ArgumentNullException(nameof(dailyEfficiencyService));
             _validator = new EntryValidator(_context);
         }
 
@@ -32,6 +33,7 @@ namespace EfficiencyTrack.Services.Implementations
                 .Include(e => e.Employee)
                 .Include(e => e.Routing)
                 .Where(e => !e.IsDeleted)
+                .OrderByDescending(e => e.CreatedOn)
                 .ToListAsync();
         }
 
@@ -45,26 +47,14 @@ namespace EfficiencyTrack.Services.Implementations
 
         public override async Task AddAsync(Entry entity)
         {
-            var validationResult = await _validator.ValidateAsync(entity);
-            if (!validationResult.IsValid)
-            {
-                throw new InvalidOperationException(string.Join(Environment.NewLine, validationResult.Errors));
-            }
-
-            await SetEfficiencyAsync(entity);
+            await ValidateAndSetEfficiencyAsync(entity);
             await base.AddAsync(entity);
             await _dailyEfficiencyService.UpdateDailyEfficiencyAsync(entity.EmployeeId, entity.Date);
         }
 
         public override async Task UpdateAsync(Entry entity)
         {
-            var validationResult = await _validator.ValidateAsync(entity);
-            if (!validationResult.IsValid)
-            {
-                throw new InvalidOperationException(string.Join(Environment.NewLine, validationResult.Errors));
-            }
-
-            await SetEfficiencyAsync(entity);
+            await ValidateAndSetEfficiencyAsync(entity);
             await base.UpdateAsync(entity);
             await _dailyEfficiencyService.UpdateDailyEfficiencyAsync(entity.EmployeeId, entity.Date);
         }
@@ -79,12 +69,13 @@ namespace EfficiencyTrack.Services.Implementations
             }
         }
 
-        private decimal CalculateEfficiency(decimal requiredMinutes, decimal workedMinutes)
+        private async Task ValidateAndSetEfficiencyAsync(Entry entry)
         {
-            if (workedMinutes <= 0)
-                return 0; // Без изключение, просто връщаме 0
+            var validationResult = await _validator.ValidateAsync(entry);
+            if (!validationResult.IsValid)
+                throw new InvalidOperationException(string.Join(Environment.NewLine, validationResult.Errors));
 
-            return (requiredMinutes / workedMinutes) * 100;
+            await SetEfficiencyAsync(entry);
         }
 
         private async Task SetEfficiencyAsync(Entry entry)
@@ -94,14 +85,17 @@ namespace EfficiencyTrack.Services.Implementations
                 .FirstOrDefaultAsync(r => r.Id == entry.RoutingId);
 
             if (routing == null)
-                throw new InvalidOperationException("Invalid RoutingId");
+                throw new InvalidOperationException("Невалиден RoutingId");
 
             var requiredMinutes = (entry.Pieces + entry.Scrap) * routing.MinutesPerPiece;
-
             entry.EfficiencyForOperation = CalculateEfficiency(requiredMinutes, entry.WorkedMinutes);
         }
 
-        // Ако искаш, можеш да оставиш това като част от интерфейса:
+        private decimal CalculateEfficiency(decimal requiredMinutes, decimal workedMinutes)
+        {
+            return workedMinutes <= 0 ? 0 : (requiredMinutes / workedMinutes) * 100;
+        }
+
         async Task IEntryService.SetEfficiencyAsync(Entry entry)
         {
             await SetEfficiencyAsync(entry);
@@ -112,6 +106,7 @@ namespace EfficiencyTrack.Services.Implementations
             var todayEntries = await _context.Entries
                 .AsNoTracking()
                 .Where(x => x.EmployeeId == entry.EmployeeId && x.Date.Date == DateTime.UtcNow.Date)
+                .OrderByDescending(e => e.CreatedOn)
                 .ToListAsync();
 
             string message = "Успешен запис!\n";
@@ -129,22 +124,13 @@ namespace EfficiencyTrack.Services.Implementations
                 }
             }
 
-            if (entry.EfficiencyForOperation >= 100)
+            message += entry.EfficiencyForOperation switch
             {
-                message += "Представянето надминава очакванията ни със супер резултатите Ви. Благодарим!\n";
-            }
-            else if (entry.EfficiencyForOperation >= 90)
-            {
-                message += "Представянето оправдава очакванията ни с добрите Ви резултати. Благодарим!\n";
-            }
-            else if (entry.EfficiencyForOperation >= 85)
-            {
-                message += "Представянето частично отговаря на очакванията ни, необходимо е подобрение.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n";
-            }
-            else
-            {
-                message += "Незадоволително представяне.\nНеобходими са навременни коригиращи действия.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n";
-            }
+                >= 100 => "Представянето надминава очакванията ни със супер резултатите Ви. Благодарим!\n",
+                >= 90 => "Представянето оправдава очакванията ни с добрите Ви резултати. Благодарим!\n",
+                >= 85 => "Представянето частично отговаря на очакванията ни, необходимо е подобрение.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n",
+                _ => "Незадоволително представяне.\nНеобходими са навременни коригиращи действия.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n"
+            };
 
             return message;
         }

@@ -4,9 +4,9 @@ namespace EfficiencyTrack.ViewModels.FeedbackViewModels
 {
     public class FeedbackCreateViewModel
     {
-        [Required(ErrorMessage = "Името на служителя е задължително.")]
+        [Required(ErrorMessage = "Името е задължително.")]
         [StringLength(100, ErrorMessage = "Името не може да е по-дълго от 100 символа.")]
-        [Display(Name = "Име на служител")]
+        [Display(Name = "Име")]
         public string? EmployeeName { get; set; } 
 
         [Required(ErrorMessage = "Съобщението е задължително.")]
@@ -14,5 +14,4 @@ namespace EfficiencyTrack.ViewModels.FeedbackViewModels
         [Display(Name = "Съобщение")]
         public string Message { get; set; } = null!;
     }
-
 }

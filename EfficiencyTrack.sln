@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficiencyTrack", "EfficiencyTrack\EfficiencyTrack.csproj", "{B9B39129-C431-4FFF-BA8F-C6267A96B96C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficiencyTrack.Data", "EfficiencyTrack.Data\EfficiencyTrack.Data.csproj", "{0959ED7A-399B-4C69-9FD9-145DA0C8DC8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficiencyTrack.Services", "EfficiencyTrack.Services\EfficiencyTrack.Services.csproj", "{C603A13F-C487-44CD-A4B8-9361A3793521}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{9DEF3CDC-521E-44F0-902B-525B2A236792}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{C603A13F-C487-44CD-A4B8-9361A3793521}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C603A13F-C487-44CD-A4B8-9361A3793521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C603A13F-C487-44CD-A4B8-9361A3793521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DEF3CDC-521E-44F0-902B-525B2A236792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DEF3CDC-521E-44F0-902B-525B2A236792}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DEF3CDC-521E-44F0-902B-525B2A236792}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DEF3CDC-521E-44F0-902B-525B2A236792}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

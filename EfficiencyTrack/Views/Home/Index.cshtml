@@ -1,8 +1,71 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model EfficiencyTrack.ViewModels.HomeViewModel.HomeIndexViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Топ 10 за днес</h3>
+            @if (Model.Top10Today != null && Model.Top10Today.Any())
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Име на служител</th>
+                            <th>Ефективност %</th>
+                            <th>Смяна</th>
+                            <th>Отдел</th>
+                            <th>Началник смяна</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Top10Today)
+                        {
+                            <tr>
+                                <td>@(item.Employee?.FirstName + " " + item.Employee?.LastName)</td>
+                                <td>@item.EfficiencyPercentage.ToString("F2")</td>
+                                <td>@item.Shift?.Name </td>
+                                <td>@item.Employee?.Department?.Name </td>
+                                <td>@item.Employee?.ShiftManagerUser?.UserName </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Няма данни за днес.</p>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <h3>Топ 10 за месеца</h3>
+            @if (Model.Top10ThisMonth != null && Model.Top10ThisMonth.Any())
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Име на служител</th>
+                            <th>Ефективност %</th>
+                            <th>Отдел</th>
+                            <th>Началник смяна</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Top10ThisMonth)
+                        {
+                            <tr>
+                                <td>@(item.Employee?.FirstName + " " + item.Employee?.LastName)</td>
+                                <td>@item.EfficiencyPercentage.ToString("F2")</td>
+                                <td>@item.Employee?.Department?.Name </td>
+                                <td>@item.Employee?.ShiftManagerUser?.UserName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Няма данни за този месец.</p>
+            }
+        </div>
+    </div>
 </div>

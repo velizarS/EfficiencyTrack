@@ -22,7 +22,7 @@ namespace EfficiencyTrack.ViewModels.Routing
 
         [Required]
         [Range(0.01, 180, ErrorMessage = "Minutes per piece must be between 0.01 and 180 minutes.")]
-        [Display(Name = "Време за една бройка в минутри")]
+        [Display(Name = "Време за една бройка в минути")]
         public decimal MinutesPerPiece { get; set; }
 
         [Required]

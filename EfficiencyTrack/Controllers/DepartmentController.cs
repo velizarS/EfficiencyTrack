@@ -109,5 +109,4 @@ public class DepartmentController : BaseCrudController<
 
         return View(viewModel);
     }
-
 }

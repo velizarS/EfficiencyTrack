@@ -11,5 +11,8 @@ namespace EfficiencyTrack.Services.Interfaces
 
         Task<DailyEfficiencyDto?> GetByIdAsync(Guid id);
 
+        Task<IEnumerable<DailyEfficiency>> GetTop10ForTodayAsync();
+                                              
+        Task<IEnumerable<DailyEfficiency>> GetTop10ForThisMonthAsync();
     }
 }

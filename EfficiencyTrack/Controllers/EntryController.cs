@@ -109,9 +109,11 @@ public class EntryController : BaseCrudController<
         var entries = await _entryService.GetAllWithIncludesAsync();
         var viewModels = entries.Select(MapToViewModel).ToList();
         var sortedFiltered = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+
         ViewBag.SearchTerm = searchTerm;
         ViewBag.SortBy = sortBy;
         ViewBag.SortAsc = sortAsc;
+
         return View(BuildListViewModel(sortedFiltered));
     }
 
@@ -165,8 +167,24 @@ public class EntryController : BaseCrudController<
             WorkedMinutes = model.WorkedMinutes
         };
 
-        await _entryService.AddAsync(entity);
-        return RedirectToAction(nameof(Index));
+        try
+        {
+            await _entryService.AddAsync(entity);
+            TempData["Message"] = await _entryService.Greetings(entity);
+        }
+        catch (InvalidOperationException ex)
+        {
+            var errorMessages = ex.Message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var msg in errorMessages)
+            {
+                ModelState.AddModelError(string.Empty, msg);
+            }
+
+            await LoadSelectLists();
+            return View();
+        }
+
+        return View();
     }
 
     [HttpGet]
@@ -188,9 +206,42 @@ public class EntryController : BaseCrudController<
             return View(model);
         }
 
-        await _entryService.UpdateAsync(MapToEntity(model));
+        var employee = await _employeeService.GetByCodeAsync(model.EmployeeCode);
+        if (employee == null)
+            ModelState.AddModelError(nameof(model.EmployeeCode), "Невалиден код на служител.");
+
+        var routing = await _routingService.GetRoutingByCodeAsync(model.RoutingCode);
+        if (routing == null)
+            ModelState.AddModelError(nameof(model.RoutingCode), "Невалиден код на операция.");
+
+        if (!ModelState.IsValid)
+        {
+            await LoadSelectLists();
+            return View(model);
+        }
+
+        model.EmployeeId = employee.Id;
+        model.RoutingId = routing.Id;
+
+        try
+        {
+            await _entryService.UpdateAsync(MapToEntity(model));
+        }
+        catch (InvalidOperationException ex)
+        {
+            var errorMessages = ex.Message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var msg in errorMessages)
+            {
+                ModelState.AddModelError(string.Empty, msg);
+            }
+
+            await LoadSelectLists();
+            return View(model);
+        }
+
         return RedirectToAction(nameof(Index));
     }
+
 
     private async Task LoadSelectLists()
     {

@@ -70,6 +70,5 @@ namespace EfficiencyTrack.Services.Implementations
             if (exists)
                 throw new InvalidOperationException($"Another Routing with code {entity.Code} already exists.");
         }
-
     }
 }

@@ -9,8 +9,15 @@
         <h1>Редакция на запис</h1>
     </header>
 
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+
     <form asp-action="Edit" method="post" class="needs-validation">
         <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="EmployeeId" />
+        <input type="hidden" asp-for="RoutingId" />
 
         <div class="mb-3">
             <label asp-for="EmployeeCode" class="form-label"></label>

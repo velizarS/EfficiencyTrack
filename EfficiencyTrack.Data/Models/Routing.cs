@@ -12,7 +12,6 @@ namespace EfficiencyTrack.Data.Models
         [Comment("The unique code for the routing operation.")]
         [StringLength(20, ErrorMessage = "Code cannot be longer than 20 characters.")]
         public string Code { get; set; } = null!;
-
         [Required]
         [Display(Name = "Description")]
         [Comment("The description of the routing operation.")]

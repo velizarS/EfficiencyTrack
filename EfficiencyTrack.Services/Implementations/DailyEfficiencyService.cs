@@ -1,9 +1,9 @@
-﻿using EfficiencyTrack.Data.Data;
+﻿using Common;
+using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.DTOs;
 using EfficiencyTrack.Services.DTOs.EfficiencyTrack.Services.DTOs;
 using EfficiencyTrack.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfficiencyTrack.Services.Implementations
@@ -11,14 +11,10 @@ namespace EfficiencyTrack.Services.Implementations
     public class DailyEfficiencyService : IDailyEfficiencyService
     {
         private readonly EfficiencyTrackDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DailyEfficiencyService(
-            EfficiencyTrackDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+        public DailyEfficiencyService(EfficiencyTrackDbContext context)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<DailyEfficiency>> GetAllAsync()
@@ -48,7 +44,9 @@ namespace EfficiencyTrack.Services.Implementations
             var entries = await _context.Entries
                 .AsNoTracking()
                 .Include(e => e.Routing)
-                .Where(e => e.EmployeeId == dailyEfficiency.EmployeeId && e.Date.Date == dailyEfficiency.Date.Date && !e.IsDeleted)
+                .Where(e => e.EmployeeId == dailyEfficiency.EmployeeId &&
+                            e.Date.Date == dailyEfficiency.Date.Date &&
+                            !e.IsDeleted)
                 .ToListAsync();
 
             return new DailyEfficiencyDto
@@ -74,17 +72,85 @@ namespace EfficiencyTrack.Services.Implementations
             };
         }
 
+        public async Task<IEnumerable<DailyEfficiency>> GetTop10ForThisMonthAsync()
+        {
+            var now = DateTime.UtcNow;
+
+            var topEfficiencies = await _context.DailyEfficiencies
+                .AsNoTracking()
+                .Where(e => e.Date.Month == now.Month &&
+                            e.Date.Year == now.Year &&
+                            e.EfficiencyPercentage >= EfficiencyAppConstants.MinimumEfficiencyForTopList &&
+                            !e.IsDeleted)
+                .GroupBy(e => e.EmployeeId)
+                .Select(g => new
+                {
+                    EmployeeId = g.Key,
+                    AverageEfficiency = g.Average(e => e.EfficiencyPercentage),
+                    Entries = g.OrderByDescending(e => e.Date).ToList()
+                })
+                .OrderByDescending(g => g.AverageEfficiency)
+                .Take(10)
+                .ToListAsync();
+
+            var result = new List<DailyEfficiency>();
+
+            foreach (var group in topEfficiencies)
+            {
+                var latest = group.Entries.First();
+
+                result.Add(new DailyEfficiency
+                {
+                    Id = latest.Id, 
+                    Date = latest.Date,
+                    Employee = await _context.Employees
+                        .Include(e => e.Department)
+                        .Include(e => e.ShiftManagerUser)
+                        .FirstOrDefaultAsync(e => e.Id == group.EmployeeId),
+                    EfficiencyPercentage = group.AverageEfficiency,
+                    Shift = latest.Shift,
+                    TotalNeededMinutes = latest.TotalNeededMinutes,
+                    TotalWorkedMinutes = latest.TotalWorkedMinutes
+                });
+            }
+            return result;
+        }
+
+        public async Task<IEnumerable<DailyEfficiency>> GetTop10ForTodayAsync()
+        {
+            var today = DateTime.UtcNow.Date;
+
+            return await _context.DailyEfficiencies
+                .AsNoTracking()
+                .Where(e =>
+                    e.Date.Day == today.Day &&
+                    e.Date.Month == today.Month &&
+                    e.Date.Year == today.Year &&
+                    e.EfficiencyPercentage > EfficiencyAppConstants.MinimumEfficiencyForTopList)
+                .Include(de => de.Employee)
+                    .ThenInclude(emp => emp.Department)
+                .Include(de => de.Employee)
+                    .ThenInclude(emp => emp.ShiftManagerUser)
+                .Include(de => de.Shift)
+                .OrderByDescending(e => e.EfficiencyPercentage)
+                .Take(10)
+                .ToListAsync();
+        }
+
         public async Task UpdateDailyEfficiencyAsync(Guid employeeId, DateTime date)
         {
             var entriesOfDay = await _context.Entries.AsNoTracking()
-                .Where(e => e.EmployeeId == employeeId && e.Date.Date == date.Date && !e.IsDeleted)
+                .Where(e => e.EmployeeId == employeeId &&
+                            e.Date.Date == date.Date &&
+                            !e.IsDeleted)
                 .ToListAsync();
+
+            var existing = await _context.DailyEfficiencies
+                .FirstOrDefaultAsync(de => de.EmployeeId == employeeId &&
+                                           de.Date.Date == date.Date);
 
             if (!entriesOfDay.Any())
             {
-                var existing = await _context.DailyEfficiencies
-                    .FirstOrDefaultAsync(de => de.EmployeeId == employeeId && de.Date.Date == date.Date);
-
                 if (existing != null)
                 {
                     _context.DailyEfficiencies.Remove(existing);
@@ -93,14 +159,16 @@ namespace EfficiencyTrack.Services.Implementations
                 return;
             }
 
-            decimal totalNeededMinutes = 0;
-            foreach (var entry in entriesOfDay)
-            {
-                var routing = await _context.Routings
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(r => r.Id == entry.RoutingId && !r.IsDeleted);
-                totalNeededMinutes += (entry.Pieces + entry.Scrap) * routing.MinutesPerPiece;
-            }
+            var routingIds = entriesOfDay.Select(e => e.RoutingId).Distinct();
+            var routingMap = await _context.Routings
+                .AsNoTracking()
+                .Where(r => routingIds.Contains(r.Id) && !r.IsDeleted)
+                .ToDictionaryAsync(r => r.Id, r => r.MinutesPerPiece);
+
+            int totalNeededMinutes = (int)entriesOfDay.Sum(e =>
+                routingMap.TryGetValue(e.RoutingId, out var minutesPerPiece)
+                    ? (e.Pieces + e.Scrap) * minutesPerPiece
+                    : 0);
 
             var shiftId = entriesOfDay.First().ShiftId;
 
@@ -111,16 +179,14 @@ namespace EfficiencyTrack.Services.Implementations
                 .FirstOrDefaultAsync();
 
             if (shiftDuration == 0)
-                shiftDuration = 1;
+                throw new InvalidOperationException("Shift duration is 0 or shift not found.");
 
             decimal efficiencyPercent = (totalNeededMinutes / shiftDuration) * 100;
+            int totalTime = entriesOfDay.Sum(e => e.WorkedMinutes);
 
-            var dailyEfficiency = await _context.DailyEfficiencies.AsNoTracking()
-                .FirstOrDefaultAsync(de => de.EmployeeId == employeeId && de.Date.Date == date.Date);
-            var totalTime = entriesOfDay.Sum(e => e.WorkedMinutes);
-            if (dailyEfficiency == null)
+            if (existing == null)
             {
-                dailyEfficiency = new DailyEfficiency
+                var dailyEfficiency = new DailyEfficiency
                 {
                     Id = Guid.NewGuid(),
                     EmployeeId = employeeId,
@@ -135,12 +201,12 @@ namespace EfficiencyTrack.Services.Implementations
             }
             else
             {
-                dailyEfficiency.EfficiencyPercentage = efficiencyPercent;
-                dailyEfficiency.ComputedOn = DateTime.UtcNow;
-                dailyEfficiency.ShiftId = shiftId;
-                dailyEfficiency.TotalWorkedMinutes = totalTime;
-                dailyEfficiency.TotalNeededMinutes = totalNeededMinutes;
-                _context.DailyEfficiencies.Update(dailyEfficiency);
+                existing.EfficiencyPercentage = efficiencyPercent;
+                existing.ComputedOn = DateTime.UtcNow;
+                existing.ShiftId = shiftId;
+                existing.TotalWorkedMinutes = totalTime;
+                existing.TotalNeededMinutes = totalNeededMinutes;
+                _context.DailyEfficiencies.Update(existing);
             }
 
             await _context.SaveChangesAsync();

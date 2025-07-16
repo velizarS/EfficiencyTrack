@@ -4,10 +4,23 @@
     ViewData["Title"] = "Нов запис";
 }
 
-<main class="container">
-    <header>
+<main class="container mt-4">
+    <header class="mb-4">
         <h1>Създай нов запис</h1>
     </header>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div class="alert alert-danger">@error.ErrorMessage</div>
+        }
+    }
 
     <form asp-action="Create" method="post" class="needs-validation">
         <div class="mb-3">
@@ -30,7 +43,7 @@
 
         <div class="mb-3">
             <label asp-for="Pieces" class="form-label"></label>
-            <input asp-for="Pieces" class="form-control" />
+            <input asp-for="Pieces" class="form-control" placeholder="0" value="" />
             <span asp-validation-for="Pieces" class="text-danger"></span>
         </div>
 
@@ -42,12 +55,12 @@
 
         <div class="mb-3">
             <label asp-for="WorkedMinutes" class="form-label"></label>
-            <input asp-for="WorkedMinutes" class="form-control" />
+            <input asp-for="WorkedMinutes" class="form-control" placeholder="Минути" value="" />
             <span asp-validation-for="WorkedMinutes" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary">Запази</button>
-        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Отказ</a>
     </form>
 </main>
 

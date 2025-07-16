@@ -3,6 +3,7 @@ using EfficiencyTrack.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
@@ -19,7 +20,7 @@ namespace EfficiencyTrack.Services.Implementations
 
         public EntryValidator(EfficiencyTrackDbContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context;
         }
 
         public async Task<ValidationResult> ValidateAsync(Entry entry)
@@ -31,20 +32,11 @@ namespace EfficiencyTrack.Services.Implementations
                 result.Errors.Add("Вече сте добавили тези данни през днешния ден. МОЛЯ НЕ ПРАВЕТЕ ДВОЙНИ ЗАПИСИ В СИСТЕМАТА.");
             }
 
-            var (isOver, remainingMinutes, shiftDuration) = await IsOverShiftTimeAsync(entry);
-            if (isOver)
-            {
-                string message = remainingMinutes > 0
-                    ? $"Въведеното изработено време надвишава максимално допустимото. Оставащи минути за въвеждане: {remainingMinutes}."
-                    : $"Въведеното изработено време е повече от времето на работната смяна ({shiftDuration} минути).";
+            var shiftValidation = await ValidateShiftTimeAsync(entry);
+            result.Errors.AddRange(shiftValidation.Errors);
 
-                result.Errors.Add(message);
-            }
-
-            if (await IsOverEfficiencyPercentAsync(entry))
-            {
-                result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
-            }
+            var efficiencyValidation = await ValidateEfficiencyAsync(entry);
+            result.Errors.AddRange(efficiencyValidation.Errors);
 
             return result;
         }
@@ -60,39 +52,63 @@ namespace EfficiencyTrack.Services.Implementations
                 !x.IsDeleted);
         }
 
-        private async Task<(bool IsOver, int RemainingMinutes, int ShiftDuration)> IsOverShiftTimeAsync(Entry entry)
+        private async Task<ValidationResult> ValidateShiftTimeAsync(Entry entry)
         {
-            // Взимаме shift duration + сумата на изработените минути за деня в една заявка
+            var result = new ValidationResult();
+
             var shift = await _context.Shifts.AsNoTracking().FirstOrDefaultAsync(s => s.Id == entry.ShiftId);
             if (shift == null)
-                throw new InvalidOperationException("Невалидна смяна (Shift).");
+            {
+                result.Errors.Add("Невалидна смяна (Shift).");
+                return result;
+            }
 
-            decimal totalWorkedMinutes = await _context.Entries
+            int totalWorkedMinutes = (int)await _context.Entries
                 .AsNoTracking()
                 .Where(x => x.EmployeeId == entry.EmployeeId && x.Date.Date == entry.Date.Date && !x.IsDeleted)
                 .SumAsync(x => x.WorkedMinutes);
 
-            int remainingMinutes = shift.DurationMinutes - (int)totalWorkedMinutes;
+            int remainingMinutes = shift.DurationMinutes - totalWorkedMinutes;
 
-            bool isOver = (totalWorkedMinutes + entry.WorkedMinutes) > shift.DurationMinutes;
+            if (entry.WorkedMinutes > remainingMinutes)
+            {
+                string message = remainingMinutes > 0
+                    ? $"Въведеното изработено време надвишава максимално допустимото. Оставащи минути за въвеждане: {remainingMinutes}."
+                    : $"Въведеното изработено време е повече от времето на работната смяна ({shift.DurationMinutes} минути).";
 
-            return (isOver, remainingMinutes, shift.DurationMinutes);
+                result.Errors.Add(message);
+            }
+
+            return result;
         }
 
-        private async Task<bool> IsOverEfficiencyPercentAsync(Entry entry)
+        private async Task<ValidationResult> ValidateEfficiencyAsync(Entry entry)
         {
+            var result = new ValidationResult();
+
             var routing = await _context.Routings.AsNoTracking().FirstOrDefaultAsync(r => r.Id == entry.RoutingId);
             if (routing == null)
-                throw new InvalidOperationException("Невалиден RoutingId при проверка на ефективността.");
+            {
+                result.Errors.Add("Невалиден RoutingId при проверка на ефективността.");
+                return result;
+            }
 
-            var requiredMinutes = (entry.Pieces + entry.Scrap) * routing.MinutesPerPiece;
+            int totalPieces = entry.Pieces + entry.Scrap;
+            if (entry.WorkedMinutes <= 0 || totalPieces <= 0)
+            {
+                result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
+                return result;
+            }
 
-            if (entry.WorkedMinutes <= 0)
-                return true; // невалидно време, значи надвишава
-
+            var requiredMinutes = totalPieces * routing.MinutesPerPiece;
             var efficiency = (requiredMinutes / entry.WorkedMinutes) * 100;
 
-            return efficiency > 150;
+            if (efficiency > 150)
+            {
+                result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
+            }
+
+            return result;
         }
     }
 }
