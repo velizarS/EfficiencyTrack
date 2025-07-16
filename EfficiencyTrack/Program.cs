@@ -6,6 +6,7 @@ using EfficiencyTrack.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using EfficiencyTrack.Services.Implementations;
+using EfficiencyTrack.Services.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ builder.Services.AddScoped<IDailyEfficiencyService, DailyEfficiencyService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IRoutingService, RoutingService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<GreetingService>();
+
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>

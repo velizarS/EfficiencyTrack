@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using EfficiencyTrack.ViewModels.Routing;
+using EfficiencyTrack.Services.Helpers;
 
 public class EntryController : BaseCrudController<
     Entry,
@@ -22,18 +23,20 @@ public class EntryController : BaseCrudController<
     private readonly IEmployeeService _employeeService;
     private readonly IRoutingService _routingService;
     private readonly ICrudService<Shift> _shiftService;
+    private readonly GreetingService _greetingService;
 
     public EntryController(
         IEntryService entryService,
         IEmployeeService employeeService,
         IRoutingService routingService,
-        ICrudService<Shift> shiftService)
+        ICrudService<Shift> shiftService, GreetingService greetingService)
         : base(entryService)
     {
         _entryService = entryService;
         _employeeService = employeeService;
         _routingService = routingService;
         _shiftService = shiftService;
+        _greetingService = greetingService;
     }
 
     protected override EntryViewModel MapToViewModel(Entry entity) => new()
@@ -135,19 +138,7 @@ public class EntryController : BaseCrudController<
     [ValidateAntiForgeryToken]
     public override async Task<IActionResult> Create(EntryCreateViewModel model)
     {
-        if (!ModelState.IsValid)
-        {
-            await LoadSelectLists();
-            return View(model);
-        }
-
-        var employee = await _employeeService.GetByCodeAsync(model.EmployeeCode);
-        var routing = await _routingService.GetRoutingByCodeAsync(model.RoutingCode);
-
-        if (employee == null)
-            ModelState.AddModelError(nameof(model.EmployeeCode), "Невалиден код на служител.");
-        if (routing == null)
-            ModelState.AddModelError(nameof(model.RoutingCode), "Невалиден код на операция.");
+        (Employee? employee, Routing? routing) = await PrepareAndValidateEntry(model);
 
         if (!ModelState.IsValid)
         {
@@ -159,8 +150,8 @@ public class EntryController : BaseCrudController<
         {
             Id = Guid.NewGuid(),
             Date = DateTime.UtcNow,
-            EmployeeId = employee.Id,
-            RoutingId = routing.Id,
+            EmployeeId = employee!.Id,
+            RoutingId = routing!.Id,
             ShiftId = model.ShiftId,
             Pieces = model.Pieces,
             Scrap = model.Scrap,
@@ -170,6 +161,17 @@ public class EntryController : BaseCrudController<
         try
         {
             await _entryService.AddAsync(entity);
+<<<<<<< HEAD
+            TempData["Message"] = await _greetingService.GetGreetingAsync(entity);
+            return View();
+        }
+        catch (InvalidOperationException ex)
+        {
+            AddModelErrors(ex);
+            await LoadSelectLists();
+            return View(model);
+        }
+=======
             TempData["Message"] = await _entryService.Greetings(entity);
         }
         catch (InvalidOperationException ex)
@@ -185,6 +187,7 @@ public class EntryController : BaseCrudController<
         }
 
         return View();
+>>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
     }
 
     [HttpGet]
@@ -192,6 +195,7 @@ public class EntryController : BaseCrudController<
     {
         var entity = await _entryService.GetByIdWithIncludesAsync(id);
         if (entity == null) return NotFound();
+
         await LoadSelectLists();
         return View(MapToEditModel(entity));
     }
@@ -200,12 +204,16 @@ public class EntryController : BaseCrudController<
     [ValidateAntiForgeryToken]
     public override async Task<IActionResult> Edit(EntryEditViewModel model)
     {
-        if (!ModelState.IsValid)
+        (Employee? employee, Routing? routing) = await PrepareAndValidateEntry(model);
+
+        if (employee == null || routing == null || !ModelState.IsValid)
         {
             await LoadSelectLists();
             return View(model);
         }
 
+<<<<<<< HEAD
+=======
         var employee = await _employeeService.GetByCodeAsync(model.EmployeeCode);
         if (employee == null)
             ModelState.AddModelError(nameof(model.EmployeeCode), "Невалиден код на служител.");
@@ -220,12 +228,21 @@ public class EntryController : BaseCrudController<
             return View(model);
         }
 
+>>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
         model.EmployeeId = employee.Id;
         model.RoutingId = routing.Id;
 
         try
         {
             await _entryService.UpdateAsync(MapToEntity(model));
+<<<<<<< HEAD
+            TempData["Message"] = "Записът беше успешно редактиран.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (InvalidOperationException ex)
+        {
+            AddModelErrors(ex);
+=======
         }
         catch (InvalidOperationException ex)
         {
@@ -234,12 +251,25 @@ public class EntryController : BaseCrudController<
             {
                 ModelState.AddModelError(string.Empty, msg);
             }
+>>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
 
             await LoadSelectLists();
             return View(model);
         }
+<<<<<<< HEAD
+    }
+
+    private void AddModelErrors(InvalidOperationException ex)
+    {
+        var errorMessages = ex.Message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var msg in errorMessages)
+        {
+            ModelState.AddModelError(string.Empty, msg);
+        }
+=======
 
         return RedirectToAction(nameof(Index));
+>>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
     }
 
 
@@ -274,4 +304,18 @@ public class EntryController : BaseCrudController<
 
         return items;
     }
+
+    private async Task<(Employee? employee, Routing? routing)> PrepareAndValidateEntry<T>(T model) where T : EntryBaseViewModel
+    {
+        var employee = await _employeeService.GetByCodeAsync(model.EmployeeCode);
+        var routing = await _routingService.GetRoutingByCodeAsync(model.RoutingCode);
+
+        if (employee == null)
+            ModelState.AddModelError(nameof(model.EmployeeCode), "Невалиден код на служител.");
+        if (routing == null)
+            ModelState.AddModelError(nameof(model.RoutingCode), "Невалиден код на операция.");
+
+        return (employee, routing);
+    }
+
 }

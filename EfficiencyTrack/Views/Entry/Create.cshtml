@@ -11,9 +11,27 @@
 
     @if (TempData["Message"] != null)
     {
+<<<<<<< HEAD
+        <div id="success-message" class="alert alert-success" style="white-space: pre-line;">
+            @TempData["Message"]
+        </div>
+
+        <script>
+            setTimeout(function () {
+                var msg = document.getElementById('success-message');
+                if (msg) {
+                    msg.style.display = 'none';
+                }
+            }, 10000); 
+        </script>
+    }
+
+
+=======
         <div class="alert alert-success">@TempData["Message"]</div>
     }
 
+>>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
     @if (!ViewData.ModelState.IsValid)
     {
         foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))

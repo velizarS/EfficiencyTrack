@@ -7,6 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+<<<<<<< HEAD
+using EfficiencyTrack.Services.Helpers;
+=======
+>>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -15,16 +19,19 @@ namespace EfficiencyTrack.Services.Implementations
         private readonly IDailyEfficiencyService _dailyEfficiencyService;
         private readonly EfficiencyTrackDbContext _context;
         private readonly EntryValidator _validator;
+        private readonly GreetingService _greetingService;
 
         public EntryService(
             EfficiencyTrackDbContext context,
             IHttpContextAccessor httpContextAccessor,
-            IDailyEfficiencyService dailyEfficiencyService)
+            IDailyEfficiencyService dailyEfficiencyService ,
+            GreetingService greetingService)
             : base(context, httpContextAccessor)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _dailyEfficiencyService = dailyEfficiencyService ?? throw new ArgumentNullException(nameof(dailyEfficiencyService));
             _validator = new EntryValidator(_context);
+            _greetingService = greetingService;
         }
 
         public async Task<List<Entry>> GetAllWithIncludesAsync()
@@ -101,6 +108,8 @@ namespace EfficiencyTrack.Services.Implementations
             await SetEfficiencyAsync(entry);
         }
 
+<<<<<<< HEAD
+=======
         public async Task<string> Greetings(Entry entry)
         {
             var todayEntries = await _context.Entries
@@ -134,5 +143,6 @@ namespace EfficiencyTrack.Services.Implementations
 
             return message;
         }
+>>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
     }
 }
