@@ -138,21 +138,21 @@ namespace EfficiencyTrack.Services.Implementations
             return topTen;
         }
 
-
-
-
-
         public async Task UpdateDailyEfficiencyAsync(Guid employeeId, DateTime date)
         {
+            var dayStart = date.Date;
+            var dayEnd = dayStart.AddDays(1);
+
             var entriesOfDay = await _context.Entries.AsNoTracking()
                 .Where(e => e.EmployeeId == employeeId &&
-                            e.Date.Date == date.Date &&
+                            e.Date >= dayStart &&
+                            e.Date < dayEnd &&
                             !e.IsDeleted)
                 .ToListAsync();
 
             var existing = await _context.DailyEfficiencies
                 .FirstOrDefaultAsync(de => de.EmployeeId == employeeId &&
-                                           de.Date.Date == date.Date);
+                                           de.Date >= dayStart && de.Date < dayEnd);
 
             if (!entriesOfDay.Any())
             {
@@ -163,6 +163,21 @@ namespace EfficiencyTrack.Services.Implementations
                 }
                 return;
             }
+
+            var distinctShiftIds = entriesOfDay.Select(e => e.ShiftId).Distinct().ToList();
+            if (distinctShiftIds.Count != 1)
+                throw new InvalidOperationException("Entries span multiple shifts. Cannot calculate efficiency.");
+
+            var shiftId = distinctShiftIds.First();
+
+            var shiftDuration = await _context.Shifts
+                .AsNoTracking()
+                .Where(s => s.Id == shiftId)
+                .Select(s => s.DurationMinutes)
+                .FirstOrDefaultAsync();
+
+            if (shiftDuration <= 0)
+                throw new InvalidOperationException("Invalid or missing shift duration.");
 
             var routingIds = entriesOfDay.Select(e => e.RoutingId).Distinct();
             var routingMap = await _context.Routings
@@ -175,29 +190,22 @@ namespace EfficiencyTrack.Services.Implementations
                     ? (e.Pieces + e.Scrap) * minutesPerPiece
                     : 0);
 
-            var shiftId = entriesOfDay.First().ShiftId;
+            decimal totalWorkedMinutes = entriesOfDay.Sum(e => e.WorkedMinutes);
 
-            var shiftDuration = await _context.Shifts
-                .AsNoTracking()
-                .Where(s => s.Id == shiftId)
-                .Select(s => s.DurationMinutes)
-                .FirstOrDefaultAsync();
+            decimal efficiencyPercent = shiftDuration > 0
+                ? ((decimal)totalNeededMinutes / shiftDuration) * 100
+                : 0;
 
-            if (shiftDuration == 0)
-                throw new InvalidOperationException("Shift duration is 0 or shift not found.");
-
-            decimal efficiencyPercent = (totalNeededMinutes / shiftDuration) * 100;
-            decimal totalTime = entriesOfDay.Sum(e => e.WorkedMinutes);
             if (existing == null)
             {
                 var dailyEfficiency = new DailyEfficiency
                 {
                     Id = Guid.NewGuid(),
                     EmployeeId = employeeId,
-                    Date = date.Date,
+                    Date = dayStart,
                     ShiftId = shiftId,
                     EfficiencyPercentage = efficiencyPercent,
-                    TotalWorkedMinutes = totalTime,
+                    TotalWorkedMinutes = totalWorkedMinutes,
                     TotalNeededMinutes = totalNeededMinutes,
                     ComputedOn = DateTime.UtcNow
                 };
@@ -205,15 +213,15 @@ namespace EfficiencyTrack.Services.Implementations
             }
             else
             {
+                existing.ShiftId = shiftId;
+                existing.TotalWorkedMinutes = totalWorkedMinutes;
+                existing.TotalNeededMinutes = totalNeededMinutes;
                 existing.EfficiencyPercentage = efficiencyPercent;
                 existing.ComputedOn = DateTime.UtcNow;
-                existing.ShiftId = shiftId;
-                existing.TotalWorkedMinutes = totalTime;
-                existing.TotalNeededMinutes = totalNeededMinutes;
-                _context.DailyEfficiencies.Update(existing);
             }
 
             await _context.SaveChangesAsync();
         }
+
     }
 }
