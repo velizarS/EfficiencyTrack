@@ -8,8 +8,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using EfficiencyTrack.ViewModels.Routing;
-using EfficiencyTrack.Services.Helpers;
 
 public class EntryController : BaseCrudController<
     Entry,
@@ -23,13 +21,14 @@ public class EntryController : BaseCrudController<
     private readonly IEmployeeService _employeeService;
     private readonly IRoutingService _routingService;
     private readonly ICrudService<Shift> _shiftService;
-    private readonly GreetingService _greetingService;
+    private readonly IGreetingService _greetingService;
 
     public EntryController(
         IEntryService entryService,
         IEmployeeService employeeService,
         IRoutingService routingService,
-        ICrudService<Shift> shiftService, GreetingService greetingService)
+        ICrudService<Shift> shiftService,
+        IGreetingService greetingService)
         : base(entryService)
     {
         _entryService = entryService;
@@ -107,17 +106,25 @@ public class EntryController : BaseCrudController<
 
     protected override EntryListViewModel BuildListViewModel(List<EntryViewModel> items) => new() { Entries = items };
 
-    public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
+    public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
     {
         var entries = await _entryService.GetAllWithIncludesAsync();
         var viewModels = entries.Select(MapToViewModel).ToList();
-        var sortedFiltered = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+        var filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+
+        var pagedItems = filteredSorted
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
 
         ViewBag.SearchTerm = searchTerm;
         ViewBag.SortBy = sortBy;
         ViewBag.SortAsc = sortAsc;
+        ViewBag.Page = page;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalCount = filteredSorted.Count;
 
-        return View(BuildListViewModel(sortedFiltered));
+        return View(BuildListViewModel(pagedItems));
     }
 
     public override async Task<IActionResult> Details(Guid id)
@@ -161,7 +168,7 @@ public class EntryController : BaseCrudController<
         try
         {
             await _entryService.AddAsync(entity);
-            TempData["Message"] = await _greetingService.GetGreetingAsync(entity);
+            TempData["Message"] = await _greetingService.GetGreetingMessageAsync(entity);
             return RedirectToAction(nameof(Index));
         }
         catch (InvalidOperationException ex)
@@ -206,7 +213,6 @@ public class EntryController : BaseCrudController<
         catch (InvalidOperationException ex)
         {
             AddModelErrors(ex);
-
             await LoadSelectLists();
             return View(model);
         }
@@ -265,5 +271,4 @@ public class EntryController : BaseCrudController<
 
         return (employee, routing);
     }
-
 }

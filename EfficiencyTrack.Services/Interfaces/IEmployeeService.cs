@@ -1,5 +1,8 @@
 ﻿using EfficiencyTrack.Data.Identity;
 using EfficiencyTrack.Data.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Interfaces
 {
@@ -9,6 +12,6 @@ namespace EfficiencyTrack.Services.Interfaces
         Task<List<Employee>> GetByDepartmentAsync(Guid departmentId);
         Task<List<Employee>> GetByShiftManagerUserIdAsync(Guid leaderId);
         Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null);
-        Task<Employee> GetByCodeAsync(string employeeCode);
+        Task<Employee?> GetByCodeAsync(string employeeCode);
     }
 }

@@ -1,12 +1,10 @@
 ﻿using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.Services.Helpers;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
@@ -27,6 +25,7 @@ namespace EfficiencyTrack.Services.Implementations
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
+
             await EnsureDepartmentIsUniqueAsync(entity);
             await base.AddAsync(entity);
         }
@@ -35,6 +34,7 @@ namespace EfficiencyTrack.Services.Implementations
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
+
             await EnsureDepartmentIsUniqueForUpdateAsync(entity);
             await base.UpdateAsync(entity);
         }
@@ -42,10 +42,11 @@ namespace EfficiencyTrack.Services.Implementations
         public async Task<Department?> GetDepartmentWithEmployeesAsync(Guid id)
         {
             return await _context.Departments
-                                 .Include(d => d.Employees.Where(e => !e.IsDeleted))
-                                 .AsNoTracking()
-                                 .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+                .AsNoTracking()
+                .Include(d => d.Employees)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
         }
+
 
         private async Task EnsureDepartmentIsUniqueForUpdateAsync(Department entity)
         {
@@ -53,15 +54,16 @@ namespace EfficiencyTrack.Services.Implementations
                 .AnyAsync(e => e.Name == entity.Name && e.Id != entity.Id && !e.IsDeleted);
 
             if (exists)
-                throw new InvalidOperationException($"Another Department with name {entity.Name} already exists.");
+                throw new DuplicateDepartmentException($"Another Department with name '{entity.Name}' already exists.");
         }
 
         private async Task EnsureDepartmentIsUniqueAsync(Department entity)
         {
-            var exists = await _context.Departments.AsNoTracking().AnyAsync(e => e.Name == entity.Name && !e.IsDeleted);
-            if (exists)
-                throw new InvalidOperationException($"Department with name {entity.Name} already exists.");
-        }
+            var exists = await _context.Departments.AsNoTracking()
+                .AnyAsync(e => e.Name == entity.Name && !e.IsDeleted);
 
+            if (exists)
+                throw new DuplicateDepartmentException($"Department with name '{entity.Name}' already exists.");
+        }
     }
 }

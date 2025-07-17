@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
@@ -39,13 +40,6 @@ namespace EfficiencyTrack.Services.Implementations
                 .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
         }
 
-        public async Task<Routing> GetRoutingByCodeAsync(string routingCode)
-        {
-            return await _context.Routings
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Code == routingCode && !r.IsDeleted);
-        }
-
         public async Task<IEnumerable<Routing>> GetAllWithDepartmentsAsync()
         {
             return await _context.Routings
@@ -53,6 +47,39 @@ namespace EfficiencyTrack.Services.Implementations
                 .Where(r => !r.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public IQueryable<Routing> GetFilteredRoutings(string? searchTerm, string? sortBy, bool sortAsc)
+        {
+            var query = _context.Routings
+                .Include(r => r.Department)
+                .Where(r => !r.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var lowerTerm = searchTerm.ToLower();
+                query = query.Where(r =>
+                    r.Code.ToLower().Contains(lowerTerm) ||
+                    r.Department.Name.ToLower().Contains(lowerTerm));
+            }
+
+            query = (sortBy?.ToLower()) switch
+            {
+                "code" => sortAsc ? query.OrderBy(r => r.Code) : query.OrderByDescending(r => r.Code),
+                "department" => sortAsc ? query.OrderBy(r => r.Department.Name) : query.OrderByDescending(r => r.Department.Name),
+                "minutes" => sortAsc ? query.OrderBy(r => r.MinutesPerPiece) : query.OrderByDescending(r => r.MinutesPerPiece),
+                "zone" => sortAsc ? query.OrderBy(r => r.Zone) : query.OrderByDescending(r => r.Zone),
+                _ => query.OrderBy(r => r.Code)
+            };
+
+            return query;
+        }
+
+        public async Task<Routing> GetRoutingByCodeAsync(string routingCode)
+        {
+            return await _context.Routings
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Code == routingCode && !r.IsDeleted);
         }
 
         private async Task EnsureRoutingIsUniqueAsync(Routing entity)

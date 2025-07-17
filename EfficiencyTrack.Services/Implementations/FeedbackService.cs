@@ -2,6 +2,10 @@
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -59,20 +63,11 @@ namespace EfficiencyTrack.Services.Implementations
                 return null;
 
             feedback.IsHandled = !feedback.IsHandled;
-
-            if (feedback.IsHandled)
-            {
-                feedback.HandledAt = DateTime.UtcNow;
-            }
-            else
-            {
-                feedback.HandledAt = null;
-            }
+            feedback.HandledAt = feedback.IsHandled ? DateTime.UtcNow : (DateTime?)null;
 
             await _context.SaveChangesAsync();
             return feedback;
         }
-
 
         public async Task<bool> DeleteFeedbackAsync(Guid id)
         {
@@ -83,6 +78,27 @@ namespace EfficiencyTrack.Services.Implementations
             _context.Feedbacks.Remove(feedback);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public IQueryable<Feedback> GetFilteredFeedbacks(string? searchTerm, string? sortBy, bool sortAsc)
+        {
+            var query = _context.Feedbacks.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var lowerTerm = searchTerm.ToLower();
+                query = query.Where(f => f.EmployeeName != null && f.EmployeeName.ToLower().Contains(lowerTerm));
+            }
+
+            query = (sortBy?.ToLower()) switch
+            {
+                "name" => sortAsc ? query.OrderBy(f => f.EmployeeName) : query.OrderByDescending(f => f.EmployeeName),
+                "date" => sortAsc ? query.OrderBy(f => f.CreatedAt) : query.OrderByDescending(f => f.CreatedAt),
+                "handled" => sortAsc ? query.OrderBy(f => f.IsHandled) : query.OrderByDescending(f => f.IsHandled),
+                _ => query.OrderByDescending(f => f.CreatedAt),
+            };
+
+            return query;
         }
     }
 }

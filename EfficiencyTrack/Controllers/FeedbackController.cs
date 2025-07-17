@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.FeedbackViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace EfficiencyTrack.Web.Controllers
 {
@@ -19,37 +20,24 @@ namespace EfficiencyTrack.Web.Controllers
 
         public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
         {
-            var feedbacks = await _service.GetAllFeedbacksAsync();
+            var query = _service.GetFilteredFeedbacks(searchTerm, sortBy, sortAsc);
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                feedbacks = feedbacks.Where(f => f.EmployeeName != null && f.EmployeeName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
-            }
+            var feedbackEntities = await query.ToListAsync();
 
-            feedbacks = sortBy switch
-            {
-                "name" => sortAsc
-                    ? feedbacks.OrderBy(f => f.EmployeeName)
-                    : feedbacks.OrderByDescending(f => f.EmployeeName),
-                "date" => sortAsc
-                    ? feedbacks.OrderBy(f => f.CreatedAt)
-                    : feedbacks.OrderByDescending(f => f.CreatedAt),
-                "handled" => sortAsc
-                    ? feedbacks.OrderBy(f => f.IsHandled) 
-                    : feedbacks.OrderByDescending(f => f.IsHandled),
-                _ => feedbacks.OrderByDescending(f => f.CreatedAt),
-            };
-
-            var viewModel = new FeedbackListViewModel
-            {
-                Feedbacks = feedbacks.Select(f => new FeedbackViewModel
+            var feedbacks = feedbackEntities
+                .Select(f => new FeedbackViewModel
                 {
                     Id = f.Id,
-                    EmployeeName = f.EmployeeName,
+                    EmployeeName = f.EmployeeName ?? string.Empty,
                     CreatedAt = f.CreatedAt,
                     Message = f.Message,
                     IsHandled = f.IsHandled
-                }).ToList()
+                })
+                .ToList();
+
+            var viewModel = new FeedbackListViewModel
+            {
+                Feedbacks = feedbacks
             };
 
             ViewBag.SearchTerm = searchTerm;
@@ -57,6 +45,7 @@ namespace EfficiencyTrack.Web.Controllers
             ViewBag.SortAsc = sortAsc;
 
             return View(viewModel);
+
         }
 
         [HttpPost]
@@ -65,12 +54,9 @@ namespace EfficiencyTrack.Web.Controllers
         {
             var updated = await _service.ToggleHandledAsync(id);
             if (updated == null)
-            {
                 return NotFound();
-            }
 
             return RedirectToAction(nameof(Index));
-
         }
 
         public async Task<IActionResult> Details(Guid id)
@@ -101,17 +87,12 @@ namespace EfficiencyTrack.Web.Controllers
         public async Task<IActionResult> Create(FeedbackCreateViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var entity = new Feedback
             {
-                Id = Guid.NewGuid(),
                 EmployeeName = model.EmployeeName,
-                Message = model.Message,
-                CreatedAt = DateTime.UtcNow,
-                IsHandled = false
+                Message = model.Message
             };
 
             await _service.CreateFeedbackAsync(entity);
@@ -123,7 +104,7 @@ namespace EfficiencyTrack.Web.Controllers
             var feedback = await _service.GetFeedbackByIdAsync(id);
             if (feedback == null) return NotFound();
 
-            return View(new FeedbackDetailViewModel
+            var viewModel = new FeedbackDetailViewModel
             {
                 Id = feedback.Id,
                 EmployeeName = feedback.EmployeeName ?? string.Empty,
@@ -131,7 +112,9 @@ namespace EfficiencyTrack.Web.Controllers
                 CreatedAt = feedback.CreatedAt,
                 IsHandled = feedback.IsHandled,
                 HandledAt = feedback.HandledAt
-            });
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost, ActionName("Delete")]

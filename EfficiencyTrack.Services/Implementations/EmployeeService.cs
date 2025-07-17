@@ -1,14 +1,14 @@
 ﻿using EfficiencyTrack.Data.Data;
+using EfficiencyTrack.Data.Identity;
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EfficiencyTrack.Data.Identity;
-using Microsoft.AspNetCore.Identity;
 
 namespace EfficiencyTrack.Services
 {
@@ -18,14 +18,15 @@ namespace EfficiencyTrack.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ApplicationUser> _userManager;
 
-
-        public EmployeeService(EfficiencyTrackDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
-      : base(context, httpContextAccessor)
+        public EmployeeService(
+            EfficiencyTrackDbContext context,
+            IHttpContextAccessor httpContextAccessor,
+            UserManager<ApplicationUser> userManager)
+            : base(context, httpContextAccessor)
         {
             _context = context;
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
-
         }
 
         public async Task<List<ApplicationUser>> GetAllShiftManagersAsync()
@@ -41,10 +42,10 @@ namespace EfficiencyTrack.Services
                 .Include(e => e.Department)
                 .Include(e => e.ShiftManagerUser)
                 .Where(e => !e.IsDeleted)
-                .ToListAsync(); 
+                .ToListAsync();
         }
 
-        public override async Task<Employee> GetByIdAsync(Guid id)
+        public override async Task<Employee?> GetByIdAsync(Guid id)
         {
             return await _context.Employees
                 .Include(e => e.Department)
@@ -55,18 +56,27 @@ namespace EfficiencyTrack.Services
 
         public override async Task AddAsync(Employee entity)
         {
-            await EnsureEmployIsUniqueAsync(entity);
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            await EnsureEmployeeIsUniqueAsync(entity);
             await base.AddAsync(entity);
         }
 
         public override async Task UpdateAsync(Employee entity)
         {
-            await EnsureEmployIsUniqueForUpdateAsync(entity);
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            await EnsureEmployeeIsUniqueForUpdateAsync(entity);
             await base.UpdateAsync(entity);
         }
 
-        public async Task<Employee> GetByCodeAsync(string employeeCode)
+        public async Task<Employee?> GetByCodeAsync(string employeeCode)
         {
+            if (string.IsNullOrWhiteSpace(employeeCode))
+                return null;
+
             return await _context.Employees
                 .AsNoTracking()
                 .Include(e => e.Department)
@@ -91,25 +101,30 @@ namespace EfficiencyTrack.Services
 
         public async Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null)
         {
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentException("Code cannot be null or empty", nameof(code));
+
             return !await _context.Employees
                 .AsNoTracking()
-                .AnyAsync(e => e.Code == code && (!excludeId.HasValue || e.Id != excludeId.Value));
+                .AnyAsync(e => e.Code == code && (!excludeId.HasValue || e.Id != excludeId.Value) && !e.IsDeleted);
         }
 
-        private async Task EnsureEmployIsUniqueForUpdateAsync(Employee entity)
+        private async Task EnsureEmployeeIsUniqueForUpdateAsync(Employee entity)
         {
             var exists = await _context.Employees.AsNoTracking()
                 .AnyAsync(e => e.Code == entity.Code && e.Id != entity.Id && !e.IsDeleted);
 
             if (exists)
-                throw new InvalidOperationException($"Another Employ with code {entity.Code} already exists.");
+                throw new InvalidOperationException($"Another employee with code '{entity.Code}' already exists.");
         }
 
-        private async Task EnsureEmployIsUniqueAsync(Employee entity)
+        private async Task EnsureEmployeeIsUniqueAsync(Employee entity)
         {
-            var exists = await _context.Employees.AsNoTracking().AnyAsync(e => e.Code == entity.Code && !e.IsDeleted);
+            var exists = await _context.Employees.AsNoTracking()
+                .AnyAsync(e => e.Code == entity.Code && !e.IsDeleted);
+
             if (exists)
-                throw new InvalidOperationException($"Routing with code {entity.Code} already exists.");
+                throw new InvalidOperationException($"Employee with code '{entity.Code}' already exists.");
         }
     }
 }

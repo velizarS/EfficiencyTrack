@@ -1,8 +1,12 @@
-﻿using EfficiencyTrack.Services.DTOs.EfficiencyTrack.Services.DTOs;
+﻿using EfficiencyTrack.Services.DTOs;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.DailyEfficiencyViewModels;
 using EfficiencyTrack.ViewModels.EntryViewModel;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Web.Controllers
 {
@@ -43,7 +47,6 @@ namespace EfficiencyTrack.Web.Controllers
 
             return View(listViewModel);
         }
-
 
         public async Task<IActionResult> Details(Guid id)
         {
@@ -107,11 +110,10 @@ namespace EfficiencyTrack.Web.Controllers
                     ? items.OrderBy(x => x.EfficiencyPercentage).ToList()
                     : items.OrderByDescending(x => x.EfficiencyPercentage).ToList(),
 
-                _ => items
+                _ => items.OrderByDescending(x => x.Date).ToList(),
             };
 
             return items;
         }
-
     }
 }

@@ -32,7 +32,6 @@ public class EmployeesController : BaseCrudController<
             FullName = $"{e.FirstName} {e.MiddleName} {e.LastName}".Replace("  ", " ").Trim(),
             DepartmentName = e.Department?.Name ?? "(няма отдел)",
             ShiftLeader = e.ShiftManagerUser?.UserName ?? ""
-
         };
 
     protected override EmployeeDetailViewModel MapToDetailModel(Employee e)
@@ -111,7 +110,18 @@ public class EmployeesController : BaseCrudController<
         }
 
         var entity = MapToEntity(model);
-        await _service.AddAsync(entity);
+
+        try
+        {
+            await _service.AddAsync(entity);
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            await LoadSelectLists();
+            return View(model);
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -143,8 +153,23 @@ public class EmployeesController : BaseCrudController<
             return View(model);
         }
 
+        var existing = await _employeeService.GetByIdAsync(model.Id);
+        if (existing == null)
+            return NotFound();
+
         var entity = MapToEntity(model);
-        await _service.UpdateAsync(entity);
+
+        try
+        {
+            await _service.UpdateAsync(entity);
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            await LoadSelectLists();
+            return View(model);
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -153,7 +178,8 @@ public class EmployeesController : BaseCrudController<
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             items = items
-                .Where(x => x.Code.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .Where(x => x.Code.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                         || x.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
 
@@ -183,8 +209,8 @@ public class EmployeesController : BaseCrudController<
 
     private async Task LoadSelectLists()
     {
-        var departments = await _departmentService.GetAllAsync();
-        var shiftManagers = await _employeeService.GetAllShiftManagersAsync();
+        var departments = (await _departmentService.GetAllAsync()).ToList();
+        var shiftManagers = (await _employeeService.GetAllShiftManagersAsync()).ToList();
 
         ViewBag.Departments = departments.Select(d => new SelectListItem
         {
@@ -198,5 +224,4 @@ public class EmployeesController : BaseCrudController<
             Value = m.Id.ToString()
         });
     }
-
 }

@@ -16,17 +16,17 @@ namespace EfficiencyTrack.Services.Implementations
         private readonly IDailyEfficiencyService _dailyEfficiencyService;
         private readonly EfficiencyTrackDbContext _context;
         private readonly EntryValidator _validator;
-        private readonly GreetingService _greetingService;
+        private readonly IGreetingService _greetingService;
 
         public EntryService(
             EfficiencyTrackDbContext context,
             IHttpContextAccessor httpContextAccessor,
-            IDailyEfficiencyService dailyEfficiencyService ,
-            GreetingService greetingService)
+            IDailyEfficiencyService dailyEfficiencyService,
+            IGreetingService greetingService)
             : base(context, httpContextAccessor)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _dailyEfficiencyService = dailyEfficiencyService ?? throw new ArgumentNullException(nameof(dailyEfficiencyService));
+            _context = context;
+            _dailyEfficiencyService = dailyEfficiencyService;
             _validator = new EntryValidator(_context);
             _greetingService = greetingService;
         }
@@ -34,6 +34,7 @@ namespace EfficiencyTrack.Services.Implementations
         public async Task<List<Entry>> GetAllWithIncludesAsync()
         {
             return await _context.Entries
+                .AsNoTracking()
                 .Include(e => e.Employee)
                 .Include(e => e.Routing)
                 .Where(e => !e.IsDeleted)
@@ -44,6 +45,7 @@ namespace EfficiencyTrack.Services.Implementations
         public async Task<Entry?> GetByIdWithIncludesAsync(Guid id)
         {
             return await _context.Entries
+                .AsNoTracking()
                 .Include(e => e.Employee)
                 .Include(e => e.Routing)
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
@@ -105,38 +107,9 @@ namespace EfficiencyTrack.Services.Implementations
             await SetEfficiencyAsync(entry);
         }
 
-        public async Task<string> Greetings(Entry entry)
+        public Task<string> Greetings(Entry entry)
         {
-            var todayEntries = await _context.Entries
-                .AsNoTracking()
-                .Where(x => x.EmployeeId == entry.EmployeeId && x.Date.Date == DateTime.UtcNow.Date)
-                .OrderByDescending(e => e.CreatedOn)
-                .ToListAsync();
-
-            string message = "Успешен запис!\n";
-
-            if (todayEntries.Count == 1)
-            {
-                var workerName = (await _context.Employees
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == entry.EmployeeId))?.FirstName;
-
-                if (!string.IsNullOrEmpty(workerName))
-                {
-                    message += $"Здравейте, {workerName}!\n";
-                    message += "Пожелавам ви лека работа и успешен ден!\n";
-                }
-            }
-
-            message += entry.EfficiencyForOperation switch
-            {
-                >= 100 => "Представянето надминава очакванията ни със супер резултатите Ви. Благодарим!\n",
-                >= 90 => "Представянето оправдава очакванията ни с добрите Ви резултати. Благодарим!\n",
-                >= 85 => "Представянето частично отговаря на очакванията ни, необходимо е подобрение.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n",
-                _ => "Незадоволително представяне.\nНеобходими са навременни коригиращи действия.\nС какво можем да Ви помогнем? Обърнете се към прекия Ви ръководител!\n"
-            };
-
-            return message;
+            return _greetingService.GetGreetingMessageAsync(entry);
         }
     }
 }

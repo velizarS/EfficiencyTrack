@@ -3,6 +3,10 @@ using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 public class CrudService<T> : ICrudService<T> where T : BaseEntity
 {
@@ -31,6 +35,7 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
     {
         if (entity == null)
             throw new ArgumentNullException(nameof(entity));
+
         entity.CreatedOn = DateTime.UtcNow;
         entity.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
 
@@ -56,5 +61,46 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
             entity.DeletedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
             await _context.SaveChangesAsync();
         }
+    }
+
+    public virtual async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(
+        string? searchTerm, string? sortBy, bool sortAsc, int pageNumber,  int pageSize)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        IQueryable<T> query = _context.Set<T>().AsNoTracking().Where(e => !e.IsDeleted);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(e => EF.Property<string>(e, "Name").Contains(searchTerm));
+        }
+
+        if (!string.IsNullOrWhiteSpace(sortBy))
+        {
+            try
+            {
+                query = sortAsc
+                    ? query.OrderBy(e => EF.Property<object>(e, sortBy))
+                    : query.OrderByDescending(e => EF.Property<object>(e, sortBy));
+            }
+            catch
+            {
+                query = query.OrderByDescending(e => e.CreatedOn);
+            }
+        }
+        else
+        {
+            query = query.OrderByDescending(e => e.CreatedOn);
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
     }
 }

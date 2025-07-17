@@ -3,7 +3,7 @@ using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.Department;
 using EfficiencyTrack.ViewModels.DepartmentViewModels;
 using EfficiencyTrack.ViewModels.DepartmentViewModels.EfficiencyTrack.ViewModels.Department;
-using EfficiencyTrack.ViewModels.Routing;
+using EfficiencyTrack.ViewModels.Employee;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EfficiencyTrack.Web.Controllers;
@@ -34,8 +34,7 @@ public class DepartmentController : BaseCrudController<
         };
 
     protected override DepartmentDetailViewModel MapToDetailModel(Department entity)
-    {
-        return new DepartmentDetailViewModel
+        => new()
         {
             Id = entity.Id,
             Name = entity.Name,
@@ -48,7 +47,6 @@ public class DepartmentController : BaseCrudController<
                 })
                 .ToList()
         };
-    }
 
     protected override Department MapToEntity(DepartmentCreateViewModel model)
         => new()
@@ -85,13 +83,11 @@ public class DepartmentController : BaseCrudController<
                 .ToList();
         }
 
-        items = sortBy switch
+        items = sortBy?.ToLower() switch
         {
             "name" => sortAsc
                 ? items.OrderBy(x => x.Name).ToList()
                 : items.OrderByDescending(x => x.Name).ToList(),
-
-
             _ => items
         };
 

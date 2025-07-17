@@ -23,32 +23,44 @@ namespace EfficiencyTrack.Web.Controllers
             return items;
         }
 
-        public virtual async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
+        protected virtual async Task<(List<TViewModel> Items, int TotalCount)> GetPagedAsync(
+            string? searchTerm, string? sortBy, bool sortAsc, int page = 1, int pageSize = 20)
         {
-            var items = await _service.GetAllAsync();
-            var viewModels = items.Select(MapToViewModel).ToList();
+            var allItems = await _service.GetAllAsync();
+            var vmItems = allItems.Select(MapToViewModel).ToList();
 
-            var filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+            var filteredSorted = FilterAndSort(vmItems, searchTerm, sortBy, sortAsc);
 
-            var listViewModel = BuildListViewModel(filteredSorted);
+            return (filteredSorted, filteredSorted.Count);
+        }
+
+        public virtual async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
+        {
+            var (items, totalCount) = await GetPagedAsync(searchTerm, sortBy, sortAsc, page, pageSize);
+
+            var listViewModel = BuildListViewModel(items);
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.SortBy = sortBy;
             ViewBag.SortAsc = sortAsc;
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = totalCount;
 
             return View(listViewModel);
         }
 
         public virtual async Task<IActionResult> Details(Guid id)
         {
-            var item = await _service.GetByIdAsync(id);
-            if (item == null) return NotFound();
+            var entity = await _service.GetByIdAsync(id);
+            if (entity == null) return NotFound();
 
-            var viewModel = MapToDetailModel(item);
+            var viewModel = MapToDetailModel(entity);
             return View(viewModel);
         }
 
         public virtual async Task<IActionResult> Create()
+
         {
             return View();
         }
@@ -99,7 +111,7 @@ namespace EfficiencyTrack.Web.Controllers
             return View(viewModel);
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> DeleteConfirmed(Guid id)
         {
