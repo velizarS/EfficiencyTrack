@@ -99,7 +99,6 @@ namespace EfficiencyTrack.Services.Helpers
                 result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
                 return result;
             }
-<<<<<<< HEAD:EfficiencyTrack.Services/Helpers/ValidationResult.cs
 
             var requiredMinutes = totalPieces * routing.MinutesPerPiece;
             var efficiency = requiredMinutes / entry.WorkedMinutes * 100;
@@ -109,17 +108,15 @@ namespace EfficiencyTrack.Services.Helpers
                 result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
             }
 
-=======
 
-            var requiredMinutes = totalPieces * routing.MinutesPerPiece;
-            var efficiency = (requiredMinutes / entry.WorkedMinutes) * 100;
+             requiredMinutes = totalPieces * routing.MinutesPerPiece;
+             efficiency = (requiredMinutes / entry.WorkedMinutes) * 100;
 
             if (efficiency > 150)
             {
                 result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
             }
 
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc:EfficiencyTrack.Services/Implementations/ValidationResult.cs
             return result;
         }
     }

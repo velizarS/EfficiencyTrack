@@ -120,22 +120,12 @@ namespace EfficiencyTrack.Services.Implementations
         {
             var today = DateTime.UtcNow.Date;
 
-<<<<<<< HEAD
             var topTen = await _context.DailyEfficiencies
                 .AsNoTracking()
                 .Where(e =>
                     e.Date.Date == today.Date &&
                     e.EfficiencyPercentage >= EfficiencyAppConstants.MinimumEfficiencyForTopList &&
                     !e.IsDeleted)
-=======
-            return await _context.DailyEfficiencies
-                .AsNoTracking()
-                .Where(e =>
-                    e.Date.Day == today.Day &&
-                    e.Date.Month == today.Month &&
-                    e.Date.Year == today.Year &&
-                    e.EfficiencyPercentage > EfficiencyAppConstants.MinimumEfficiencyForTopList)
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
                 .Include(de => de.Employee)
                     .ThenInclude(emp => emp.Department)
                 .Include(de => de.Employee)
@@ -144,16 +134,14 @@ namespace EfficiencyTrack.Services.Implementations
                 .OrderByDescending(e => e.EfficiencyPercentage)
                 .Take(10)
                 .ToListAsync();
-<<<<<<< HEAD
 
             return topTen;
         }
 
 
-=======
-        }
 
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
+
+
         public async Task UpdateDailyEfficiencyAsync(Guid employeeId, DateTime date)
         {
             var entriesOfDay = await _context.Entries.AsNoTracking()
@@ -199,12 +187,7 @@ namespace EfficiencyTrack.Services.Implementations
                 throw new InvalidOperationException("Shift duration is 0 or shift not found.");
 
             decimal efficiencyPercent = (totalNeededMinutes / shiftDuration) * 100;
-<<<<<<< HEAD
             decimal totalTime = entriesOfDay.Sum(e => e.WorkedMinutes);
-=======
-            int totalTime = entriesOfDay.Sum(e => e.WorkedMinutes);
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
-
             if (existing == null)
             {
                 var dailyEfficiency = new DailyEfficiency

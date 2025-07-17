@@ -161,9 +161,8 @@ public class EntryController : BaseCrudController<
         try
         {
             await _entryService.AddAsync(entity);
-<<<<<<< HEAD
             TempData["Message"] = await _greetingService.GetGreetingAsync(entity);
-            return View();
+            return RedirectToAction(nameof(Index));
         }
         catch (InvalidOperationException ex)
         {
@@ -171,23 +170,6 @@ public class EntryController : BaseCrudController<
             await LoadSelectLists();
             return View(model);
         }
-=======
-            TempData["Message"] = await _entryService.Greetings(entity);
-        }
-        catch (InvalidOperationException ex)
-        {
-            var errorMessages = ex.Message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var msg in errorMessages)
-            {
-                ModelState.AddModelError(string.Empty, msg);
-            }
-
-            await LoadSelectLists();
-            return View();
-        }
-
-        return View();
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
     }
 
     [HttpGet]
@@ -212,51 +194,22 @@ public class EntryController : BaseCrudController<
             return View(model);
         }
 
-<<<<<<< HEAD
-=======
-        var employee = await _employeeService.GetByCodeAsync(model.EmployeeCode);
-        if (employee == null)
-            ModelState.AddModelError(nameof(model.EmployeeCode), "Невалиден код на служител.");
-
-        var routing = await _routingService.GetRoutingByCodeAsync(model.RoutingCode);
-        if (routing == null)
-            ModelState.AddModelError(nameof(model.RoutingCode), "Невалиден код на операция.");
-
-        if (!ModelState.IsValid)
-        {
-            await LoadSelectLists();
-            return View(model);
-        }
-
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
         model.EmployeeId = employee.Id;
         model.RoutingId = routing.Id;
 
         try
         {
             await _entryService.UpdateAsync(MapToEntity(model));
-<<<<<<< HEAD
             TempData["Message"] = "Записът беше успешно редактиран.";
             return RedirectToAction(nameof(Index));
         }
         catch (InvalidOperationException ex)
         {
             AddModelErrors(ex);
-=======
-        }
-        catch (InvalidOperationException ex)
-        {
-            var errorMessages = ex.Message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var msg in errorMessages)
-            {
-                ModelState.AddModelError(string.Empty, msg);
-            }
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
 
             await LoadSelectLists();
             return View(model);
         }
-<<<<<<< HEAD
     }
 
     private void AddModelErrors(InvalidOperationException ex)
@@ -266,12 +219,7 @@ public class EntryController : BaseCrudController<
         {
             ModelState.AddModelError(string.Empty, msg);
         }
-=======
-
-        return RedirectToAction(nameof(Index));
->>>>>>> a1a4673be72f9c81ce7a9985c64bba5dde972ddc
     }
-
 
     private async Task LoadSelectLists()
     {
