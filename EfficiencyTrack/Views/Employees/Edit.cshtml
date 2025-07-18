@@ -1,11 +1,13 @@
-﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeEditViewModel
+﻿@model EfficiencyTrack.ViewModels.EmployeeViewModels.EmployeeEditViewModel
 
 @{
     ViewData["Title"] = "Редактиране на служител";
 }
 
-<main class="container mt-4">
-    <h1>Редактиране на служител</h1>
+<main class="max-w-3xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">@ViewData["Title"]</h1>
+    </header>
 
     <form asp-action="Edit" method="post" class="needs-validation" novalidate>
         <input type="hidden" asp-for="Id" />
@@ -16,22 +18,22 @@
             <span asp-validation-for="Code" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="FirstName" class="form-label"></label>
-            <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="FirstName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="MiddleName" class="form-label"></label>
-            <input asp-for="MiddleName" class="form-control" />
-            <span asp-validation-for="MiddleName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="LastName" class="form-label"></label>
-            <input asp-for="LastName" class="form-control" />
-            <span asp-validation-for="LastName" class="text-danger"></span>
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="MiddleName" class="form-label"></label>
+                <input asp-for="MiddleName" class="form-control" />
+                <span asp-validation-for="MiddleName" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
         </div>
 
         <div class="mb-3">
@@ -40,14 +42,20 @@
             <span asp-validation-for="DepartmentId" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-4">
             <label asp-for="ShiftManagerUserId" class="form-label"></label>
             <select asp-for="ShiftManagerUserId" asp-items="ViewBag.ShiftManagers" class="form-select"></select>
             <span asp-validation-for="ShiftManagerUserId" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Запази</button>
-        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-save"></i> Запази
+            </button>
+            <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-x-circle"></i> Отказ
+            </a>
+        </div>
     </form>
 </main>
 

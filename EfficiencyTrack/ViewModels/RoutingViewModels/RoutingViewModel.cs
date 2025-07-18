@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EfficiencyTrack.ViewModels.Routing
+namespace EfficiencyTrack.ViewModels.RoutingViewModels
 {
     public class RoutingViewModel
     {

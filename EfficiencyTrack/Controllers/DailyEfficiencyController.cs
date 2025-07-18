@@ -1,14 +1,9 @@
-﻿using EfficiencyTrack.Services.DTOs;
-using EfficiencyTrack.Services.Interfaces;
+﻿using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.DailyEfficiencyViewModels;
 using EfficiencyTrack.ViewModels.EntryViewModel;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace EfficiencyTrack.Web.Controllers
+namespace EfficiencyTrack.Controllers
 {
     public class DailyEfficiencyController : Controller
     {
@@ -21,9 +16,9 @@ namespace EfficiencyTrack.Web.Controllers
 
         public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
         {
-            var efficiencies = await _dailyEfficiencyService.GetAllAsync();
+            IEnumerable<Data.Models.DailyEfficiency> efficiencies = await _dailyEfficiencyService.GetAllAsync();
 
-            var viewModels = efficiencies.Select(e => new DailyEfficiencyViewModel
+            List<DailyEfficiencyViewModel> viewModels = efficiencies.Select(e => new DailyEfficiencyViewModel
             {
                 Id = e.Id,
                 Date = e.Date,
@@ -34,13 +29,13 @@ namespace EfficiencyTrack.Web.Controllers
                 EfficiencyPercentage = e.EfficiencyPercentage
             }).ToList();
 
-            var filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+            List<DailyEfficiencyViewModel> filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.SortBy = sortBy;
             ViewBag.SortAsc = sortAsc;
 
-            var listViewModel = new DailyEfficiencyListViewModel
+            DailyEfficiencyListViewModel listViewModel = new()
             {
                 DailyEfficiencies = filteredSorted
             };
@@ -50,18 +45,20 @@ namespace EfficiencyTrack.Web.Controllers
 
         public async Task<IActionResult> Details(Guid id)
         {
-            var dto = await _dailyEfficiencyService.GetByIdAsync(id);
+            Services.DTOs.EfficiencyTrack.Services.DTOs.DailyEfficiencyDto? dto = await _dailyEfficiencyService.GetByIdAsync(id);
             if (dto == null)
+            {
                 return NotFound();
+            }
 
-            var viewModel = new DailyDetailEfficiencyViewModel
+            DailyDetailEfficiencyViewModel viewModel = new()
             {
                 Id = dto.Id,
                 Date = dto.Date,
                 EmployeeCode = dto.EmployeeCode,
                 EmployeeFullName = dto.EmployeeFullName,
                 TotalWorkedMinutes = dto.TotalWorkedMinutes,
-                TotalNeddedMinutes = dto.TotalNeddedMinutes,
+                TotalNeededMinutes = dto.TotalNeddedMinutes,
                 ShiftName = dto.ShiftName,
                 EfficiencyPercentage = dto.EfficiencyPercentage,
                 DetailEntries = dto.Entries.Select(e => new EntryDetailsViewModel
@@ -69,7 +66,7 @@ namespace EfficiencyTrack.Web.Controllers
                     Date = e.Date,
                     EmployeeId = e.EmployeeId,
                     RoutingId = e.RoutingId,
-                    RoutingName = e.RoutingName,
+                    RoutingName = e.RoutingName!,
                     Pieces = e.Pieces,
                     WorkedMinutes = e.WorkedMinutes,
                     EfficiencyForOperation = e.EfficiencyForOperation

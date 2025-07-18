@@ -1,7 +1,5 @@
 ﻿namespace EfficiencyTrack.Services.DTOs
 {
-    using System;
-
     namespace EfficiencyTrack.Services.DTOs
     {
         public class DailyEfficiencyDto
@@ -22,7 +20,7 @@
 
             public decimal EfficiencyPercentage { get; set; }
 
-            public List<EntryDto> Entries { get; set; } = new();
+            public List<EntryDto> Entries { get; set; } = [];
         }
     }
 

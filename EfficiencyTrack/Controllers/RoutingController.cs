@@ -1,16 +1,11 @@
 ﻿using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
-using EfficiencyTrack.ViewModels.Routing;
-using EfficiencyTrack.Web.Controllers;
+using EfficiencyTrack.ViewModels.RoutingViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace EfficiencyTrack.Web.Controllers
+namespace EfficiencyTrack.Controllers
 {
     public class RoutingController : BaseCrudController<
      Routing,
@@ -32,74 +27,92 @@ namespace EfficiencyTrack.Web.Controllers
             _departmentService = departmentService;
         }
 
-        protected override RoutingViewModel MapToViewModel(Routing entity) => new()
+        protected override RoutingViewModel MapToViewModel(Routing entity)
         {
-            Id = entity.Id,
-            Code = entity.Code,
-            MinutesPerPiece = entity.MinutesPerPiece,
-            DepartmentName = entity.Department?.Name ?? "—",
-            Zone = entity.Zone
-        };
+            return new()
+            {
+                Id = entity.Id,
+                Code = entity.Code,
+                MinutesPerPiece = entity.MinutesPerPiece,
+                DepartmentName = entity.Department?.Name ?? "—",
+                Zone = entity.Zone
+            };
+        }
 
-        protected override RoutingDetailViewModel MapToDetailModel(Routing entity) => new()
+        protected override RoutingDetailViewModel MapToDetailModel(Routing entity)
         {
-            Id = entity.Id,
-            Code = entity.Code,
-            Description = entity.Description,
-            Zone = entity.Zone,
-            MinutesPerPiece = entity.MinutesPerPiece,
-            DepartmentId = entity.DepartmentId,
-            DepartmentName = entity.Department?.Name ?? "—"
-        };
+            return new()
+            {
+                Id = entity.Id,
+                Code = entity.Code,
+                Description = entity.Description,
+                Zone = entity.Zone,
+                MinutesPerPiece = entity.MinutesPerPiece,
+                DepartmentId = entity.DepartmentId,
+                DepartmentName = entity.Department?.Name ?? "—"
+            };
+        }
 
-        protected override Routing MapToEntity(RoutingCreateViewModel model) => new()
+        protected override Routing MapToEntity(RoutingCreateViewModel model)
         {
-            Code = model.Code,
-            Description = model.Description,
-            Zone = model.Zone,
-            MinutesPerPiece = model.MinutesPerPiece,
-            DepartmentId = model.DepartmentId
-        };
+            return new()
+            {
+                Code = model.Code,
+                Description = model.Description,
+                Zone = model.Zone,
+                MinutesPerPiece = model.MinutesPerPiece,
+                DepartmentId = model.DepartmentId
+            };
+        }
 
-        protected override Routing MapToEntity(RoutingEditViewModel model) => new()
+        protected override Routing MapToEntity(RoutingEditViewModel model)
         {
-            Id = model.Id,
-            Code = model.Code,
-            Description = model.Description,
-            Zone = model.Zone,
-            MinutesPerPiece = model.MinutesPerPiece,
-            DepartmentId = model.DepartmentId
-        };
+            return new()
+            {
+                Id = model.Id,
+                Code = model.Code,
+                Description = model.Description,
+                Zone = model.Zone,
+                MinutesPerPiece = model.MinutesPerPiece,
+                DepartmentId = model.DepartmentId
+            };
+        }
 
-        protected override RoutingEditViewModel MapToEditModel(Routing entity) => new()
+        protected override RoutingEditViewModel MapToEditModel(Routing entity)
         {
-            Id = entity.Id,
-            Code = entity.Code,
-            Description = entity.Description,
-            Zone = entity.Zone,
-            MinutesPerPiece = entity.MinutesPerPiece,
-            DepartmentId = entity.DepartmentId
-        };
+            return new()
+            {
+                Id = entity.Id,
+                Code = entity.Code,
+                Description = entity.Description,
+                Zone = entity.Zone,
+                MinutesPerPiece = entity.MinutesPerPiece,
+                DepartmentId = entity.DepartmentId
+            };
+        }
 
-        protected override RoutingListViewModel BuildListViewModel(List<RoutingViewModel> items) => new()
+        protected override RoutingListViewModel BuildListViewModel(List<RoutingViewModel> items)
         {
-            Routings = items
-        };
+            return new()
+            {
+                Routings = items
+            };
+        }
 
         protected async Task PrepareDropdownsAsync(object? model = null)
         {
-            var departments = await _departmentService.GetAllAsync();
+            IEnumerable<Department> departments = await _departmentService.GetAllAsync();
 
-            var departmentItems = departments
+            List<SelectListItem> departmentItems = departments
                 .Select(d => new SelectListItem(d.Name, d.Id.ToString()))
                 .ToList();
 
-            var zoneItems = new List<SelectListItem>
-            {
+            List<SelectListItem> zoneItems =
+            [
                 new("Zone A", "Zone A"),
                 new("Zone B", "Zone B"),
                 new("Zone C", "Zone C")
-            };
+            ];
 
             switch (model)
             {
@@ -116,10 +129,10 @@ namespace EfficiencyTrack.Web.Controllers
 
         public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
-            var query = _routingService.GetFilteredRoutings(searchTerm, sortBy, sortAsc);
-            var entities = await query.AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-            var viewModels = entities.Select(MapToViewModel).ToList();
-            var listModel = BuildListViewModel(viewModels);
+            IQueryable<Routing> query = _routingService.GetFilteredRoutings(searchTerm, sortBy, sortAsc);
+            List<Routing> entities = await query.AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            List<RoutingViewModel> viewModels = entities.Select(MapToViewModel).ToList();
+            RoutingListViewModel listModel = BuildListViewModel(viewModels);
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.SortBy = sortBy;
@@ -132,28 +145,32 @@ namespace EfficiencyTrack.Web.Controllers
 
         public override async Task<IActionResult> Details(Guid id)
         {
-            var entity = await _routingService.GetByIdWithDepartmentAsync(id);
+            Routing? entity = await _routingService.GetByIdWithDepartmentAsync(id);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
-            var model = MapToDetailModel(entity);
+            RoutingDetailViewModel model = MapToDetailModel(entity);
             return View(model);
         }
 
         public override async Task<IActionResult> Edit(Guid id)
         {
-            var entity = await _routingService.GetByIdWithDepartmentAsync(id);
+            Routing? entity = await _routingService.GetByIdWithDepartmentAsync(id);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
-            var model = MapToEditModel(entity);
+            RoutingEditViewModel model = MapToEditModel(entity);
             await PrepareDropdownsAsync(model);
             return View(model);
         }
 
         public override async Task<IActionResult> Create()
         {
-            var model = new RoutingCreateViewModel();
+            RoutingCreateViewModel model = new();
             await PrepareDropdownsAsync(model);
             return View(model);
         }

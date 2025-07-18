@@ -10,7 +10,7 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "IsActive",
                 table: "Employees");
         }
@@ -18,7 +18,7 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
+            _ = migrationBuilder.AddColumn<bool>(
                 name: "IsActive",
                 table: "Employees",
                 type: "bit",

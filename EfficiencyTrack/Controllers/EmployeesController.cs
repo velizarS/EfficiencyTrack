@@ -1,11 +1,10 @@
 ﻿using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
-using EfficiencyTrack.ViewModels.Employee;
 using EfficiencyTrack.ViewModels.EmployeeViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace EfficiencyTrack.Web.Controllers;
+namespace EfficiencyTrack.Controllers;
 
 public class EmployeesController : BaseCrudController<
     Employee,
@@ -25,17 +24,20 @@ public class EmployeesController : BaseCrudController<
     }
 
     protected override EmployeeViewModel MapToViewModel(Employee e)
-        => new()
+    {
+        return new()
         {
             Id = e.Id,
             Code = e.Code,
             FullName = $"{e.FirstName} {e.MiddleName} {e.LastName}".Replace("  ", " ").Trim(),
             DepartmentName = e.Department?.Name ?? "(няма отдел)",
-            ShiftLeader = e.ShiftManagerUser?.UserName ?? ""
+            ShiftManagerUserName = e.ShiftManagerUser?.UserName ?? ""
         };
+    }
 
     protected override EmployeeDetailViewModel MapToDetailModel(Employee e)
-        => new()
+    {
+        return new()
         {
             Id = e.Id,
             Code = e.Code,
@@ -45,9 +47,11 @@ public class EmployeesController : BaseCrudController<
             DepartmentId = e.DepartmentId,
             DepartmentName = e.Department?.Name ?? "(няма отдел)"
         };
+    }
 
     protected override Employee MapToEntity(EmployeeCreateViewModel model)
-        => new()
+    {
+        return new()
         {
             Id = Guid.NewGuid(),
             Code = model.Code,
@@ -57,9 +61,11 @@ public class EmployeesController : BaseCrudController<
             DepartmentId = model.DepartmentId,
             ShiftManagerUserId = model.ShiftManagerUserId
         };
+    }
 
     protected override Employee MapToEntity(EmployeeEditViewModel model)
-        => new()
+    {
+        return new()
         {
             Id = model.Id,
             Code = model.Code,
@@ -69,9 +75,11 @@ public class EmployeesController : BaseCrudController<
             DepartmentId = model.DepartmentId,
             ShiftManagerUserId = model.ShiftManagerUserId
         };
+    }
 
     protected override EmployeeEditViewModel MapToEditModel(Employee e)
-        => new()
+    {
+        return new()
         {
             Id = e.Id,
             Code = e.Code,
@@ -81,9 +89,12 @@ public class EmployeesController : BaseCrudController<
             DepartmentId = e.DepartmentId,
             ShiftManagerUserId = e.ShiftManagerUserId
         };
+    }
 
     protected override EmployeeListViewModel BuildListViewModel(List<EmployeeViewModel> employees)
-        => new() { Employees = employees };
+    {
+        return new() { Employees = employees };
+    }
 
     [HttpGet]
     public override async Task<IActionResult> Create()
@@ -109,7 +120,7 @@ public class EmployeesController : BaseCrudController<
             return View(model);
         }
 
-        var entity = MapToEntity(model);
+        Employee entity = MapToEntity(model);
 
         try
         {
@@ -128,10 +139,13 @@ public class EmployeesController : BaseCrudController<
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id)
     {
-        var employee = await _employeeService.GetByIdAsync(id);
-        if (employee == null) return NotFound();
+        Employee? employee = await _employeeService.GetByIdAsync(id);
+        if (employee == null)
+        {
+            return NotFound();
+        }
 
-        var model = MapToEditModel(employee);
+        EmployeeEditViewModel model = MapToEditModel(employee);
         await LoadSelectLists();
         return View(model);
     }
@@ -153,11 +167,13 @@ public class EmployeesController : BaseCrudController<
             return View(model);
         }
 
-        var existing = await _employeeService.GetByIdAsync(model.Id);
+        Employee? existing = await _employeeService.GetByIdAsync(model.Id);
         if (existing == null)
+        {
             return NotFound();
+        }
 
-        var entity = MapToEntity(model);
+        Employee entity = MapToEntity(model);
 
         try
         {
@@ -194,8 +210,8 @@ public class EmployeesController : BaseCrudController<
                 : items.OrderByDescending(x => x.DepartmentName).ToList(),
 
             "shiftmanager" => sortAsc
-                ? items.OrderBy(x => x.ShiftLeader).ToList()
-                : items.OrderByDescending(x => x.ShiftLeader).ToList(),
+                ? items.OrderBy(x => x.ShiftManagerUserName).ToList()
+                : items.OrderByDescending(x => x.ShiftManagerUserName).ToList(),
 
             "code" => sortAsc
                 ? items.OrderBy(x => x.Code).ToList()
@@ -209,8 +225,8 @@ public class EmployeesController : BaseCrudController<
 
     private async Task LoadSelectLists()
     {
-        var departments = (await _departmentService.GetAllAsync()).ToList();
-        var shiftManagers = (await _employeeService.GetAllShiftManagersAsync()).ToList();
+        List<Department> departments = (await _departmentService.GetAllAsync()).ToList();
+        List<Data.Identity.ApplicationUser> shiftManagers = (await _employeeService.GetAllShiftManagersAsync()).ToList();
 
         ViewBag.Departments = departments.Select(d => new SelectListItem
         {

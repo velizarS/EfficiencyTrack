@@ -1,8 +1,8 @@
-using System.Diagnostics;
-using EfficiencyTrack.Models;
 using EfficiencyTrack.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using EfficiencyTrack.ViewModels;
 using EfficiencyTrack.ViewModels.HomeViewModel;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 
 namespace EfficiencyTrack.Controllers
@@ -22,13 +22,33 @@ namespace EfficiencyTrack.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var model = new HomeIndexViewModel
+            IEnumerable<Services.DTOs.TopEfficiencyDto> top10Today = await _dailyEfficiencyService.GetTop10ForTodayAsync();
+            IEnumerable<Services.DTOs.TopEfficiencyDto> top10ThisMonth = await _dailyEfficiencyService.GetTop10ForThisMonthAsync();
+
+            HomeIndexViewModel viewModel = new()
             {
-                Top10Today = await _dailyEfficiencyService.GetTop10ForTodayAsync(),
-                Top10ThisMonth = await _dailyEfficiencyService.GetTop10ForThisMonthAsync()
+                Top10Today = top10Today.Select(dto => new TopEfficiencyViewModel
+                {
+                    FullName = dto.FullName,
+                    EfficiencyPercentage = dto.EfficiencyPercentage,
+                    DepartmentName = dto.DepartmentName,
+                    ShiftManagerName = dto.ShiftManagerName,
+                    ShiftName = dto.ShiftName
+                }).ToList(),
+
+                Top10ThisMonth = top10ThisMonth.Select(dto => new TopEfficiencyViewModel
+                {
+                    FullName = dto.FullName,
+                    EfficiencyPercentage = dto.EfficiencyPercentage,
+                    DepartmentName = dto.DepartmentName,
+                    ShiftManagerName = dto.ShiftManagerName,
+                    ShiftName = dto.ShiftName
+                }).ToList()
             };
-            return View(model);
+
+            return View(viewModel);
         }
+
 
         public IActionResult Privacy()
         {

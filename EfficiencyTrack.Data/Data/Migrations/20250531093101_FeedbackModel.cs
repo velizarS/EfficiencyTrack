@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,7 +10,7 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Shifts",
                 type: "nvarchar(max)",
@@ -21,7 +20,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(max)",
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Routings",
                 type: "nvarchar(max)",
@@ -31,7 +30,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(max)",
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Entries",
                 type: "nvarchar(max)",
@@ -41,7 +40,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(max)",
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Employees",
                 type: "nvarchar(max)",
@@ -51,7 +50,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(max)",
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Departments",
                 type: "nvarchar(max)",
@@ -61,7 +60,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(max)",
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "DailyEfficiencies",
                 type: "nvarchar(max)",
@@ -71,7 +70,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(max)",
                 oldComment: "By who is deleted");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Feedbacks",
                 columns: table => new
                 {
@@ -85,8 +84,8 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Feedbacks", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_Feedbacks", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_Feedbacks_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
@@ -94,7 +93,7 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 comment: "Represents user feedback in the system.");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_UserId",
                 table: "Feedbacks",
                 column: "UserId");
@@ -103,10 +102,10 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Feedbacks");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Shifts",
                 type: "nvarchar(max)",
@@ -118,7 +117,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldNullable: true,
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Routings",
                 type: "nvarchar(max)",
@@ -130,7 +129,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldNullable: true,
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Entries",
                 type: "nvarchar(max)",
@@ -142,7 +141,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldNullable: true,
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Employees",
                 type: "nvarchar(max)",
@@ -154,7 +153,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldNullable: true,
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "Departments",
                 type: "nvarchar(max)",
@@ -166,7 +165,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldNullable: true,
                 oldComment: "By who is deleted");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "DeletedBy",
                 table: "DailyEfficiencies",
                 type: "nvarchar(max)",

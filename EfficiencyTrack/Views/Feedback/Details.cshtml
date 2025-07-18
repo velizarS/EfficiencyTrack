@@ -4,40 +4,47 @@
     ViewData["Title"] = "Детайли за обратна връзка";
 }
 
-<main class="container">
-    <header>
-        <h1>Детайли за обратна връзка</h1>
+<main class="container py-4">
+    <header class="mb-4">
+        <h1 class="h3 text-primary">Детайли за обратна връзка</h1>
     </header>
 
-    <section>
-        <dl class="row mt-4">
-            <dt class="col-sm-3">Име</dt>
-            <dd class="col-sm-9">@Model.EmployeeName</dd>
+    <section class="card shadow-sm border-0">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold">Име</dt>
+                <dd class="col-sm-9">@Model.EmployeeName</dd>
 
-            <dt class="col-sm-3">Съобщение</dt>
-            <dd class="col-sm-9">@Model.Message</dd>
+                <dt class="col-sm-3 fw-bold">Съобщение</dt>
+                <dd class="col-sm-9">@Model.Message</dd>
 
-            <dt class="col-sm-3">Дата на създаване</dt>
-            <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+                <dt class="col-sm-3 fw-bold">Дата на създаване</dt>
+                <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
 
-            <dt class="col-sm-3">Обработено</dt>
-            <dd class="col-sm-9">@((Model.IsHandled) ? "Да" : "Не")</dd>
+                <dt class="col-sm-3 fw-bold">Обработено</dt>
+                <dd class="col-sm-9">@((Model.IsHandled) ? "Да" : "Не")</dd>
 
-            @if (Model.IsHandled && Model.HandledAt.HasValue)
-            {
-                <dt class="col-sm-3">Дата на обработка</dt>
-                <dd class="col-sm-9">@Model.HandledAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
-            }
-        </dl>
+                @if (Model.IsHandled && Model.HandledAt.HasValue)
+                {
+                    <dt class="col-sm-3 fw-bold">Дата на обработка</dt>
+                    <dd class="col-sm-9">@Model.HandledAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
+                }
+            </dl>
+        </div>
     </section>
 
-    <nav class="mt-4 d-flex gap-2">
-        <a asp-action="Index" class="btn btn-secondary">Назад</a>
-        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Изтрий</a>
+    <footer class="mt-4 d-flex gap-2">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+            <i class="bi bi-trash"></i> Изтрий
+        </a>
         <form asp-action="ToggleHandled" asp-route-id="@Model.Id" method="post" class="d-inline">
             <button type="submit" class="btn @(Model.IsHandled ? "btn-warning" : "btn-success")">
-                @(Model.IsHandled ? "Отмени обработка" : "Маркирай като обработено")
+                <i class="bi @(Model.IsHandled ? "bi-x-circle" : "bi-check-circle")"></i>
+                @(Model.IsHandled ? "Отмени" : "Маркирай")
             </button>
         </form>
-    </nav>
+    </footer>
 </main>

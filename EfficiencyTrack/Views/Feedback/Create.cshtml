@@ -4,29 +4,43 @@
     ViewData["Title"] = "Нова обратна връзка";
 }
 
-<main class="container">
-    <h1>Нова обратна връзка</h1>
+<main class="container py-4">
+    <header class="mb-4">
+        <h1 class="h3">Нова обратна връзка</h1>
+    </header>
 
-    <form asp-action="Create" method="post" class="mt-4">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <section class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create" method="post" novalidate>
+                <fieldset>
+                    <legend class="visually-hidden">Въведете вашата обратна връзка</legend>
 
-        <div class="mb-3">
-            <label asp-for="EmployeeName" class="form-label"></label>
-            <input asp-for="EmployeeName" class="form-control" />
-            <span asp-validation-for="EmployeeName" class="text-danger"></span>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="EmployeeName" class="form-label fw-bold"></label>
+                        <input asp-for="EmployeeName" class="form-control" />
+                        <span asp-validation-for="EmployeeName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Message" class="form-label fw-bold"></label>
+                        <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-send"></i> Изпрати
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Отказ
+                        </a>
+                    </div>
+                </fieldset>
+            </form>
         </div>
-
-        <div class="mb-3">
-            <label asp-for="Message" class="form-label"></label>
-            <textarea asp-for="Message" class="form-control" rows="5"></textarea>
-            <span asp-validation-for="Message" class="text-danger"></span>
-        </div>
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">Изпрати</button>
-            <a asp-action="Index" class="btn btn-secondary">Отказ</a>
-        </div>
-    </form>
+    </section>
 </main>
 
 @section Scripts {

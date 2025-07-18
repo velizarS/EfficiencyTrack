@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EfficiencyTrack.Data.Models
 {
@@ -60,7 +60,7 @@ namespace EfficiencyTrack.Data.Models
         [Display(Name = "Efficiency (%)")]
         [Comment("The efficiency percentage for the operation.")]
         [Column(TypeName = "decimal(10,4)")]
-        public decimal EfficiencyForOperation { get;  set; }
+        public decimal EfficiencyForOperation { get; set; }
 
     }
 

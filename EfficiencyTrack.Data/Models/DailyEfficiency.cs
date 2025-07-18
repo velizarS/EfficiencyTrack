@@ -7,7 +7,7 @@ namespace EfficiencyTrack.Data.Models
     [Comment("Represents the daily efficiency of an employee, calculated automatically based on performed tasks and shift time.")]
     public class DailyEfficiency : BaseEntity
     {
-       
+
 
         [Display(Name = "Date")]
         [Comment("The date for which this daily efficiency entry is calculated.")]
@@ -25,7 +25,7 @@ namespace EfficiencyTrack.Data.Models
         public Guid ShiftId { get; set; }
         public Shift Shift { get; set; } = null!;
 
-        
+
         [Display(Name = "Total Worked Minutes")]
         [Comment("Total actual time worked by the employee on that day.")]
         [Column(TypeName = "decimal(10,4)")]

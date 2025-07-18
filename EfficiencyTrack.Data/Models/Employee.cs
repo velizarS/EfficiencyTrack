@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic;
 
 namespace EfficiencyTrack.Data.Models
 {
@@ -52,7 +51,7 @@ namespace EfficiencyTrack.Data.Models
         public Department Department { get; set; } = null!;
 
         [InverseProperty(nameof(Entry.Employee))]
-        public ICollection<Entry> Entries { get; set; } = new List<Entry>();
+        public ICollection<Entry> Entries { get; set; } = [];
 
         [Display(Name = "Application User")]
         [Comment("Reference to the associated application user.")]

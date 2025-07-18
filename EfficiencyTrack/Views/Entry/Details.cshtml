@@ -4,42 +4,48 @@
     ViewData["Title"] = "Детайли за запис";
 }
 
-<main class="container">
-    <header>
-        <h1>Детайли за запис</h1>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
     </header>
 
     <section>
         <dl class="row">
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Date)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Date)</dt>
             <dd class="col-sm-9">@Model.Date.ToString("dd.MM.yyyy")</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EmployeeCode)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.EmployeeCode)</dt>
             <dd class="col-sm-9">@Model.EmployeeCode</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EmployeeName)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.EmployeeName)</dt>
             <dd class="col-sm-9">@Model.EmployeeName</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RoutingName)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.RoutingName)</dt>
             <dd class="col-sm-9">@Model.RoutingName</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Pieces)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Pieces)</dt>
             <dd class="col-sm-9">@Model.Pieces</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Scrap)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Scrap)</dt>
             <dd class="col-sm-9">@Model.Scrap</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.WorkedMinutes)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.WorkedMinutes)</dt>
             <dd class="col-sm-9">@Model.WorkedMinutes</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RequiredMinutes)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.RequiredMinutes)</dt>
             <dd class="col-sm-9">@Model.RequiredMinutes</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EfficiencyForOperation)</dt>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.EfficiencyForOperation)</dt>
             <dd class="col-sm-9">@Model.EfficiencyForOperation.ToString("0.##")%</dd>
         </dl>
 
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редакция</a>
-        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+        <div class="mt-6 d-flex gap-3">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning d-inline-flex align-items-center gap-1">
+                <i class="bi bi-pencil"></i> Редакция
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+        </div>
     </section>
 </main>

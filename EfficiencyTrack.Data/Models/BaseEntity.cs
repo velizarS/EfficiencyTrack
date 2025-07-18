@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.ComponentModel.DataAnnotations;
 
 namespace EfficiencyTrack.Data.Models
@@ -25,8 +24,8 @@ namespace EfficiencyTrack.Data.Models
         public bool IsDeleted { get; set; } = false;
 
         [Comment("By who is deleted")]
-        public string? DeletedBy { get; set; } 
+        public string? DeletedBy { get; set; }
     }
-    
+
 }
 

@@ -4,36 +4,46 @@
     ViewData["Title"] = "Потвърждение за изтриване";
 }
 
-<main class="container">
-    <h1>Изтриване на обратна връзка</h1>
+<main class="container py-4">
+    <header class="mb-4">
+        <h1 class="h3 text-danger">Изтриване на обратна връзка</h1>
+    </header>
 
-    <p class="text-danger mt-4">
-        Сигурни ли сте, че искате да изтриете тази обратна връзка? Това действие не може да бъде отменено.
-    </p>
+    <section class="card border-danger shadow-sm">
+        <div class="card-body">
+            <p class="alert alert-danger fw-bold">
+                Сигурни ли сте, че искате да изтриете тази обратна връзка? Това действие не може да бъде отменено.
+            </p>
 
-    <dl class="row mt-3">
-        <dt class="col-sm-3">Име</dt>
-        <dd class="col-sm-9">@Model.EmployeeName</dd>
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold">Име</dt>
+                <dd class="col-sm-9">@Model.EmployeeName</dd>
 
-        <dt class="col-sm-3">Съобщение</dt>
-        <dd class="col-sm-9">@Model.Message</dd>
+                <dt class="col-sm-3 fw-bold">Съобщение</dt>
+                <dd class="col-sm-9">@Model.Message</dd>
 
-        <dt class="col-sm-3">Дата на създаване</dt>
-        <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+                <dt class="col-sm-3 fw-bold">Дата на създаване</dt>
+                <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
 
-        <dt class="col-sm-3">Обработено</dt>
-        <dd class="col-sm-9">@((Model.IsHandled) ? "Да" : "Не")</dd>
+                <dt class="col-sm-3 fw-bold">Обработено</dt>
+                <dd class="col-sm-9">@((Model.IsHandled) ? "Да" : "Не")</dd>
 
-        @if (Model.IsHandled && Model.HandledAt.HasValue)
-        {
-            <dt class="col-sm-3">Дата на обработка</dt>
-            <dd class="col-sm-9">@Model.HandledAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
-        }
-    </dl>
+                @if (Model.IsHandled && Model.HandledAt.HasValue)
+                {
+                    <dt class="col-sm-3 fw-bold">Дата на обработка</dt>
+                    <dd class="col-sm-9">@Model.HandledAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
+                }
+            </dl>
+        </div>
+    </section>
 
-    <form asp-action="Delete" method="post">
+    <form asp-action="Delete" method="post" class="mt-4 d-flex gap-2">
         <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">Изтрий</button>
-        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Изтрий
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Отказ
+        </a>
     </form>
 </main>

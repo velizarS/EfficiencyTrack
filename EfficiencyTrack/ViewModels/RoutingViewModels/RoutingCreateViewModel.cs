@@ -1,38 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
 
-namespace EfficiencyTrack.ViewModels.Routing
+namespace EfficiencyTrack.ViewModels.RoutingViewModels
 {
-    public class RoutingCreateViewModel
+    public class RoutingCreateViewModel : RoutingBaseViewModel
     {
-        [Required]
-        [StringLength(20, ErrorMessage = "Code cannot be longer than 20 characters.")]
-        [Display(Name = "Код")]
-        public string Code { get; set; } = null!;
-
-        [Required]
-        [StringLength(200, ErrorMessage = "Description cannot be longer than 200 characters.")]
-        [Display(Name = "Описание")]
-        public string Description { get; set; } = string.Empty;
-
-        [Required]
-        [Display(Name = "Зона")]
-        public string Zone { get; set; } = string.Empty;
-
-        [Required]
-        [Range(0.01, 180, ErrorMessage = "Minutes per piece must be between 0.01 and 180 minutes.")]
-        [Display(Name = "Време за една бройка в минути")]
-        public decimal MinutesPerPiece { get; set; }
-
-        [Required]
-        [Display(Name = "Отдел")]
-        public Guid DepartmentId { get; set; }
-
         [Display(Name = "Отдели")]
-        public List<SelectListItem> AvailableDepartments { get; set; } = new();
+        public List<SelectListItem> AvailableDepartments { get; set; } = [];
 
         [Display(Name = "Зони")]
-        public List<SelectListItem> AvailableZones { get; set; } = new();
+        public List<SelectListItem> AvailableZones { get; set; } = [];
     }
 }

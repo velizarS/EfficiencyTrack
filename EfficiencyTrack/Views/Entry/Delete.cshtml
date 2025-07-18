@@ -4,41 +4,48 @@
     ViewData["Title"] = "Потвърждение за изтриване";
 }
 
-<main class="container">
-    <h1>Изтриване на запис</h1>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Изтриване на запис</h1>
+    </header>
 
-    <p class="text-danger mt-4">
+    <p class="text-danger fs-5 fw-semibold mb-6">
         Сигурни ли сте, че искате да изтриете този запис? Това действие не може да бъде отменено.
     </p>
 
-    <dl class="row mt-3">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Date)</dt>
-        <dd class="col-sm-9">@Model.Date.ToString("dd.MM.yyyy")</dd>
+    <section>
+        <dl class="row">
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Date)</dt>
+            <dd class="col-sm-9">@Model.Date.ToString("dd.MM.yyyy")</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EmployeeName)</dt>
-        <dd class="col-sm-9">@Model.EmployeeName</dd>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.EmployeeName)</dt>
+            <dd class="col-sm-9">@Model.EmployeeName</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RoutingName)</dt>
-        <dd class="col-sm-9">@Model.RoutingName</dd>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.RoutingName)</dt>
+            <dd class="col-sm-9">@Model.RoutingName</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Pieces)</dt>
-        <dd class="col-sm-9">@Model.Pieces</dd>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Pieces)</dt>
+            <dd class="col-sm-9">@Model.Pieces</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Scrap)</dt>
-        <dd class="col-sm-9">@Model.Scrap</dd>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Scrap)</dt>
+            <dd class="col-sm-9">@Model.Scrap</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.WorkedMinutes)</dt>
-        <dd class="col-sm-9">@Model.WorkedMinutes</dd>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.WorkedMinutes)</dt>
+            <dd class="col-sm-9">@Model.WorkedMinutes</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.EfficiencyForOperation)</dt>
-        <dd class="col-sm-9">@Model.EfficiencyForOperation.ToString("0.##")%</dd>
-    </dl>
+            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.EfficiencyForOperation)</dt>
+            <dd class="col-sm-9">@Model.EfficiencyForOperation.ToString("0.##")%</dd>
+        </dl>
+    </section>
 
-    <form asp-action="DeleteConfirmed" method="post">
+    <form asp-action="DeleteConfirmed" method="post" class="mt-8 d-flex gap-3">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">Изтрий</button>
-        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        <button type="submit" class="btn btn-danger d-inline-flex align-items-center gap-1">
+            <i class="bi bi-trash"></i> Изтрий
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1">
+            <i class="bi bi-x-circle"></i> Отказ
+        </a>
     </form>
-
 </main>

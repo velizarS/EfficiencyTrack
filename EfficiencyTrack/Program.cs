@@ -1,23 +1,21 @@
 using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Identity;
-using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.Services.Helpers;
+using EfficiencyTrack.Services.Implementations;
 using EfficiencyTrack.Services.Interfaces;
-using EfficiencyTrack.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using EfficiencyTrack.Services.Implementations;
-using EfficiencyTrack.Services.Helpers;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<EfficiencyTrackDbContext>((serviceProvider, options) =>
 {
-    options.UseSqlServer(connectionString);
+    _ = options.UseSqlServer(connectionString);
 }, ServiceLifetime.Scoped);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -49,16 +47,16 @@ builder.Services
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    _ = app.UseMigrationsEndPoint();
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    _ = app.UseExceptionHandler("/Home/Error");
+    _ = app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -75,9 +73,9 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    IServiceProvider services = scope.ServiceProvider;
     try
     {
         await SeedRolesAsync(services);
@@ -86,7 +84,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
+        ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while seeding roles.");
     }
 }
@@ -95,27 +93,27 @@ await app.RunAsync();
 
 static async Task SeedRolesAsync(IServiceProvider serviceProvider)
 {
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    RoleManager<IdentityRole<Guid>> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-    var roles = new[] { "Manager", "Admin", "UnitResponsible", "ShiftLeader", "User" };
+    string[] roles = new[] { "Manager", "Admin", "UnitResponsible", "ShiftLeader", "User" };
 
-    foreach (var role in roles)
+    foreach (string? role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
-            await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+            _ = await roleManager.CreateAsync(new IdentityRole<Guid>(role));
         }
     }
 }
 
 static async Task SeedUsersAsync(IServiceProvider serviceProvider)
 {
-    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+    UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    ILogger<Program> logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
     async Task<ApplicationUser> CreateUserIfNotExists(string email, string role)
     {
-        var user = await userManager.FindByEmailAsync(email);
+        ApplicationUser? user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
             user = new ApplicationUser
@@ -124,10 +122,10 @@ static async Task SeedUsersAsync(IServiceProvider serviceProvider)
                 Email = email,
                 EmailConfirmed = true,
             };
-            var result = await userManager.CreateAsync(user, "Password123!");
+            IdentityResult result = await userManager.CreateAsync(user, "Password123!");
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(user, role);
+                _ = await userManager.AddToRoleAsync(user, role);
                 logger.LogInformation($"User '{email}' created and assigned to role '{role}'.");
             }
             else
@@ -142,34 +140,34 @@ static async Task SeedUsersAsync(IServiceProvider serviceProvider)
         return user;
     }
 
-    var admin = await CreateUserIfNotExists("admin@example.com", "Admin");
-    var manager = await CreateUserIfNotExists("manager@example.com", "Manager");
+    ApplicationUser admin = await CreateUserIfNotExists("admin@example.com", "Admin");
+    ApplicationUser manager = await CreateUserIfNotExists("manager@example.com", "Manager");
 
-    var unitResponsibles = new List<ApplicationUser>();
+    List<ApplicationUser> unitResponsibles = [];
     for (int i = 1; i <= 2; i++)
     {
-        var unitResp = await CreateUserIfNotExists($"unitresp{i}@example.com", "UnitResponsible");
+        ApplicationUser unitResp = await CreateUserIfNotExists($"unitresp{i}@example.com", "UnitResponsible");
         unitResponsibles.Add(unitResp);
     }
 
-    var shiftLeaders = new List<ApplicationUser>();
+    List<ApplicationUser> shiftLeaders = [];
     int shiftLeaderCounter = 1;
-    foreach (var unitResp in unitResponsibles)
+    foreach (ApplicationUser unitResp in unitResponsibles)
     {
         for (int i = 1; i <= 2; i++)
         {
-            var shiftLeader = await CreateUserIfNotExists($"shiftleader{shiftLeaderCounter}@example.com", "ShiftLeader");
+            ApplicationUser shiftLeader = await CreateUserIfNotExists($"shiftleader{shiftLeaderCounter}@example.com", "ShiftLeader");
             shiftLeaders.Add(shiftLeader);
             shiftLeaderCounter++;
         }
     }
 
     int userCounter = 1;
-    foreach (var shiftLeader in shiftLeaders)
+    foreach (ApplicationUser shiftLeader in shiftLeaders)
     {
         for (int i = 1; i <= 2; i++)
         {
-            await CreateUserIfNotExists($"user{userCounter}@example.com", "User");
+            _ = await CreateUserIfNotExists($"user{userCounter}@example.com", "User");
             userCounter++;
         }
     }

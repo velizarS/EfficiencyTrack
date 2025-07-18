@@ -1,9 +1,7 @@
-﻿namespace EfficiencyTrack.ViewModels.Routing
+﻿namespace EfficiencyTrack.ViewModels.RoutingViewModels
 {
-    using System.Collections.Generic;
-
     public class RoutingListViewModel
     {
-        public List<RoutingViewModel> Routings { get; set; } = new List<RoutingViewModel>();
+        public List<RoutingViewModel> Routings { get; set; } = [];
     }
 }

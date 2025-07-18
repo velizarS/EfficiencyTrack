@@ -1,15 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace EfficiencyTrack.ViewModels.Shift
+﻿namespace EfficiencyTrack.ViewModels.ShiftViewModels
 {
-    public class ShiftViewModel
+    public class ShiftViewModel : ShiftBaseViewModel
     {
         public Guid Id { get; set; }
-
-        [Display(Name = "Смяна")]
-        public string Name { get; set; } = null!;
-
-        [Display(Name = "Продължителност(в минути)")]
-        public int DurationMinutes { get; set; }
     }
 }

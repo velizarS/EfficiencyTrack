@@ -1,15 +1,31 @@
-﻿@model EfficiencyTrack.ViewModels.Shift.ShiftDetailViewModel
+﻿@model EfficiencyTrack.ViewModels.ShiftViewModels.ShiftDetailViewModel
 
-<h2>Потвърждение за изтриване</h2>
+@{
+    ViewData["Title"] = "Потвърждение за изтриване";
+}
 
-<div>
-    <h3>@Model.Name</h3>
-    <p>Продължителност: @Model.DurationMinutes минути</p>
-</div>
+<main class="max-w-xl mx-auto px-4 py-8">
+    <header class="mb-4">
+        <h1 class="h4 fw-semibold text-danger">@ViewData["Title"]</h1>
+    </header>
 
-<form asp-action="DeleteConfirmed" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Изтрий</button>
-    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
-</form>
+    <section class="alert alert-danger rounded-3">
+        <h2 class="h5 fw-medium mb-3">Наистина ли желаеш да изтриеш тази смяна?</h2>
+
+        <div class="mb-4">
+            <p><strong>Име:</strong> @Model.Name</p>
+            <p><strong>Продължителност:</strong> @Model.DurationMinutes минути</p>
+        </div>
+
+        <form asp-action="DeleteConfirmed" method="post" class="d-flex gap-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">
+                Изтрий
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                Отказ
+            </a>
+        </form>
+    </section>
+</main>

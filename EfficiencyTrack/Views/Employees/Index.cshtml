@@ -2,95 +2,113 @@
 
 @{
     ViewData["Title"] = "Служители";
-
     var searchTerm = ViewBag.SearchTerm as string;
     var sortBy = ViewBag.SortBy as string;
-    var sortAsc = (bool)(ViewBag.SortAsc ?? true);
+    var sortAsc = ViewBag.SortAsc as bool? ?? true;
 
     string GetSortIcon(string field) => sortBy == field
-        ? (sortAsc ? "↑" : "↓")
+        ? (sortAsc ? "▲" : "▼")
         : "";
 }
 
-<main class="container mt-4">
-    <h1>Служители</h1>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
+    </header>
 
-    <section aria-label="Търсене">
-        <form asp-action="Index" method="get" class="mb-3" role="search">
-            <div class="form-group d-flex gap-2">
-                <input type="text" name="searchTerm" value="@searchTerm" class="form-control"
-                       placeholder="Търси по код..." aria-label="Търси по код" />
-                <button type="submit" class="btn btn-primary">Търси</button>
-                <a asp-action="Index" class="btn btn-secondary">Изчисти</a>
-            </div>
+    <section class="mb-4" aria-label="Търсене">
+        <form asp-action="Index" method="get" role="search" class="d-flex flex-wrap gap-2 align-items-center">
+            <input type="text" name="searchTerm" value="@searchTerm"
+                   class="form-control flex-grow-1"
+                   placeholder="Търси по код..." aria-label="Търси по код" />
+            <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
+                <i class="bi bi-search"></i> Търси
+            </button>
+            <a asp-action="Index" class="btn btn-secondary d-flex align-items-center gap-1">
+                <i class="bi bi-x-circle"></i> Изчисти
+            </a>
         </form>
     </section>
 
-    <nav aria-label="Създаване">
-        <a asp-action="Create" class="btn btn-success mb-3">+ Нов служител</a>
-    </nav>
+    <div class="mb-4">
+        <a asp-action="Create" class="btn btn-success d-inline-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i> Нов служител
+        </a>
+    </div>
 
     <section aria-label="Списък със служители">
-        <table class="table table-bordered table-striped">
-            <caption>Списък със служители</caption>
-            <thead>
-                <tr>
-                    <th>
-                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                           asp-route-sortBy="code"
-                           asp-route-sortAsc="@(sortBy == "code" ? !sortAsc : true)">
-                            Код @GetSortIcon("code")
-                        </a>
-                    </th>
-                    <th>
-                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                           asp-route-sortBy="fullName"
-                           asp-route-sortAsc="@(sortBy == "fullName" ? !sortAsc : true)">
-                            Име @GetSortIcon("fullName")
-                        </a>
-                    </th>
-                    <th>
-                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                           asp-route-sortBy="department"
-                           asp-route-sortAsc="@(sortBy == "department" ? !sortAsc : true)">
-                            Отдел @GetSortIcon("department")
-                        </a>
-                    </th>
-                    <th>
-                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                           asp-route-sortBy="shiftManager"
-                           asp-route-sortAsc="@(sortBy == "shiftManager" ? !sortAsc : true)">
-                            Началник смяна @GetSortIcon("shiftManager")
-                        </a>
-                    </th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Employees.Any())
-                {
-                    foreach (var emp in Model.Employees)
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-sm">
+                <caption class="sr-only">Списък със служители</caption>
+                <thead class="table-light text-start">
+                    <tr>
+                        <th>
+                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="code"
+                               asp-route-sortAsc="@(sortBy == "code" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Код @GetSortIcon("code")
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="fullName"
+                               asp-route-sortAsc="@(sortBy == "fullName" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Име @GetSortIcon("fullName")
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="department"
+                               asp-route-sortAsc="@(sortBy == "department" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Отдел @GetSortIcon("department")
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="shiftManager"
+                               asp-route-sortAsc="@(sortBy == "shiftManager" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Началник смяна @GetSortIcon("shiftManager")
+                            </a>
+                        </th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Employees.Any())
+                    {
+                        foreach (var emp in Model.Employees)
+                        {
+                            <tr>
+                                <td>@emp.Code</td>
+                                <td>@emp.FullName</td>
+                                <td>@emp.DepartmentName</td>
+                                <td>@emp.ShiftManagerUserName</td>
+                                <td class="d-flex gap-2">
+                                    <a asp-action="Details" asp-route-id="@emp.Id" class="btn btn-sm btn-info d-inline-flex align-items-center gap-1" title="Детайли">
+                                        <i class="bi bi-info-circle"></i> Детайли
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@emp.Id" class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1" title="Редактирай">
+                                        <i class="bi bi-pencil"></i> Редакция
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@emp.Id" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1" title="Изтрий">
+                                        <i class="bi bi-trash"></i> Изтриване
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@emp.Code</td>
-                            <td>@emp.FullName</td>
-                            <td>@emp.DepartmentName</td>
-                            <td>@emp.ShiftLeader</td>
-                            <td>
-                                <a asp-action="Details" asp-route-id="@emp.Id" class="btn btn-sm btn-info">Детайли</a>
-                                <a asp-action="Edit" asp-route-id="@emp.Id" class="btn btn-sm btn-warning">Редактирай</a>
-                                <a asp-action="Delete" asp-route-id="@emp.Id" class="btn btn-sm btn-danger">Изтрий</a>
-                            </td>
+                            <td colspan="5" class="text-center fst-italic text-muted">Няма намерени служители.</td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="6" class="text-center">Няма намерени служители.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </section>
 </main>

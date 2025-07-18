@@ -1,11 +1,6 @@
-﻿using EfficiencyTrack.Data.Models;
-using EfficiencyTrack.Services.Interfaces;
-using EfficiencyTrack.ViewModels.Shift;
-using EfficiencyTrack.Web.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EfficiencyTrack.Controllers;
+using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.ViewModels.ShiftViewModels;
 
 public class ShiftController : BaseCrudController<
     Shift,
@@ -19,49 +14,61 @@ public class ShiftController : BaseCrudController<
         : base(service) { }
 
     protected override ShiftViewModel MapToViewModel(Shift entity)
-        => new()
+    {
+        return new()
         {
             Id = entity.Id,
             Name = entity.Name,
             DurationMinutes = entity.DurationMinutes
         };
+    }
 
     protected override ShiftDetailViewModel MapToDetailModel(Shift entity)
-        => new()
+    {
+        return new()
         {
             Id = entity.Id,
             Name = entity.Name,
             DurationMinutes = entity.DurationMinutes
         };
+    }
 
     protected override Shift MapToEntity(ShiftCreateViewModel model)
-        => new()
+    {
+        return new()
         {
             Name = model.Name,
             DurationMinutes = model.DurationMinutes
         };
+    }
 
     protected override Shift MapToEntity(ShiftEditViewModel model)
-        => new()
+    {
+        return new()
         {
             Id = model.Id,
             Name = model.Name,
             DurationMinutes = model.DurationMinutes
         };
+    }
 
     protected override ShiftEditViewModel MapToEditModel(Shift entity)
-        => new()
+    {
+        return new()
         {
             Id = entity.Id,
             Name = entity.Name,
             DurationMinutes = entity.DurationMinutes
         };
+    }
 
     protected override ShiftListViewModel BuildListViewModel(List<ShiftViewModel> items)
-        => new()
+    {
+        return new()
         {
             Shifts = items
         };
+    }
 
     protected override List<ShiftViewModel> FilterAndSort(List<ShiftViewModel> items, string? searchTerm, string? sortBy, bool sortAsc)
     {

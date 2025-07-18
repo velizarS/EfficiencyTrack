@@ -1,7 +1,4 @@
-﻿using EfficiencyTrack.Services.DTOs;
-using EfficiencyTrack.Data.Models;
-using System;
-using System.Threading.Tasks;
+﻿using EfficiencyTrack.Data.Models;
 
 namespace EfficiencyTrack.Services.Interfaces
 {

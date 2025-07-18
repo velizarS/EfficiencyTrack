@@ -1,10 +1,8 @@
-﻿using EfficiencyTrack.ViewModels.Shift;
-
-namespace EfficiencyTrack.ViewModels.FeedbackViewModels
+﻿namespace EfficiencyTrack.ViewModels.FeedbackViewModels
 {
     public class FeedbackListViewModel
     {
-        public List<FeedbackViewModel> Feedbacks { get; set; } = new();
+        public List<FeedbackViewModel> Feedbacks { get; set; } = [];
     }
 
 }

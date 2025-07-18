@@ -1,27 +1,35 @@
-﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeDetailViewModel
+﻿@model EfficiencyTrack.ViewModels.EmployeeViewModels.EmployeeDetailViewModel
 
 @{
     ViewData["Title"] = "Изтриване на служител";
 }
 
-<main class="container">
-    <h2>Сигурен ли си, че искаш да изтриеш този служител?</h2>
+<main class="max-w-3xl mx-auto px-4 py-8">
+    <header class="mb-5">
+        <h1 class="text-2xl font-semibold text-danger">Сигурен ли си, че искаш да изтриеш този служител?</h1>
+    </header>
 
-    <dl class="row">
-        <dt class="col-sm-2">Код</dt>
-        <dd class="col-sm-10">@Model.Code</dd>
+    <section class="mb-4">
+        <dl class="row fs-5">
+            <dt class="col-sm-3 fw-semibold">Код</dt>
+            <dd class="col-sm-9">@Model.Code</dd>
 
-        <dt class="col-sm-2">Име</dt>
-        <dd class="col-sm-10">@Model.FullName</dd>
+            <dt class="col-sm-3 fw-semibold">Име</dt>
+            <dd class="col-sm-9">@Model.FullName</dd>
 
-        <dt class="col-sm-2">Отдел</dt>
-        <dd class="col-sm-10">@Model.DepartmentName</dd>
-    </dl>
+            <dt class="col-sm-3 fw-semibold">Отдел</dt>
+            <dd class="col-sm-9">@Model.DepartmentName</dd>
+        </dl>
+    </section>
 
-    <form asp-action="DeleteConfirmed" method="post">
+    <form asp-action="DeleteConfirmed" method="post" class="d-flex gap-3">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-danger">Изтрий</button>
-        <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        <button type="submit" class="btn btn-danger d-inline-flex align-items-center gap-2">
+            <i class="bi bi-trash"></i> Изтрий
+        </button>
+        <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-2">
+            <i class="bi bi-x-circle"></i> Отказ
+        </a>
     </form>
 </main>

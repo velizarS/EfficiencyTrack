@@ -4,61 +4,85 @@
     ViewData["Title"] = "Отдели";
     var searchTerm = ViewBag.SearchTerm as string;
     var sortBy = ViewBag.SortBy as string;
-    var sortAsc = (bool)(ViewBag.SortAsc ?? true);
+    var sortAsc = ViewBag.SortAsc as bool? ?? true;
 
     string GetSortIcon(string field) => sortBy == field
-        ? (sortAsc ? "↑" : "↓")
+        ? (sortAsc ? "▲" : "▼")
         : "";
 }
 
-<main class="container mt-4">
-    <header>
-        <h1>Отдели</h1>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
     </header>
 
-    <section aria-label="Търсене">
-        <form asp-action="Index" method="get" class="mb-3" role="search">
-            <div class="form-group d-flex gap-2">
-                <input type="text" name="searchTerm" value="@searchTerm" class="form-control"
-                       placeholder="Търси по име..." aria-label="Търси по име" />
-                <button type="submit" class="btn btn-primary">Търси</button>
-                <a asp-action="Index" class="btn btn-secondary">Изчисти</a>
-            </div>
+    <section class="mb-4" aria-label="Търсене">
+        <form asp-action="Index" method="get" role="search" class="d-flex flex-wrap gap-2 align-items-center">
+            <input type="text" name="searchTerm" value="@searchTerm"
+                   class="form-control flex-grow-1"
+                   placeholder="Търси по име..." aria-label="Търси по име" />
+            <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
+                <i class="bi bi-search"></i> Търси
+            </button>
+            <a asp-action="Index" class="btn btn-secondary d-flex align-items-center gap-1">
+                <i class="bi bi-x-circle"></i> Изчисти
+            </a>
         </form>
     </section>
 
-    <nav aria-label="Създаване">
-        <a asp-action="Create" class="btn btn-success mb-3">+ Нов отдел</a>
-    </nav>
+    <div class="mb-4">
+        <a asp-action="Create" class="btn btn-success d-inline-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i> Нов отдел
+        </a>
+    </div>
 
     <section aria-label="Списък с отдели">
-        <table class="table table-bordered table-striped">
-            <caption>Списък с отдели</caption>
-            <thead>
-                <tr>
-                    <th>
-                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                           asp-route-sortBy="name"
-                           asp-route-sortAsc="@(sortBy == "name" ? !sortAsc : true)">
-                            Име @GetSortIcon("name")
-                        </a>
-                    </th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Departments)
-                {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-sm">
+                <caption class="sr-only">Списък с отдели</caption>
+                <thead class="table-light text-start">
                     <tr>
-                        <td>@item.Name</td>
-                        <td>
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детайли</a>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редакция</a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Изтриване</a>
-                        </td>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="name"
+                               asp-route-sortAsc="@(sortBy == "name" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Име @GetSortIcon("name")
+                            </a>
+                        </th>
+                        <th class="text-center">Действия</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (Model.Departments.Any())
+                    {
+                        @foreach (var item in Model.Departments)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td class="text-center d-flex justify-content-center gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-info-circle"></i> Детайли
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-pencil"></i> Редакция
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-trash"></i> Изтриване
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">Няма налични отдели.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </section>
 </main>

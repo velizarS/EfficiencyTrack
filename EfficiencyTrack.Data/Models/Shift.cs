@@ -18,7 +18,7 @@ namespace EfficiencyTrack.Data.Models
         [Range(1, 720, ErrorMessage = "Duration must be between 1 and 720 minutes.")]
         public int DurationMinutes { get; set; }
 
-        public ICollection<Entry> Entries { get; set; } = new List<Entry>();
+        public ICollection<Entry> Entries { get; set; } = [];
 
     }
 }

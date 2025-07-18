@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,7 +10,7 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "AspNetUserTokens",
                 type: "nvarchar(450)",
@@ -20,7 +19,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(128)",
                 oldMaxLength: 128);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "LoginProvider",
                 table: "AspNetUserTokens",
                 type: "nvarchar(450)",
@@ -29,26 +28,26 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(128)",
                 oldMaxLength: 128);
 
-            migrationBuilder.AddColumn<DateTime>(
+            _ = migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedOn",
                 table: "AspNetUsers",
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
-            migrationBuilder.AddColumn<DateTime>(
+            _ = migrationBuilder.AddColumn<DateTime>(
                 name: "ModifiedOn",
                 table: "AspNetUsers",
                 type: "datetime2",
                 nullable: true);
 
-            migrationBuilder.AddColumn<Guid>(
+            _ = migrationBuilder.AddColumn<Guid>(
                 name: "ApplicationUserId",
                 table: "AspNetUserRoles",
                 type: "uniqueidentifier",
                 nullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ProviderKey",
                 table: "AspNetUserLogins",
                 type: "nvarchar(450)",
@@ -57,7 +56,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(128)",
                 oldMaxLength: 128);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "LoginProvider",
                 table: "AspNetUserLogins",
                 type: "nvarchar(450)",
@@ -66,13 +65,13 @@ namespace EfficiencyTrack.Data.Migrations
                 oldType: "nvarchar(128)",
                 oldMaxLength: 128);
 
-            migrationBuilder.AddColumn<Guid>(
+            _ = migrationBuilder.AddColumn<Guid>(
                 name: "ApplicationUserId",
                 table: "AspNetUserLogins",
                 type: "uniqueidentifier",
                 nullable: true);
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Departments",
                 columns: table => new
                 {
@@ -87,11 +86,11 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Departments", x => x.Id);
+                    _ = table.PrimaryKey("PK_Departments", x => x.Id);
                 },
                 comment: "Represents a department within the organization.");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Shifts",
                 columns: table => new
                 {
@@ -107,11 +106,11 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Shifts", x => x.Id);
+                    _ = table.PrimaryKey("PK_Shifts", x => x.Id);
                 },
                 comment: "Represents a work shift in the system.");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
@@ -133,19 +132,19 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_Employees", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_Employees_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_Employees_Departments_DepartmentId",
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_Employees_Employees_LeaderId",
                         column: x => x.LeaderId,
                         principalTable: "Employees",
@@ -153,7 +152,7 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 comment: "Represents an employee in the system.");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Routings",
                 columns: table => new
                 {
@@ -172,8 +171,8 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Routings", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_Routings", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_Routings_Departments_DepartmentId",
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
@@ -182,7 +181,7 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 comment: "Represents a routing operation in the system.");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "DailyEfficiencies",
                 columns: table => new
                 {
@@ -201,8 +200,8 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DailyEfficiencies", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_DailyEfficiencies", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_DailyEfficiencies_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
@@ -211,7 +210,7 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 comment: "Represents the daily efficiency of an employee, calculated based on the tasks performed and time worked.");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "Entries",
                 columns: table => new
                 {
@@ -233,20 +232,20 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Entries", x => x.Id);
-                    table.ForeignKey(
+                    _ = table.PrimaryKey("PK_Entries", x => x.Id);
+                    _ = table.ForeignKey(
                         name: "FK_Entries_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_Entries_Routings_RoutingId",
                         column: x => x.RoutingId,
                         principalTable: "Routings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
+                    _ = table.ForeignKey(
                         name: "FK_Entries_Shifts_ShiftId",
                         column: x => x.ShiftId,
                         principalTable: "Shifts",
@@ -255,100 +254,100 @@ namespace EfficiencyTrack.Data.Migrations
                 },
                 comment: "Represents a production entry for an employee, including details about the operation performed, pieces produced, and efficiency metrics.");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_ApplicationUserId",
                 table: "AspNetUserRoles",
                 column: "ApplicationUserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserLogins_ApplicationUserId",
                 table: "AspNetUserLogins",
                 column: "ApplicationUserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_DailyEfficiencies_EmployeeId",
                 table: "DailyEfficiencies",
                 column: "EmployeeId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_DailyEfficiency_Date_Employee",
                 table: "DailyEfficiencies",
                 columns: new[] { "Date", "EmployeeId" },
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Departments_Name",
                 table: "Departments",
                 column: "Name",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Employees_ApplicationUserId",
                 table: "Employees",
                 column: "ApplicationUserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Employees_Code",
                 table: "Employees",
                 column: "Code",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Employees_DepartmentId",
                 table: "Employees",
                 column: "DepartmentId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Employees_LeaderId",
                 table: "Employees",
                 column: "LeaderId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Entries_Date_Employee_Routing_Shift",
                 table: "Entries",
                 columns: new[] { "Date", "EmployeeId", "RoutingId", "ShiftId", "Pieces", "WorkedMinutes" },
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Entries_EmployeeId",
                 table: "Entries",
                 column: "EmployeeId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Entries_RoutingId",
                 table: "Entries",
                 column: "RoutingId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Entries_ShiftId",
                 table: "Entries",
                 column: "ShiftId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Routings_Code",
                 table: "Routings",
                 column: "Code",
                 unique: true);
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Routings_DepartmentId",
                 table: "Routings",
                 column: "DepartmentId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_Shifts_Name",
                 table: "Shifts",
                 column: "Name",
                 unique: true);
 
-            migrationBuilder.AddForeignKey(
+            _ = migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUserLogins_AspNetUsers_ApplicationUserId",
                 table: "AspNetUserLogins",
                 column: "ApplicationUserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id");
 
-            migrationBuilder.AddForeignKey(
+            _ = migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUserRoles_AspNetUsers_ApplicationUserId",
                 table: "AspNetUserRoles",
                 column: "ApplicationUserId",
@@ -359,57 +358,57 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
+            _ = migrationBuilder.DropForeignKey(
                 name: "FK_AspNetUserLogins_AspNetUsers_ApplicationUserId",
                 table: "AspNetUserLogins");
 
-            migrationBuilder.DropForeignKey(
+            _ = migrationBuilder.DropForeignKey(
                 name: "FK_AspNetUserRoles_AspNetUsers_ApplicationUserId",
                 table: "AspNetUserRoles");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "DailyEfficiencies");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Entries");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Employees");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Routings");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Shifts");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "Departments");
 
-            migrationBuilder.DropIndex(
+            _ = migrationBuilder.DropIndex(
                 name: "IX_AspNetUserRoles_ApplicationUserId",
                 table: "AspNetUserRoles");
 
-            migrationBuilder.DropIndex(
+            _ = migrationBuilder.DropIndex(
                 name: "IX_AspNetUserLogins_ApplicationUserId",
                 table: "AspNetUserLogins");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "CreatedOn",
                 table: "AspNetUsers");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "ModifiedOn",
                 table: "AspNetUsers");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "ApplicationUserId",
                 table: "AspNetUserRoles");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "ApplicationUserId",
                 table: "AspNetUserLogins");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "AspNetUserTokens",
                 type: "nvarchar(128)",
@@ -418,7 +417,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(450)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "LoginProvider",
                 table: "AspNetUserTokens",
                 type: "nvarchar(128)",
@@ -427,7 +426,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(450)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ProviderKey",
                 table: "AspNetUserLogins",
                 type: "nvarchar(128)",
@@ -436,7 +435,7 @@ namespace EfficiencyTrack.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(450)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "LoginProvider",
                 table: "AspNetUserLogins",
                 type: "nvarchar(128)",

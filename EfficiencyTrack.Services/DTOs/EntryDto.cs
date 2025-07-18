@@ -1,6 +1,4 @@
-﻿using EfficiencyTrack.Data.Models;
-
-namespace EfficiencyTrack.Services.DTOs
+﻿namespace EfficiencyTrack.Services.DTOs
 {
     public class EntryDto
     {

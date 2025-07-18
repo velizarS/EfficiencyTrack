@@ -2,11 +2,6 @@
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Helpers
 {
@@ -21,7 +16,7 @@ namespace EfficiencyTrack.Services.Helpers
 
         public async Task<string> GetGreetingMessageAsync(Entry entry)
         {
-            var todayEntryCount = await _context.Entries
+            int todayEntryCount = await _context.Entries
                 .AsNoTracking()
                 .CountAsync(x => x.EmployeeId == entry.EmployeeId && x.Date.Date == DateTime.UtcNow.Date);
 
@@ -29,7 +24,7 @@ namespace EfficiencyTrack.Services.Helpers
 
             if (todayEntryCount == 1)
             {
-                var workerName = await _context.Employees
+                string? workerName = await _context.Employees
                     .AsNoTracking()
                     .Where(x => x.Id == entry.EmployeeId)
                     .Select(x => x.FirstName)

@@ -1,43 +1,42 @@
-﻿@model EfficiencyTrack.ViewModels.Shift.ShiftCreateViewModel
+﻿@model EfficiencyTrack.ViewModels.ShiftViewModels.ShiftCreateViewModel
 
 @{
     ViewData["Title"] = "Създай нова смяна";
 }
 
-<main class="container mt-4">
+<main class="max-w-xl mx-auto px-4 py-8">
     <header class="mb-4">
-        <h1>@ViewData["Title"]</h1>
+        <h1 class="h4 fw-semibold text-gray-800">@ViewData["Title"]</h1>
     </header>
 
-    <section aria-labelledby="form-section">
-        <form asp-action="Create" method="post" role="form">
+    <section>
+        <form asp-action="Create" method="post" novalidate>
             @Html.AntiForgeryToken()
-            <fieldset>
-                <legend class="visually-hidden">Данни за смяна</legend>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="DurationMinutes" class="form-label"></label>
-                    <input asp-for="DurationMinutes" type="number" min="1" max="720" class="form-control" />
-                    <span asp-validation-for="DurationMinutes" class="text-danger"></span>
-                </div>
-            </fieldset>
-
-            <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary">Създай</button>
-                <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" placeholder="Име на смяна" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
             </div>
+
+            <div class="mb-3">
+                <label asp-for="DurationMinutes" class="form-label"></label>
+                <input asp-for="DurationMinutes" type="number" min="1" max="720" placeholder="Продължителност в минути" class="form-control" />
+                <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
+            </div>
+
+            <footer class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-success d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-plus-circle"></i> Създай
+                </button>
+                <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-arrow-left-circle"></i> Отказ
+                </a>
+            </footer>
         </form>
     </section>
 </main>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

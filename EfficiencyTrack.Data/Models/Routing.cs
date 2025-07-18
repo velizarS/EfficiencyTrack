@@ -39,6 +39,6 @@ namespace EfficiencyTrack.Data.Models
         [ForeignKey(nameof(DepartmentId))]
         public Department Department { get; set; } = null!;
 
-        public ICollection<Entry> Entries { get; set; } = new List<Entry>();
+        public ICollection<Entry> Entries { get; set; } = [];
     }
 }

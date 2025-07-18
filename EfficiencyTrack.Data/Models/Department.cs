@@ -12,6 +12,6 @@ namespace EfficiencyTrack.Data.Models
         [Comment("The name of the department.")]
         public string Name { get; set; } = null!;
 
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+        public ICollection<Employee> Employees { get; set; } = [];
     }
 }

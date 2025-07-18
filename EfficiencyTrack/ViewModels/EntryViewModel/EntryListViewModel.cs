@@ -2,7 +2,7 @@
 {
     public class EntryListViewModel
     {
-        public List<EntryViewModel> Entries { get; set; } = new();
+        public List<EntryViewModel> Entries { get; set; } = [];
 
     }
 }

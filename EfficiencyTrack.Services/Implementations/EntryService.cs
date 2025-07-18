@@ -1,13 +1,9 @@
 ﻿using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.Services.Helpers;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using EfficiencyTrack.Services.Helpers;
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -67,7 +63,7 @@ namespace EfficiencyTrack.Services.Implementations
 
         public override async Task DeleteAsync(Guid id)
         {
-            var entity = await base.GetByIdAsync(id);
+            Entry? entity = await base.GetByIdAsync(id);
             if (entity != null)
             {
                 await base.DeleteAsync(id);
@@ -77,29 +73,33 @@ namespace EfficiencyTrack.Services.Implementations
 
         private async Task ValidateAndSetEfficiencyAsync(Entry entry)
         {
-            var validationResult = await _validator.ValidateAsync(entry);
+            ValidationResult validationResult = await _validator.ValidateAsync(entry);
             if (!validationResult.IsValid)
+            {
                 throw new InvalidOperationException(string.Join(Environment.NewLine, validationResult.Errors));
+            }
 
             await SetEfficiencyAsync(entry);
         }
 
         private async Task SetEfficiencyAsync(Entry entry)
         {
-            var routing = await _context.Routings
+            Routing? routing = await _context.Routings
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id == entry.RoutingId);
 
             if (routing == null)
+            {
                 throw new InvalidOperationException("Невалиден RoutingId");
+            }
 
-            var requiredMinutes = (entry.Pieces + entry.Scrap) * routing.MinutesPerPiece;
+            decimal requiredMinutes = (entry.Pieces + entry.Scrap) * routing.MinutesPerPiece;
             entry.EfficiencyForOperation = CalculateEfficiency(requiredMinutes, entry.WorkedMinutes);
         }
 
         private decimal CalculateEfficiency(decimal requiredMinutes, decimal workedMinutes)
         {
-            return workedMinutes <= 0 ? 0 : (requiredMinutes / workedMinutes) * 100;
+            return workedMinutes <= 0 ? 0 : requiredMinutes / workedMinutes * 100;
         }
 
         async Task IEntryService.SetEfficiencyAsync(Entry entry)

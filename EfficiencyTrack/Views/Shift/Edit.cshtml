@@ -1,45 +1,46 @@
-﻿@model EfficiencyTrack.ViewModels.Shift.ShiftEditViewModel
+﻿@model EfficiencyTrack.ViewModels.ShiftViewModels.ShiftEditViewModel
 
 @{
     ViewData["Title"] = "Редакция на смяна";
 }
 
-<main class="container mt-4">
+<main class="max-w-xl mx-auto px-4 py-8">
     <header class="mb-4">
-        <h1>@ViewData["Title"]</h1>
+        <h1 class="h3 text-gray-800">@ViewData["Title"]</h1>
     </header>
 
-    <section aria-labelledby="edit-heading">
-        <form asp-action="Edit" method="post" role="form">
+    <section>
+        <form asp-action="Edit" method="post" class="needs-validation" novalidate>
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
 
-            <fieldset>
-                <legend class="visually-hidden">Данни за смяна</legend>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" placeholder="Въведи име на смяна"
+                       class="form-control" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
+            <div class="mb-3">
+                <label asp-for="DurationMinutes" class="form-label"></label>
+                <input asp-for="DurationMinutes" type="number" min="1" max="720"
+                       placeholder="Продължителност в минути"
+                       class="form-control" />
+                <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
+            </div>
 
-                <div class="mb-3">
-                    <label asp-for="DurationMinutes" class="form-label"></label>
-                    <input asp-for="DurationMinutes" type="number" min="1" max="720" class="form-control" />
-                    <span asp-validation-for="DurationMinutes" class="text-danger"></span>
-                </div>
-            </fieldset>
-
-            <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary">Запази</button>
-                <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    Запази
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Отказ
+                </a>
             </div>
         </form>
     </section>
 </main>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

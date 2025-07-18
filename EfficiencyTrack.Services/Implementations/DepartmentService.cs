@@ -4,8 +4,6 @@ using EfficiencyTrack.Services.Helpers;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -24,7 +22,9 @@ namespace EfficiencyTrack.Services.Implementations
         public override async Task AddAsync(Department entity)
         {
             if (entity == null)
+            {
                 throw new ArgumentNullException(nameof(entity));
+            }
 
             await EnsureDepartmentIsUniqueAsync(entity);
             await base.AddAsync(entity);
@@ -33,7 +33,9 @@ namespace EfficiencyTrack.Services.Implementations
         public override async Task UpdateAsync(Department entity)
         {
             if (entity == null)
+            {
                 throw new ArgumentNullException(nameof(entity));
+            }
 
             await EnsureDepartmentIsUniqueForUpdateAsync(entity);
             await base.UpdateAsync(entity);
@@ -50,20 +52,24 @@ namespace EfficiencyTrack.Services.Implementations
 
         private async Task EnsureDepartmentIsUniqueForUpdateAsync(Department entity)
         {
-            var exists = await _context.Departments.AsNoTracking()
+            bool exists = await _context.Departments.AsNoTracking()
                 .AnyAsync(e => e.Name == entity.Name && e.Id != entity.Id && !e.IsDeleted);
 
             if (exists)
+            {
                 throw new DuplicateDepartmentException($"Another Department with name '{entity.Name}' already exists.");
+            }
         }
 
         private async Task EnsureDepartmentIsUniqueAsync(Department entity)
         {
-            var exists = await _context.Departments.AsNoTracking()
+            bool exists = await _context.Departments.AsNoTracking()
                 .AnyAsync(e => e.Name == entity.Name && !e.IsDeleted);
 
             if (exists)
+            {
                 throw new DuplicateDepartmentException($"Department with name '{entity.Name}' already exists.");
+            }
         }
     }
 }

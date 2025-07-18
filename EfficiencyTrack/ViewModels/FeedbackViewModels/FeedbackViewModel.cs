@@ -4,7 +4,7 @@ namespace EfficiencyTrack.ViewModels.FeedbackViewModels
 {
     public class FeedbackViewModel
     {
-        public Guid Id { get; set; } 
+        public Guid Id { get; set; }
 
         [Display(Name = "Име на служител")]
         public string? EmployeeName { get; set; }
@@ -16,7 +16,7 @@ namespace EfficiencyTrack.ViewModels.FeedbackViewModels
         [Display(Name = "Съобщение")]
         public string Message { get; set; } = null!;
 
-        public bool IsHandled { get; set; }  
+        public bool IsHandled { get; set; }
     }
 
 }

@@ -1,12 +1,7 @@
 ﻿using EfficiencyTrack.Data.Models;
-using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace EfficiencyTrack.Web.Controllers
+namespace EfficiencyTrack.Controllers
 {
     public abstract class BaseCrudController<T, TViewModel, TListViewModel, TCreateModel, TEditModel, TDetailModel>
         : Controller where T : BaseEntity
@@ -26,19 +21,19 @@ namespace EfficiencyTrack.Web.Controllers
         protected virtual async Task<(List<TViewModel> Items, int TotalCount)> GetPagedAsync(
             string? searchTerm, string? sortBy, bool sortAsc, int page = 1, int pageSize = 20)
         {
-            var allItems = await _service.GetAllAsync();
-            var vmItems = allItems.Select(MapToViewModel).ToList();
+            IEnumerable<T> allItems = await _service.GetAllAsync();
+            List<TViewModel> vmItems = allItems.Select(MapToViewModel).ToList();
 
-            var filteredSorted = FilterAndSort(vmItems, searchTerm, sortBy, sortAsc);
+            List<TViewModel> filteredSorted = FilterAndSort(vmItems, searchTerm, sortBy, sortAsc);
 
             return (filteredSorted, filteredSorted.Count);
         }
 
         public virtual async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
-            var (items, totalCount) = await GetPagedAsync(searchTerm, sortBy, sortAsc, page, pageSize);
+            (List<TViewModel> items, int totalCount) = await GetPagedAsync(searchTerm, sortBy, sortAsc, page, pageSize);
 
-            var listViewModel = BuildListViewModel(items);
+            TListViewModel? listViewModel = BuildListViewModel(items);
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.SortBy = sortBy;
@@ -52,18 +47,21 @@ namespace EfficiencyTrack.Web.Controllers
 
         public virtual async Task<IActionResult> Details(Guid id)
         {
-            var entity = await _service.GetByIdAsync(id);
-            if (entity == null) return NotFound();
+            T? entity = await _service.GetByIdAsync(id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
 
-            var viewModel = MapToDetailModel(entity);
+            TDetailModel? viewModel = MapToDetailModel(entity);
             return View(viewModel);
         }
 
         public virtual async Task<IActionResult> Create()
-
         {
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -74,17 +72,20 @@ namespace EfficiencyTrack.Web.Controllers
                 return View(model);
             }
 
-            var entity = MapToEntity(model);
+            T entity = MapToEntity(model);
             await _service.AddAsync(entity);
             return RedirectToAction(nameof(Index));
         }
 
         public virtual async Task<IActionResult> Edit(Guid id)
         {
-            var entity = await _service.GetByIdAsync(id);
-            if (entity == null) return NotFound();
+            T? entity = await _service.GetByIdAsync(id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
 
-            var viewModel = MapToEditModel(entity);
+            TEditModel? viewModel = MapToEditModel(entity);
             return View(viewModel);
         }
 
@@ -97,17 +98,20 @@ namespace EfficiencyTrack.Web.Controllers
                 return View(model);
             }
 
-            var entity = MapToEntity(model);
+            T entity = MapToEntity(model);
             await _service.UpdateAsync(entity);
             return RedirectToAction(nameof(Index));
         }
 
         public virtual async Task<IActionResult> Delete(Guid id)
         {
-            var entity = await _service.GetByIdAsync(id);
-            if (entity == null) return NotFound();
+            T? entity = await _service.GetByIdAsync(id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
 
-            var viewModel = MapToDetailModel(entity);
+            TDetailModel? viewModel = MapToDetailModel(entity);
             return View(viewModel);
         }
 

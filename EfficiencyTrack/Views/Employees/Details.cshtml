@@ -1,26 +1,36 @@
-﻿@model EfficiencyTrack.ViewModels.Employee.EmployeeDetailViewModel
+﻿@model EfficiencyTrack.ViewModels.EmployeeViewModels.EmployeeDetailViewModel
 
 @{
     ViewData["Title"] = "Детайли за служител";
 }
 
-<main class="container mt-4">
-    <h1>Детайли за служител</h1>
+<main class="max-w-3xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800">@ViewData["Title"]</h1>
+    </header>
 
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Code)</dt>
-        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Code) ? Model.Code : "-")</dd>
+    <section class="mb-5">
+        <dl class="row">
+            <dt class="col-sm-4 fw-semibold">@Html.DisplayNameFor(m => m.Code)</dt>
+            <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Code) ? Model.Code : "-")</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.FullName)</dt>
-        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.FullName) ? Model.FullName : "-")</dd>
+            <dt class="col-sm-4 fw-semibold">@Html.DisplayNameFor(m => m.FullName)</dt>
+            <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.FullName) ? Model.FullName : "-")</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.DepartmentName)</dt>
-        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.DepartmentName) ? Model.DepartmentName : "-")</dd>
+            <dt class="col-sm-4 fw-semibold">@Html.DisplayNameFor(m => m.DepartmentName)</dt>
+            <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.DepartmentName) ? Model.DepartmentName : "-")</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ShiftManagerUserName)</dt>
-        <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.ShiftManagerUserName) ? Model.ShiftManagerUserName : "-")</dd>
-    </dl>
+            <dt class="col-sm-4 fw-semibold">@Html.DisplayNameFor(m => m.ShiftManagerUserName)</dt>
+            <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.ShiftManagerUserName) ? Model.ShiftManagerUserName : "-")</dd>
+        </dl>
+    </section>
 
-    <a asp-action="Index" class="btn btn-secondary">Обратно към списъка</a>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редактирай</a>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Обратно към списъка
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary d-inline-flex align-items-center gap-1">
+            <i class="bi bi-pencil"></i> Редактирай
+        </a>
+    </div>
 </main>

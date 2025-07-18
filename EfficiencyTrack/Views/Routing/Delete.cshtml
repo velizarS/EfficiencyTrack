@@ -1,41 +1,51 @@
-﻿@model EfficiencyTrack.ViewModels.Routing.RoutingDetailViewModel
+﻿@model EfficiencyTrack.ViewModels.RoutingViewModels.RoutingDetailViewModel
 
 @{
     ViewData["Title"] = "Потвърди изтриване";
 }
 
-<main class="container mt-5">
+<main class="max-w-xl mx-auto px-4 py-5">
     <header class="mb-4">
         <h1 class="text-danger">Потвърди изтриване</h1>
-        <p class="lead">Сигурни ли сте, че искате да изтриете този роутинг?</p>
+        <p class="lead text-muted">Сигурни ли сте, че искате да изтриете този рутинг?</p>
     </header>
 
-    <section aria-labelledby="routing-info">
-        <dl class="row">
-            <dt class="col-sm-3">Код</dt>
-            <dd class="col-sm-9">@Model.Code</dd>
-
-            <dt class="col-sm-3">Описание</dt>
-            <dd class="col-sm-9">@Model.Description</dd>
-
-            <dt class="col-sm-3">Зона</dt>
-            <dd class="col-sm-9">@Model.Zone</dd>
-
-            <dt class="col-sm-3">Време за бройка</dt>
-            <dd class="col-sm-9">@Model.MinutesPerPiece мин.</dd>
-
-            <dt class="col-sm-3">Отдел</dt>
-            <dd class="col-sm-9">@Model.DepartmentName</dd>
-        </dl>
+    <section class="card border-danger mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Код:</h6>
+                <p class="mb-0">@Model.Code</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Описание:</h6>
+                <p class="mb-0">@Model.Description</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Зона:</h6>
+                <p class="mb-0">@Model.Zone</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Време за бройка:</h6>
+                <p class="mb-0">@Model.MinutesPerPiece мин.</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Отдел:</h6>
+                <p class="mb-0">@Model.DepartmentName</p>
+            </div>
+        </div>
     </section>
 
     <form asp-action="DeleteConfirmed" method="post">
         <input type="hidden" asp-for="Id" />
         @Html.AntiForgeryToken()
 
-        <footer class="d-flex gap-3 mt-4">
-            <button type="submit" class="btn btn-danger">Изтрий</button>
-            <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+        <footer class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                <i class="bi bi-trash-fill"></i> Изтрий
+            </button>
+            <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Отказ
+            </a>
         </footer>
     </form>
 </main>

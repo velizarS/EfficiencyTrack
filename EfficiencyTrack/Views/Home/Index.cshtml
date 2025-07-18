@@ -1,71 +1,81 @@
 ﻿@model EfficiencyTrack.ViewModels.HomeViewModel.HomeIndexViewModel
 
-<div class="container">
-    <div class="row">
+<main class="container py-5">
+    <div class="row g-4">
         <div class="col-md-6">
-            <h3>Топ 10 за днес</h3>
-            @if (Model.Top10Today != null && Model.Top10Today.Any())
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Име на служител</th>
-                            <th>Ефективност %</th>
-                            <th>Смяна</th>
-                            <th>Отдел</th>
-                            <th>Началник смяна</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Top10Today)
-                        {
-                            <tr>
-                                <td>@(item.Employee?.FirstName + " " + item.Employee?.LastName)</td>
-                                <td>@item.EfficiencyPercentage.ToString("F2")</td>
-                                <td>@item.Shift?.Name </td>
-                                <td>@item.Employee?.Department?.Name </td>
-                                <td>@item.Employee?.ShiftManagerUser?.UserName </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>Няма данни за днес.</p>
-            }
+            <section aria-labelledby="top10-today" class="shadow-sm p-3 rounded bg-white">
+                <h2 id="top10-today" class="h4 fw-bold mb-4 border-bottom pb-2">Топ 10 за днес</h2>
+
+                @if (Model.Top10Today.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle mb-0">
+                            <thead class="table-light text-uppercase small">
+                                <tr>
+                                    <th>Име на служител</th>
+                                    <th class="text-end">Ефективност %</th>
+                                    <th>Смяна</th>
+                                    <th>Отдел</th>
+                                    <th>Началник смяна</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Top10Today)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@item.FullName</td>
+                                        <td class="text-end">@item.EfficiencyPercentage.ToString("F2")</td>
+                                        <td>@item.ShiftName</td>
+                                        <td>@item.DepartmentName</td>
+                                        <td>@item.ShiftManagerName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic">Няма данни за днес.</p>
+                }
+            </section>
         </div>
 
         <div class="col-md-6">
-            <h3>Топ 10 за месеца</h3>
-            @if (Model.Top10ThisMonth != null && Model.Top10ThisMonth.Any())
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Име на служител</th>
-                            <th>Ефективност %</th>
-                            <th>Отдел</th>
-                            <th>Началник смяна</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Top10ThisMonth)
-                        {
-                            <tr>
-                                <td>@(item.Employee?.FirstName + " " + item.Employee?.LastName)</td>
-                                <td>@item.EfficiencyPercentage.ToString("F2")</td>
-                                <td>@item.Employee?.Department?.Name </td>
-                                <td>@item.Employee?.ShiftManagerUser?.UserName</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p>Няма данни за този месец.</p>
-            }
+            <section aria-labelledby="top10-month" class="shadow-sm p-3 rounded bg-white">
+                <h2 id="top10-month" class="h4 fw-bold mb-4 border-bottom pb-2">Топ 10 за месеца</h2>
+
+                @if (Model.Top10ThisMonth.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle mb-0">
+                            <thead class="table-light text-uppercase small">
+                                <tr>
+                                    <th>Име на служител</th>
+                                    <th class="text-end">Ефективност %</th>
+                                    <th>Отдел</th>
+                                    <th>Началник смяна</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Top10ThisMonth)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@item.FullName</td>
+                                        <td class="text-end">@item.EfficiencyPercentage.ToString("F2")</td>
+                                        <td>@item.DepartmentName</td>
+                                        <td>@item.ShiftManagerName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic">Няма данни за този месец.</p>
+                }
+            </section>
         </div>
     </div>
-</div>
+</main>

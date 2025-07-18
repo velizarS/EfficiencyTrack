@@ -4,59 +4,68 @@
     ViewData["Title"] = "Редакция на запис";
 }
 
-<main class="container">
-    <header>
-        <h1>Редакция на запис</h1>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
     </header>
 
     @if (TempData["Message"] != null)
     {
-        <div class="alert alert-success">@TempData["Message"]</div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
 
-    <form asp-action="Edit" method="post" class="needs-validation">
+    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
         <input type="hidden" asp-for="Id" />
         <input type="hidden" asp-for="EmployeeId" />
         <input type="hidden" asp-for="RoutingId" />
 
-        <div class="mb-3">
+        <div class="mb-4">
             <label asp-for="EmployeeCode" class="form-label"></label>
             <input asp-for="EmployeeCode" class="form-control" />
             <span asp-validation-for="EmployeeCode" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-4">
             <label asp-for="RoutingCode" class="form-label"></label>
             <input asp-for="RoutingCode" class="form-control" />
             <span asp-validation-for="RoutingCode" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-4">
             <label asp-for="ShiftId" class="form-label"></label>
             <select asp-for="ShiftId" asp-items="ViewBag.Shifts" class="form-select"></select>
             <span asp-validation-for="ShiftId" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-4">
             <label asp-for="Pieces" class="form-label"></label>
-            <input asp-for="Pieces" class="form-control" />
+            <input asp-for="Pieces" class="form-control" type="number" min="0" />
             <span asp-validation-for="Pieces" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-4">
             <label asp-for="Scrap" class="form-label"></label>
-            <input asp-for="Scrap" class="form-control" />
+            <input asp-for="Scrap" class="form-control" type="number" min="0" />
             <span asp-validation-for="Scrap" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-4">
             <label asp-for="WorkedMinutes" class="form-label"></label>
-            <input asp-for="WorkedMinutes" class="form-control" />
+            <input asp-for="WorkedMinutes" class="form-control" type="number" min="0" />
             <span asp-validation-for="WorkedMinutes" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Запази промените</button>
-        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+        <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-save"></i> Запази промените
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+        </div>
     </form>
 </main>
 

@@ -1,17 +1,13 @@
 ﻿using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Helpers
 {
     public class ValidationResult
     {
         public bool IsValid => Errors.Count == 0;
-        public List<string> Errors { get; } = new();
+        public List<string> Errors { get; } = [];
     }
 
     public class EntryValidator
@@ -25,17 +21,17 @@ namespace EfficiencyTrack.Services.Helpers
 
         public async Task<ValidationResult> ValidateAsync(Entry entry)
         {
-            var result = new ValidationResult();
+            ValidationResult result = new();
 
             if (await IsDuplicateEntry(entry))
             {
                 result.Errors.Add("Вече сте добавили тези данни през днешния ден. МОЛЯ НЕ ПРАВЕТЕ ДВОЙНИ ЗАПИСИ В СИСТЕМАТА.");
             }
 
-            var shiftValidation = await ValidateShiftTimeAsync(entry);
+            ValidationResult shiftValidation = await ValidateShiftTimeAsync(entry);
             result.Errors.AddRange(shiftValidation.Errors);
 
-            var efficiencyValidation = await ValidateEfficiencyAsync(entry);
+            ValidationResult efficiencyValidation = await ValidateEfficiencyAsync(entry);
             result.Errors.AddRange(efficiencyValidation.Errors);
 
             return result;
@@ -54,9 +50,9 @@ namespace EfficiencyTrack.Services.Helpers
 
         private async Task<ValidationResult> ValidateShiftTimeAsync(Entry entry)
         {
-            var result = new ValidationResult();
+            ValidationResult result = new();
 
-            var shift = await _context.Shifts.AsNoTracking().FirstOrDefaultAsync(s => s.Id == entry.ShiftId);
+            Shift? shift = await _context.Shifts.AsNoTracking().FirstOrDefaultAsync(s => s.Id == entry.ShiftId);
             if (shift == null)
             {
                 result.Errors.Add("Невалидна смяна (Shift).");
@@ -84,9 +80,9 @@ namespace EfficiencyTrack.Services.Helpers
 
         private async Task<ValidationResult> ValidateEfficiencyAsync(Entry entry)
         {
-            var result = new ValidationResult();
+            ValidationResult result = new();
 
-            var routing = await _context.Routings.AsNoTracking().FirstOrDefaultAsync(r => r.Id == entry.RoutingId);
+            Routing? routing = await _context.Routings.AsNoTracking().FirstOrDefaultAsync(r => r.Id == entry.RoutingId);
             if (routing == null)
             {
                 result.Errors.Add("Невалиден RoutingId при проверка на ефективността.");
@@ -100,8 +96,8 @@ namespace EfficiencyTrack.Services.Helpers
                 return result;
             }
 
-            var requiredMinutes = totalPieces * routing.MinutesPerPiece;
-            var efficiency = requiredMinutes / entry.WorkedMinutes * 100;
+            decimal requiredMinutes = totalPieces * routing.MinutesPerPiece;
+            decimal efficiency = requiredMinutes / entry.WorkedMinutes * 100;
 
             if (efficiency > 150)
             {
@@ -109,8 +105,8 @@ namespace EfficiencyTrack.Services.Helpers
             }
 
 
-             requiredMinutes = totalPieces * routing.MinutesPerPiece;
-             efficiency = (requiredMinutes / entry.WorkedMinutes) * 100;
+            requiredMinutes = totalPieces * routing.MinutesPerPiece;
+            efficiency = requiredMinutes / entry.WorkedMinutes * 100;
 
             if (efficiency > 150)
             {

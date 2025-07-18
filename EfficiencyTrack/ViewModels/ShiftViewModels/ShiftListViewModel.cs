@@ -1,11 +1,9 @@
-﻿namespace EfficiencyTrack.ViewModels.Shift
+﻿namespace EfficiencyTrack.ViewModels.ShiftViewModels
 {
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-
     public class ShiftListViewModel
     {
-        public List<ShiftViewModel> Shifts { get; set; } = new();
+        public IEnumerable<ShiftViewModel> Shifts { get; set; } = Enumerable.Empty<ShiftViewModel>();
     }
-
 }
+
+

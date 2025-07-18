@@ -8,58 +8,107 @@
     var sortAsc = (bool)(ViewBag.SortAsc ?? true);
 
     string GetSortIcon(string field) => sortBy == field
-        ? (sortAsc ? "↑" : "↓")
+        ? (sortAsc ? "▲" : "▼")
         : "";
 }
 
-<main class="container">
-    <h1>Обратна връзка</h1>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
+    </header>
 
-    <form method="get" class="mb-3 d-flex gap-2">
-        <input type="text" name="searchTerm" value="@searchTerm" class="form-control" placeholder="Търси по име..." />
-        <button type="submit" class="btn btn-primary">Търси</button>
-        <a asp-action="Index" class="btn btn-secondary">Изчисти</a>
-    </form>
+    <section class="mb-4" aria-label="Търсене">
+        <form asp-action="Index" method="get" role="search" class="d-flex flex-wrap gap-2 align-items-center">
+            <input type="text" name="searchTerm" value="@searchTerm"
+                   class="form-control flex-grow-1"
+                   placeholder="Търси по име..." aria-label="Търси по име" />
+            <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
+                <i class="bi bi-search"></i> Търси
+            </button>
+            <a asp-action="Index" class="btn btn-secondary d-flex align-items-center gap-1">
+                <i class="bi bi-x-circle"></i> Изчисти
+            </a>
+        </form>
+    </section>
 
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>
-                    <a asp-action="Index" asp-route-searchTerm="@searchTerm" asp-route-sortBy="name" asp-route-sortAsc="@(sortBy == "name" ? !sortAsc : true)">
-                        Име @GetSortIcon("name")
-                    </a>
-                </th>
-                <th>
-                    <a asp-action="Index" asp-route-searchTerm="@searchTerm" asp-route-sortBy="date" asp-route-sortAsc="@(sortBy == "date" ? !sortAsc : true)">
-                        Дата @GetSortIcon("date")
-                    </a>
-                </th>
-                <th>
-                    <a asp-action="Index" asp-route-searchTerm="@searchTerm" asp-route-sortBy="handled" asp-route-sortAsc="@(sortBy == "handled" ? !sortAsc : true)">
-                        Обработено @GetSortIcon("handled")
-                    </a>
-                </th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Feedbacks)
-            {
-                <tr>
-                    <td>@item.EmployeeName</td>
-                    <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                    <td>@(item.IsHandled ? "Да" : "Не")</td>
-                    <td class="d-flex gap-1">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детайли</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Изтриване</a>
-                        <form asp-action="ToggleHandled" asp-route-id="@item.Id" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm @(item.IsHandled ? "btn-warning" : "btn-success")">
-                                @(item.IsHandled ? "Отмени" : "Маркирай")
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <section aria-label="Списък с обратна връзка">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-sm">
+                <caption class="sr-only">Списък с обратна връзка</caption>
+                <thead class="table-light text-start">
+                    <tr>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="name"
+                               asp-route-sortAsc="@(sortBy == "name" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Име @GetSortIcon("name")
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="date"
+                               asp-route-sortAsc="@(sortBy == "date" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Дата @GetSortIcon("date")
+                            </a>
+                        </th>
+                        <th>
+                            <a asp-action="Index"
+                               asp-route-searchTerm="@searchTerm"
+                               asp-route-sortBy="handled"
+                               asp-route-sortAsc="@(sortBy == "handled" ? !sortAsc : true)"
+                               class="text-decoration-none">
+                                Обработено @GetSortIcon("handled")
+                            </a>
+                        </th>
+                        <th class="text-center">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Feedbacks.Any())
+                    {
+                        @foreach (var item in Model.Feedbacks)
+                        {
+                            <tr>
+                                <td>@item.EmployeeName</td>
+                                <td>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@(item.IsHandled ? "Да" : "Не")</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1"
+                                           title="Преглед">
+                                            <i class="bi bi-eye"></i> Детайли
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
+                                           title="Изтрий">
+                                            <i class="bi bi-trash"></i> Изтриване
+                                        </a>
+                                        <form asp-action="ToggleHandled" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            <button type="submit"
+                                                    class="btn btn-sm @(item.IsHandled ? "btn-warning" : "btn-success") d-inline-flex align-items-center gap-1"
+                                                    title="@(item.IsHandled ? "Отмени обработката" : "Маркирай като обработено")">
+                                                <i class="bi @(item.IsHandled ? "bi-x-circle" : "bi-check-circle")"></i>
+                                                @(item.IsHandled ? "Необработено" : "Обработено")
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Няма въведена обратна връзка.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
 </main>

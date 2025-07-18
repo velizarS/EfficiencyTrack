@@ -4,47 +4,41 @@
     ViewData["Title"] = "Нов запис";
 }
 
-<main class="container mt-4">
+<main class="container py-4">
     <header class="mb-4">
-        <h1>Създай нов запис</h1>
+        <h1 class="h3 fw-bold">Създай нов запис</h1>
     </header>
 
     @if (TempData["Message"] != null)
     {
-        <div id="success-message" class="alert alert-success" style="white-space: pre-line;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="white-space: pre-line;">
             @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-
-        <script>
-            setTimeout(function () {
-                var msg = document.getElementById('success-message');
-                if (msg) {
-                    msg.style.display = 'none';
-                }
-            }, 10000); 
-        </script>
     }
-
-    
 
     @if (!ViewData.ModelState.IsValid)
     {
-        foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-        {
-            <div class="alert alert-danger">@error.ErrorMessage</div>
-        }
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
     }
 
-    <form asp-action="Create" method="post" class="needs-validation">
+    <form asp-action="Create" method="post" class="needs-validation" novalidate>
         <div class="mb-3">
             <label asp-for="EmployeeCode" class="form-label"></label>
-            <input asp-for="EmployeeCode" class="form-control" />
+            <input asp-for="EmployeeCode" class="form-control" autocomplete="off" />
             <span asp-validation-for="EmployeeCode" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="RoutingCode" class="form-label"></label>
-            <input asp-for="RoutingCode" class="form-control" />
+            <input asp-for="RoutingCode" class="form-control" autocomplete="off" />
             <span asp-validation-for="RoutingCode" class="text-danger"></span>
         </div>
 
@@ -72,8 +66,14 @@
             <span asp-validation-for="WorkedMinutes" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Запази</button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">Отказ</a>
+        <footer class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-success d-inline-flex align-items-center gap-1">
+                <i class="bi bi-plus-circle"></i> Създай
+            </button>
+            <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Отказ
+            </a>
+        </footer>
     </form>
 </main>
 

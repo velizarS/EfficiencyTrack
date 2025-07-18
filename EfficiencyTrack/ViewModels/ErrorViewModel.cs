@@ -1,4 +1,4 @@
-namespace EfficiencyTrack.Models
+namespace EfficiencyTrack.ViewModels
 {
     public class ErrorViewModel
     {

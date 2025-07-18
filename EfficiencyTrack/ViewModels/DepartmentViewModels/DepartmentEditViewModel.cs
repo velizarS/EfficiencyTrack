@@ -1,15 +1,10 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace EfficiencyTrack.ViewModels.Department
+namespace EfficiencyTrack.ViewModels.DepartmentViewModels
 {
-    public class DepartmentEditViewModel
+    public class DepartmentEditViewModel : DepartmentBaseViewModel
     {
-        public Guid Id { get; set; }
-
         [Required]
-        [StringLength(50, ErrorMessage = "Name cannot be longer than 50 characters.")]
-        [Display(Name = "Име на отдел")]
-        public string Name { get; set; } = null!;
+        public Guid Id { get; set; }
     }
 }

@@ -1,12 +1,10 @@
-﻿using EfficiencyTrack.Data.Identity;
+﻿using EfficiencyTrack.Data.Configuration;
+using EfficiencyTrack.Data.Identity;
 using EfficiencyTrack.Data.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Data.Data
 {
@@ -44,11 +42,11 @@ namespace EfficiencyTrack.Data.Data
 
         private void ApplyAuditInformation()
         {
-            var userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Unknown";
+            string userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Unknown";
 
-            var entries = ChangeTracker.Entries<BaseEntity>();
+            IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BaseEntity>> entries = ChangeTracker.Entries<BaseEntity>();
 
-            foreach (var entry in entries)
+            foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BaseEntity> entry in entries)
             {
                 switch (entry.State)
                 {

@@ -5,10 +5,6 @@ using EfficiencyTrack.Services.DTOs;
 using EfficiencyTrack.Services.DTOs.EfficiencyTrack.Services.DTOs;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -35,17 +31,21 @@ namespace EfficiencyTrack.Services.Implementations
         public async Task<DailyEfficiencyDto?> GetByIdAsync(Guid id)
         {
             if (id == Guid.Empty)
+            {
                 throw new ArgumentException("Invalid ID provided.", nameof(id));
+            }
 
-            var dailyEfficiency = await _context.DailyEfficiencies
+            DailyEfficiency? dailyEfficiency = await _context.DailyEfficiencies
                 .Include(de => de.Employee)
                 .Include(de => de.Shift)
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
             if (dailyEfficiency == null)
+            {
                 return null;
+            }
 
-            var entries = await _context.Entries
+            List<Entry> entries = await _context.Entries
                 .AsNoTracking()
                 .Include(e => e.Routing)
                 .Where(e => e.EmployeeId == dailyEfficiency.EmployeeId &&
@@ -71,16 +71,16 @@ namespace EfficiencyTrack.Services.Implementations
                     RoutingName = e.Routing?.Code,
                     Pieces = e.Pieces,
                     WorkedMinutes = e.WorkedMinutes,
-                    EfficiencyForOperation = (decimal)e.EfficiencyForOperation
+                    EfficiencyForOperation = e.EfficiencyForOperation
                 }).ToList()
             };
         }
 
-        public async Task<IEnumerable<DailyEfficiency>> GetTop10ForThisMonthAsync()
+        public async Task<IEnumerable<TopEfficiencyDto>> GetTop10ForThisMonthAsync()
         {
-            var now = DateTime.UtcNow;
-            var currentMonth = now.Month;
-            var currentYear = now.Year;
+            DateTime now = DateTime.UtcNow;
+            int currentMonth = now.Month;
+            int currentYear = now.Year;
 
             var topEfficiencies = await _context.DailyEfficiencies
                 .AsNoTracking()
@@ -99,35 +99,36 @@ namespace EfficiencyTrack.Services.Implementations
                 .Take(10)
                 .ToListAsync();
 
-            var result = new List<DailyEfficiency>();
+            List<TopEfficiencyDto> result = [];
 
             foreach (var group in topEfficiencies)
             {
                 if (group.LatestEntry == null)
+                {
                     continue;
+                }
 
-                var employee = await _context.Employees
+                Employee? emp = await _context.Employees
                     .Include(e => e.Department)
                     .Include(e => e.ShiftManagerUser)
                     .FirstOrDefaultAsync(e => e.Id == group.EmployeeId);
 
-                result.Add(new DailyEfficiency
+                result.Add(new TopEfficiencyDto
                 {
-                    Id = group.LatestEntry.Id,
-                    Date = group.LatestEntry.Date,
-                    Employee = employee,
+                    FullName = emp.FirstName + " " + emp.LastName,
                     EfficiencyPercentage = group.AverageEfficiency,
-                    Shift = group.LatestEntry.Shift,
-                    TotalNeededMinutes = group.LatestEntry.TotalNeededMinutes,
-                    TotalWorkedMinutes = group.LatestEntry.TotalWorkedMinutes
+                    DepartmentName = emp.Department.Name,
+                    ShiftManagerName = emp.ShiftManagerUser.UserName,
+                    ShiftName = group.LatestEntry.Shift?.Name
                 });
             }
+
             return result;
         }
 
-        public async Task<IEnumerable<DailyEfficiency>> GetTop10ForTodayAsync()
+        public async Task<IEnumerable<TopEfficiencyDto>> GetTop10ForTodayAsync()
         {
-            var today = DateTime.UtcNow.Date;
+            DateTime today = DateTime.UtcNow.Date;
 
             return await _context.DailyEfficiencies
                 .AsNoTracking()
@@ -141,15 +142,23 @@ namespace EfficiencyTrack.Services.Implementations
                 .Include(de => de.Shift)
                 .OrderByDescending(e => e.EfficiencyPercentage)
                 .Take(10)
+                .Select(e => new TopEfficiencyDto
+                {
+                    FullName = e.Employee.FirstName + " " + e.Employee.LastName,
+                    EfficiencyPercentage = e.EfficiencyPercentage,
+                    DepartmentName = e.Employee.Department.Name,
+                    ShiftManagerName = e.Employee.ShiftManagerUser.UserName,
+                    ShiftName = e.Shift.Name
+                })
                 .ToListAsync();
         }
 
         public async Task UpdateDailyEfficiencyAsync(Guid employeeId, DateTime date)
         {
-            var dayStart = date.Date;
-            var dayEnd = dayStart.AddDays(1);
+            DateTime dayStart = date.Date;
+            DateTime dayEnd = dayStart.AddDays(1);
 
-            var entriesOfDay = await _context.Entries
+            List<Entry> entriesOfDay = await _context.Entries
                 .AsNoTracking()
                 .Where(e => e.EmployeeId == employeeId &&
                             e.Date >= dayStart &&
@@ -157,7 +166,7 @@ namespace EfficiencyTrack.Services.Implementations
                             !e.IsDeleted)
                 .ToListAsync();
 
-            var existing = await _context.DailyEfficiencies
+            DailyEfficiency? existing = await _context.DailyEfficiencies
                 .FirstOrDefaultAsync(de => de.EmployeeId == employeeId &&
                                            de.Date >= dayStart && de.Date < dayEnd);
 
@@ -165,47 +174,51 @@ namespace EfficiencyTrack.Services.Implementations
             {
                 if (existing != null)
                 {
-                    _context.DailyEfficiencies.Remove(existing);
-                    await _context.SaveChangesAsync();
+                    _ = _context.DailyEfficiencies.Remove(existing);
+                    _ = await _context.SaveChangesAsync();
                 }
                 return;
             }
 
-            var distinctShiftIds = entriesOfDay.Select(e => e.ShiftId).Distinct().ToList();
+            List<Guid> distinctShiftIds = entriesOfDay.Select(e => e.ShiftId).Distinct().ToList();
             if (distinctShiftIds.Count != 1)
+            {
                 throw new InvalidOperationException("Entries span multiple shifts. Cannot calculate efficiency.");
+            }
 
-            var shiftId = distinctShiftIds.First();
+            Guid shiftId = distinctShiftIds.First();
 
-            var shiftDuration = await _context.Shifts
+            int shiftDuration = await _context.Shifts
                 .AsNoTracking()
                 .Where(s => s.Id == shiftId)
                 .Select(s => s.DurationMinutes)
                 .FirstOrDefaultAsync();
 
             if (shiftDuration <= 0)
+            {
                 throw new InvalidOperationException("Invalid or missing shift duration.");
+            }
 
-            var routingIds = entriesOfDay.Select(e => e.RoutingId).Distinct();
-            var routingMap = await _context.Routings
+            IEnumerable<Guid> routingIds = entriesOfDay.Select(e => e.RoutingId).Distinct();
+            Dictionary<Guid, decimal> routingMap = await _context.Routings
                 .AsNoTracking()
                 .Where(r => routingIds.Contains(r.Id) && !r.IsDeleted)
                 .ToDictionaryAsync(r => r.Id, r => r.MinutesPerPiece);
 
-            var totalNeededMinutes = (int)entriesOfDay.Sum(e =>
-                routingMap.TryGetValue(e.RoutingId, out var minutesPerPiece)
+            int totalNeededMinutes = (int)entriesOfDay.Sum(e =>
+                routingMap.TryGetValue(e.RoutingId, out decimal minutesPerPiece)
                     ? (e.Pieces + e.Scrap) * minutesPerPiece
                     : 0);
 
-            var totalWorkedMinutes = entriesOfDay.Sum(e => e.WorkedMinutes);
+            decimal totalWorkedMinutes = entriesOfDay.Sum(e => e.WorkedMinutes);
 
-            var efficiencyPercent = shiftDuration > 0
-                ? ((decimal)totalNeededMinutes / shiftDuration) * 100
+            decimal efficiencyPercent = shiftDuration > 0
+                ? (decimal)totalNeededMinutes / shiftDuration * 100
                 : 0;
 
             if (existing == null)
             {
-                var dailyEfficiency = new DailyEfficiency
+                DailyEfficiency dailyEfficiency = new()
                 {
                     Id = Guid.NewGuid(),
                     EmployeeId = employeeId,
@@ -216,7 +229,7 @@ namespace EfficiencyTrack.Services.Implementations
                     TotalNeededMinutes = totalNeededMinutes,
                     ComputedOn = DateTime.UtcNow
                 };
-                _context.DailyEfficiencies.Add(dailyEfficiency);
+                _ = _context.DailyEfficiencies.Add(dailyEfficiency);
             }
             else
             {
@@ -227,7 +240,7 @@ namespace EfficiencyTrack.Services.Implementations
                 existing.ComputedOn = DateTime.UtcNow;
             }
 
-            await _context.SaveChangesAsync();
+            _ = await _context.SaveChangesAsync();
         }
     }
 }

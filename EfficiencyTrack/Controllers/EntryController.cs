@@ -1,13 +1,9 @@
-﻿using EfficiencyTrack.Data.Models;
+﻿using EfficiencyTrack.Controllers;
+using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.EntryViewModel;
-using EfficiencyTrack.Web.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 public class EntryController : BaseCrudController<
     Entry,
@@ -38,81 +34,99 @@ public class EntryController : BaseCrudController<
         _greetingService = greetingService;
     }
 
-    protected override EntryViewModel MapToViewModel(Entry entity) => new()
+    protected override EntryViewModel MapToViewModel(Entry entity)
     {
-        Id = entity.Id,
-        Date = entity.Date,
-        EmployeeCode = entity.Employee?.Code ?? string.Empty,
-        EmployeeName = $"{entity.Employee?.FirstName} {entity.Employee?.LastName}".Trim(),
-        RoutingName = entity.Routing?.Code ?? string.Empty,
-        Pieces = entity.Pieces,
-        Scrap = entity.Scrap,
-        WorkedMinutes = entity.WorkedMinutes,
-        EfficiencyForOperation = entity.EfficiencyForOperation
-    };
+        return new()
+        {
+            Id = entity.Id,
+            Date = entity.Date,
+            EmployeeCode = entity.Employee?.Code ?? string.Empty,
+            EmployeeName = $"{entity.Employee?.FirstName} {entity.Employee?.LastName}".Trim(),
+            RoutingName = entity.Routing?.Code ?? string.Empty,
+            Pieces = entity.Pieces,
+            Scrap = entity.Scrap,
+            WorkedMinutes = entity.WorkedMinutes,
+            EfficiencyForOperation = entity.EfficiencyForOperation
+        };
+    }
 
-    protected override EntryDetailsViewModel MapToDetailModel(Entry entity) => new()
+    protected override EntryDetailsViewModel MapToDetailModel(Entry entity)
     {
-        Id = entity.Id,
-        Date = entity.Date,
-        EmployeeId = entity.EmployeeId,
-        EmployeeCode = entity.Employee?.Code ?? string.Empty,
-        EmployeeName = $"{entity.Employee?.FirstName} {entity.Employee?.LastName}".Trim(),
-        ShiftId = entity.ShiftId,
-        RoutingId = entity.RoutingId,
-        RoutingName = entity.Routing?.Code ?? string.Empty,
-        Pieces = entity.Pieces,
-        Scrap = entity.Scrap,
-        WorkedMinutes = entity.WorkedMinutes,
-        RequiredMinutes = (entity.Pieces + entity.Scrap) * (entity.Routing?.MinutesPerPiece ?? 0),
-        EfficiencyForOperation = entity.EfficiencyForOperation
-    };
+        return new()
+        {
+            Id = entity.Id,
+            Date = entity.Date,
+            EmployeeId = entity.EmployeeId,
+            EmployeeCode = entity.Employee?.Code ?? string.Empty,
+            EmployeeName = $"{entity.Employee?.FirstName} {entity.Employee?.LastName}".Trim(),
+            ShiftId = entity.ShiftId,
+            RoutingId = entity.RoutingId,
+            RoutingName = entity.Routing?.Code ?? string.Empty,
+            Pieces = entity.Pieces,
+            Scrap = entity.Scrap,
+            WorkedMinutes = entity.WorkedMinutes,
+            RequiredMinutes = (entity.Pieces + entity.Scrap) * (entity.Routing?.MinutesPerPiece ?? 0),
+            EfficiencyForOperation = entity.EfficiencyForOperation
+        };
+    }
 
-    protected override Entry MapToEntity(EntryCreateViewModel model) => new()
+    protected override Entry MapToEntity(EntryCreateViewModel model)
     {
-        Id = Guid.NewGuid(),
-        Date = DateTime.UtcNow,
-        EmployeeId = model.EmployeeId,
-        RoutingId = model.RoutingId,
-        ShiftId = model.ShiftId,
-        Pieces = model.Pieces,
-        Scrap = model.Scrap,
-        WorkedMinutes = model.WorkedMinutes
-    };
+        return new()
+        {
+            Id = Guid.NewGuid(),
+            Date = DateTime.UtcNow,
+            EmployeeId = model.EmployeeId,
+            RoutingId = model.RoutingId,
+            ShiftId = model.ShiftId,
+            Pieces = model.Pieces,
+            Scrap = model.Scrap,
+            WorkedMinutes = model.WorkedMinutes
+        };
+    }
 
-    protected override Entry MapToEntity(EntryEditViewModel model) => new()
+    protected override Entry MapToEntity(EntryEditViewModel model)
     {
-        Id = model.Id,
-        EmployeeId = model.EmployeeId,
-        RoutingId = model.RoutingId,
-        ShiftId = model.ShiftId,
-        Pieces = model.Pieces,
-        Scrap = model.Scrap,
-        WorkedMinutes = model.WorkedMinutes
-    };
+        return new()
+        {
+            Id = model.Id,
+            EmployeeId = model.EmployeeId,
+            RoutingId = model.RoutingId,
+            ShiftId = model.ShiftId,
+            Pieces = model.Pieces,
+            Scrap = model.Scrap,
+            WorkedMinutes = model.WorkedMinutes
+        };
+    }
 
-    protected override EntryEditViewModel MapToEditModel(Entry entity) => new()
+    protected override EntryEditViewModel MapToEditModel(Entry entity)
     {
-        Id = entity.Id,
-        EmployeeId = entity.EmployeeId,
-        EmployeeCode = entity.Employee?.Code ?? string.Empty,
-        RoutingId = entity.RoutingId,
-        RoutingCode = entity.Routing?.Code ?? string.Empty,
-        ShiftId = entity.ShiftId,
-        Pieces = entity.Pieces,
-        Scrap = entity.Scrap,
-        WorkedMinutes = entity.WorkedMinutes
-    };
+        return new()
+        {
+            Id = entity.Id,
+            EmployeeId = entity.EmployeeId,
+            EmployeeCode = entity.Employee?.Code ?? string.Empty,
+            RoutingId = entity.RoutingId,
+            RoutingCode = entity.Routing?.Code ?? string.Empty,
+            ShiftId = entity.ShiftId,
+            Pieces = entity.Pieces,
+            Scrap = entity.Scrap,
+            WorkedMinutes = entity.WorkedMinutes
+        };
+    }
 
-    protected override EntryListViewModel BuildListViewModel(List<EntryViewModel> items) => new() { Entries = items };
+    protected override EntryListViewModel BuildListViewModel(List<EntryViewModel> items)
+    {
+        return new() { Entries = items };
+    }
 
     public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
     {
-        var entries = await _entryService.GetAllWithIncludesAsync();
-        var viewModels = entries.Select(MapToViewModel).ToList();
-        var filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+        List<Entry> entries = await _entryService.GetAllWithIncludesAsync();
+        List<EntryViewModel> viewModels = entries.Select(MapToViewModel).ToList();
+        List<EntryViewModel> filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
 
-        var pagedItems = filteredSorted
+        List<EntryViewModel> pagedItems = filteredSorted
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();
@@ -129,9 +143,8 @@ public class EntryController : BaseCrudController<
 
     public override async Task<IActionResult> Details(Guid id)
     {
-        var entity = await _entryService.GetByIdWithIncludesAsync(id);
-        if (entity == null) return NotFound();
-        return View(MapToDetailModel(entity));
+        Entry? entity = await _entryService.GetByIdWithIncludesAsync(id);
+        return entity == null ? NotFound() : View(MapToDetailModel(entity));
     }
 
     [HttpGet]
@@ -153,7 +166,7 @@ public class EntryController : BaseCrudController<
             return View(model);
         }
 
-        var entity = new Entry
+        Entry entity = new()
         {
             Id = Guid.NewGuid(),
             Date = DateTime.UtcNow,
@@ -182,8 +195,11 @@ public class EntryController : BaseCrudController<
     [HttpGet]
     public override async Task<IActionResult> Edit(Guid id)
     {
-        var entity = await _entryService.GetByIdWithIncludesAsync(id);
-        if (entity == null) return NotFound();
+        Entry? entity = await _entryService.GetByIdWithIncludesAsync(id);
+        if (entity == null)
+        {
+            return NotFound();
+        }
 
         await LoadSelectLists();
         return View(MapToEditModel(entity));
@@ -220,8 +236,8 @@ public class EntryController : BaseCrudController<
 
     private void AddModelErrors(InvalidOperationException ex)
     {
-        var errorMessages = ex.Message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var msg in errorMessages)
+        string[] errorMessages = ex.Message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        foreach (string msg in errorMessages)
         {
             ModelState.AddModelError(string.Empty, msg);
         }
@@ -229,7 +245,7 @@ public class EntryController : BaseCrudController<
 
     private async Task LoadSelectLists()
     {
-        var shifts = await _shiftService.GetAllAsync();
+        IEnumerable<Shift> shifts = await _shiftService.GetAllAsync();
         ViewBag.Shifts = shifts.Select(s => new SelectListItem
         {
             Text = s.Name,
@@ -261,13 +277,18 @@ public class EntryController : BaseCrudController<
 
     private async Task<(Employee? employee, Routing? routing)> PrepareAndValidateEntry<T>(T model) where T : EntryBaseViewModel
     {
-        var employee = await _employeeService.GetByCodeAsync(model.EmployeeCode);
-        var routing = await _routingService.GetRoutingByCodeAsync(model.RoutingCode);
+        Employee? employee = await _employeeService.GetByCodeAsync(model.EmployeeCode);
+        Routing? routing = await _routingService.GetRoutingByCodeAsync(model.RoutingCode);
 
         if (employee == null)
+        {
             ModelState.AddModelError(nameof(model.EmployeeCode), "Невалиден код на служител.");
+        }
+
         if (routing == null)
+        {
             ModelState.AddModelError(nameof(model.RoutingCode), "Невалиден код на операция.");
+        }
 
         return (employee, routing);
     }

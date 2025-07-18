@@ -1,25 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
-namespace EfficiencyTrack.ViewModels.Routing
+namespace EfficiencyTrack.ViewModels.RoutingViewModels
 {
-    public class RoutingDetailViewModel : BaseDetailViewModel
+    public class RoutingEditViewModel : RoutingBaseViewModel
     {
-        [Display(Name = "Код")]
-        public string Code { get; set; } = null!;
-        [Display(Name = "Описание")]
-        public string Description { get; set; } = null!;
+        public Guid Id { get; set; }
 
-        [Display(Name = "Зона")]
-        public string Zone { get; set; } = null!;
+        [Display(Name = "Отдели")]
+        public List<SelectListItem> AvailableDepartments { get; set; } = [];
 
-        [Display(Name = "Време за една бройка в минутри")]
-        public decimal MinutesPerPiece { get; set; }
-
-        [Display(Name = "Отдел")]
-        public Guid DepartmentId { get; set; }
-
-        [Display(Name = "Отдел")]
-        public string DepartmentName { get; set; } = null!;
+        [Display(Name = "Зони")]
+        public List<SelectListItem> AvailableZones { get; set; } = [];
     }
-
 }

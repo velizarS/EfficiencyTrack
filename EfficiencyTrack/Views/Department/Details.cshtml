@@ -1,34 +1,40 @@
-﻿@model EfficiencyTrack.ViewModels.Department.DepartmentDetailViewModel
+﻿@model EfficiencyTrack.ViewModels.DepartmentViewModels.DepartmentDetailViewModel
 
 @{
     ViewData["Title"] = "Детайли за отдел";
 }
 
 <main class="container mt-4">
-    <h1>Детайли за отдел</h1>
+    <header class="mb-4">
+        <h1 class="h3">Детайли за отдел</h1>
+    </header>
 
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
-        <dd class="col-sm-9">@Model.Name</dd>
+    <section class="mb-4">
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Name) ? Model.Name : "-")</dd>
 
-        <dt class="col-sm-3">Служители</dt>
-        <dd class="col-sm-9">
-            @if (Model.Employees != null && Model.Employees.Any())
-            {
-                <ul>
-                    @foreach (var emp in Model.Employees)
-                    {
-                        <li>@emp.FullName (@emp.Code)</li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <span class="text-muted">Няма служители</span>
-            }
-        </dd>
-    </dl>
+            <dt class="col-sm-3">Служители</dt>
+            <dd class="col-sm-9">
+                @if (Model.Employees != null && Model.Employees.Any())
+                {
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var emp in Model.Employees)
+                        {
+                            <li>👤 @emp.FullName (@emp.Code)</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span class="text-muted fst-italic">Няма служители</span>
+                }
+            </dd>
+        </dl>
+    </section>
 
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
-    <a asp-action="Index" class="btn btn-secondary">Обратно</a>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
+        <a asp-action="Index" class="btn btn-secondary">Обратно</a>
+    </div>
 </main>

@@ -1,4 +1,4 @@
-﻿@model EfficiencyTrack.ViewModels.Department.DepartmentDetailViewModel
+﻿@model EfficiencyTrack.ViewModels.DepartmentViewModels.DepartmentDetailViewModel
 
 @{
     ViewData["Title"] = "Потвърди изтриване";
@@ -7,36 +7,36 @@
 <main class="container mt-5">
     <header class="mb-4">
         <h1 class="text-danger">Потвърди изтриване</h1>
-        <p class="lead">Сигурни ли сте, че искате да изтриете този отдел?</p>
+        <p class="lead">Сигурен ли си, че искаш да изтриеш този отдел?</p>
     </header>
 
     <section aria-labelledby="department-info">
         <dl class="row">
             <dt class="col-sm-3">Име на отдел</dt>
-            <dd class="col-sm-9">@Model.Name</dd>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Name) ? Model.Name : "-")</dd>
 
             <dt class="col-sm-3">Служители</dt>
             <dd class="col-sm-9">
                 @if (Model.Employees != null && Model.Employees.Any())
                 {
-                    <ul>
+                    <ul class="list-unstyled mb-0">
                         @foreach (var emp in Model.Employees)
                         {
-                            <li>@emp.FullName (@emp.Code)</li>
+                            <li>👤 @emp.FullName (@emp.Code)</li>
                         }
                     </ul>
                 }
                 else
                 {
-                    <span class="text-muted">(няма служители)</span>
+                    <span class="text-muted fst-italic">Няма служители</span>
                 }
             </dd>
         </dl>
     </section>
 
     <form asp-action="DeleteConfirmed" method="post">
-        <input type="hidden" asp-for="Id" />
         @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
 
         <footer class="d-flex gap-3 mt-4">
             <button type="submit" class="btn btn-danger">Изтрий</button>

@@ -3,10 +3,6 @@ using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EfficiencyTrack.Services.Implementations
 {
@@ -51,13 +47,13 @@ namespace EfficiencyTrack.Services.Implementations
 
         public IQueryable<Routing> GetFilteredRoutings(string? searchTerm, string? sortBy, bool sortAsc)
         {
-            var query = _context.Routings
+            IQueryable<Routing> query = _context.Routings
                 .Include(r => r.Department)
                 .Where(r => !r.IsDeleted);
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                var lowerTerm = searchTerm.ToLower();
+                string lowerTerm = searchTerm.ToLower();
                 query = query.Where(r =>
                     r.Code.ToLower().Contains(lowerTerm) ||
                     r.Department.Name.ToLower().Contains(lowerTerm));
@@ -84,18 +80,22 @@ namespace EfficiencyTrack.Services.Implementations
 
         private async Task EnsureRoutingIsUniqueAsync(Routing entity)
         {
-            var exists = await _context.Routings.AsNoTracking().AnyAsync(r => r.Code == entity.Code && !r.IsDeleted);
+            bool exists = await _context.Routings.AsNoTracking().AnyAsync(r => r.Code == entity.Code && !r.IsDeleted);
             if (exists)
+            {
                 throw new InvalidOperationException($"Routing with code {entity.Code} already exists.");
+            }
         }
 
         private async Task EnsureRoutingIsUniqueForUpdateAsync(Routing entity)
         {
-            var exists = await _context.Routings.AsNoTracking()
+            bool exists = await _context.Routings.AsNoTracking()
                 .AnyAsync(r => r.Code == entity.Code && r.Id != entity.Id && !r.IsDeleted);
 
             if (exists)
+            {
                 throw new InvalidOperationException($"Another Routing with code {entity.Code} already exists.");
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
+            _ = migrationBuilder.AddColumn<decimal>(
                 name: "TotalNeededMinutes",
                 table: "DailyEfficiencies",
                 type: "decimal(10,4)",
@@ -22,7 +22,7 @@ namespace EfficiencyTrack.Data.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "TotalNeededMinutes",
                 table: "DailyEfficiencies");
         }

@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using EfficiencyTrack.Data.Models;
+﻿using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.FeedbackViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace EfficiencyTrack.Web.Controllers
+namespace EfficiencyTrack.Controllers
 {
     public class FeedbackController : Controller
     {
@@ -20,11 +17,11 @@ namespace EfficiencyTrack.Web.Controllers
 
         public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
         {
-            var query = _service.GetFilteredFeedbacks(searchTerm, sortBy, sortAsc);
+            IQueryable<Feedback> query = _service.GetFilteredFeedbacks(searchTerm, sortBy, sortAsc);
 
-            var feedbackEntities = await query.ToListAsync();
+            List<Feedback> feedbackEntities = await query.ToListAsync();
 
-            var feedbacks = feedbackEntities
+            List<FeedbackViewModel> feedbacks = feedbackEntities
                 .Select(f => new FeedbackViewModel
                 {
                     Id = f.Id,
@@ -35,7 +32,7 @@ namespace EfficiencyTrack.Web.Controllers
                 })
                 .ToList();
 
-            var viewModel = new FeedbackListViewModel
+            FeedbackListViewModel viewModel = new()
             {
                 Feedbacks = feedbacks
             };
@@ -52,19 +49,19 @@ namespace EfficiencyTrack.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleHandled(Guid id)
         {
-            var updated = await _service.ToggleHandledAsync(id);
-            if (updated == null)
-                return NotFound();
-
-            return RedirectToAction(nameof(Index));
+            Feedback? updated = await _service.ToggleHandledAsync(id);
+            return updated == null ? NotFound() : RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(Guid id)
         {
-            var feedback = await _service.GetFeedbackByIdAsync(id);
-            if (feedback == null) return NotFound();
+            Feedback? feedback = await _service.GetFeedbackByIdAsync(id);
+            if (feedback == null)
+            {
+                return NotFound();
+            }
 
-            var viewModel = new FeedbackDetailViewModel
+            FeedbackDetailViewModel viewModel = new()
             {
                 Id = feedback.Id,
                 EmployeeName = feedback.EmployeeName ?? string.Empty,
@@ -87,24 +84,29 @@ namespace EfficiencyTrack.Web.Controllers
         public async Task<IActionResult> Create(FeedbackCreateViewModel model)
         {
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
-            var entity = new Feedback
+            Feedback entity = new()
             {
                 EmployeeName = model.EmployeeName,
                 Message = model.Message
             };
 
-            await _service.CreateFeedbackAsync(entity);
+            _ = await _service.CreateFeedbackAsync(entity);
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(Guid id)
         {
-            var feedback = await _service.GetFeedbackByIdAsync(id);
-            if (feedback == null) return NotFound();
+            Feedback? feedback = await _service.GetFeedbackByIdAsync(id);
+            if (feedback == null)
+            {
+                return NotFound();
+            }
 
-            var viewModel = new FeedbackDetailViewModel
+            FeedbackDetailViewModel viewModel = new()
             {
                 Id = feedback.Id,
                 EmployeeName = feedback.EmployeeName ?? string.Empty,
@@ -121,7 +123,7 @@ namespace EfficiencyTrack.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            await _service.DeleteFeedbackAsync(id);
+            _ = await _service.DeleteFeedbackAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

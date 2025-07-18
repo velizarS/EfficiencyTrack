@@ -1,8 +1,4 @@
 ﻿using EfficiencyTrack.Data.Models;
-using EfficiencyTrack.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 public interface IEntryService : ICrudService<Entry>
 {

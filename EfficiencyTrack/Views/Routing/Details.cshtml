@@ -1,35 +1,45 @@
-﻿@model EfficiencyTrack.ViewModels.Routing.RoutingDetailViewModel
+﻿@model EfficiencyTrack.ViewModels.RoutingViewModels.RoutingDetailViewModel
 
 @{
-    ViewData["Title"] = "Детайли за роутинг";
+    ViewData["Title"] = "Детайли за рутинг";
 }
 
-<main class="container mt-4">
+<main class="max-w-xl mx-auto px-4 py-6">
     <header class="mb-4">
-        <h1>@ViewData["Title"]</h1>
+        <h1 class="text-2xl fw-bold text-primary">@ViewData["Title"]</h1>
     </header>
 
-    <section aria-labelledby="routing-details">
-        <dl class="row">
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Code)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Code)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Zone)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Zone)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MinutesPerPiece)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.MinutesPerPiece)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DepartmentName)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.DepartmentName)</dd>
-        </dl>
+    <section class="card shadow-sm">
+        <div class="card-body">
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Код:</h6>
+                <p class="mb-0">@Model.Code</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Описание:</h6>
+                <p class="mb-0">@Model.Description</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Зона:</h6>
+                <p class="mb-0">@Model.Zone</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Мин./бройка:</h6>
+                <p class="mb-0">@Model.MinutesPerPiece</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-bold text-muted">Отдел:</h6>
+                <p class="mb-0">@Model.DepartmentName</p>
+            </div>
+        </div>
     </section>
 
-    <footer class="mt-4">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
-        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    <footer class="mt-4 d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning d-inline-flex align-items-center gap-1">
+            <i class="bi bi-pencil-square"></i> Редактирай
+        </a>
+        <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left-circle"></i> Назад
+        </a>
     </footer>
 </main>
