@@ -1,10 +1,12 @@
 ﻿using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.DepartmentViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EfficiencyTrack.Controllers;
 
+[Authorize]
 public class DepartmentController : BaseCrudController<
     Department,
     DepartmentViewModel,

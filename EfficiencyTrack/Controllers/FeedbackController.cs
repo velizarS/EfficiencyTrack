@@ -1,11 +1,14 @@
 ﻿using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.FeedbackViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace EfficiencyTrack.Controllers
 {
+    [Authorize]
     public class FeedbackController : Controller
     {
         private readonly IFeedbackService _service;
@@ -74,6 +77,7 @@ namespace EfficiencyTrack.Controllers
             return View(viewModel);
         }
 
+        [AllowAnonymous]
         public IActionResult Create()
         {
             return View();
@@ -81,6 +85,7 @@ namespace EfficiencyTrack.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]  
         public async Task<IActionResult> Create(FeedbackCreateViewModel model)
         {
             if (!ModelState.IsValid)
@@ -94,9 +99,11 @@ namespace EfficiencyTrack.Controllers
                 Message = model.Message
             };
 
-            _ = await _service.CreateFeedbackAsync(entity);
-            return RedirectToAction(nameof(Index));
+            await _service.CreateFeedbackAsync(entity);
+
+            return RedirectToAction("Index", "Home");
         }
+
 
         public async Task<IActionResult> Delete(Guid id)
         {

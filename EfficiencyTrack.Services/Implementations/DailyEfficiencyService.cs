@@ -28,6 +28,26 @@ namespace EfficiencyTrack.Services.Implementations
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<DailyEfficiency>> GetByShiftManagerIdAsync(Guid shiftManagerUserId)
+        {
+            return await _context.DailyEfficiencies
+                .AsNoTracking()
+                .Where(e => e.Employee.ShiftManagerUserId == shiftManagerUserId && !e.IsDeleted)
+                .Include(e => e.Employee)
+                .Include(e => e.Shift)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<DailyEfficiency>> GetByEmployeeCodeAsync(string employeeCode)
+        {
+            return await _context.DailyEfficiencies
+                .AsNoTracking()
+                .Where(e => e.Employee.Code == employeeCode && !e.IsDeleted)
+                .Include(e => e.Employee)
+                .Include(e => e.Shift)
+                .ToListAsync();
+        }
+
         public async Task<DailyEfficiencyDto?> GetByIdAsync(Guid id)
         {
             if (id == Guid.Empty)

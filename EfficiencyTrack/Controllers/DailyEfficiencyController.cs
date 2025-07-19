@@ -2,21 +2,52 @@
 using EfficiencyTrack.ViewModels.DailyEfficiencyViewModels;
 using EfficiencyTrack.ViewModels.EntryViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.Data.Identity;
 
 namespace EfficiencyTrack.Controllers
 {
     public class DailyEfficiencyController : Controller
     {
         private readonly IDailyEfficiencyService _dailyEfficiencyService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DailyEfficiencyController(IDailyEfficiencyService dailyEfficiencyService)
+        public DailyEfficiencyController(
+            IDailyEfficiencyService dailyEfficiencyService,
+            UserManager<ApplicationUser> userManager)
         {
             _dailyEfficiencyService = dailyEfficiencyService;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
         {
-            IEnumerable<Data.Models.DailyEfficiency> efficiencies = await _dailyEfficiencyService.GetAllAsync();
+            IEnumerable<Data.Models.DailyEfficiency> efficiencies;
+
+            if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                efficiencies = await _dailyEfficiencyService.GetAllAsync();
+            }
+            else if (User.IsInRole("ShiftManager"))
+            {
+                var user = await _userManager.GetUserAsync(User);
+                efficiencies = user != null
+                    ? await _dailyEfficiencyService.GetByShiftManagerIdAsync(user.Id)
+                    : Enumerable.Empty<Data.Models.DailyEfficiency>();
+            }
+            else 
+            {
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    efficiencies = await _dailyEfficiencyService.GetByEmployeeCodeAsync(searchTerm);
+                }
+                else
+                {
+                    efficiencies = Enumerable.Empty<Data.Models.DailyEfficiency>();
+                    ViewBag.Warning = "Моля, въведете служебния си код за достъп.";
+                }
+            }
 
             List<DailyEfficiencyViewModel> viewModels = efficiencies.Select(e => new DailyEfficiencyViewModel
             {
@@ -45,7 +76,7 @@ namespace EfficiencyTrack.Controllers
 
         public async Task<IActionResult> Details(Guid id)
         {
-            Services.DTOs.EfficiencyTrack.Services.DTOs.DailyEfficiencyDto? dto = await _dailyEfficiencyService.GetByIdAsync(id);
+            var dto = await _dailyEfficiencyService.GetByIdAsync(id);
             if (dto == null)
             {
                 return NotFound();

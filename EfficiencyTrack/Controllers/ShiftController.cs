@@ -1,7 +1,9 @@
 ﻿using EfficiencyTrack.Controllers;
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.ViewModels.ShiftViewModels;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize]
 public class ShiftController : BaseCrudController<
     Shift,
     ShiftViewModel,

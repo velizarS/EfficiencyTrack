@@ -32,16 +32,12 @@ namespace EfficiencyTrack.Services.Helpers
 
                 if (!string.IsNullOrEmpty(workerName))
                 {
-                    message += $"Здравейте, {workerName}!\n";
-                    message += "Пожелавам ви лека работа и успешен ден!\n";
+                    message += $"Здравейте, {workerName}!\nПожелавам ви лека работа и успешен ден!\n";
                 }
             }
-            else
+            else if (entry.EfficiencyForOperation >= 90)
             {
-                if (entry.EfficiencyForOperation >= 90)
-                {
-                    message += "Добра работа! Продължавайте така!\n";
-                }
+                message += "Добра работа! Продължавайте така!\n";
             }
 
             message += entry.EfficiencyForOperation switch
@@ -54,7 +50,5 @@ namespace EfficiencyTrack.Services.Helpers
 
             return message;
         }
-
     }
-
 }

@@ -8,24 +8,24 @@ namespace EfficiencyTrack.Services.Implementations
 {
     public class RoutingService : CrudService<Routing>, IRoutingService
     {
-        private readonly EfficiencyTrackDbContext _context;
 
         public RoutingService(EfficiencyTrackDbContext context, IHttpContextAccessor httpContextAccessor)
             : base(context, httpContextAccessor)
         {
-            _context = context;
         }
 
-        public override async Task AddAsync(Routing entity)
+        public override async Task<Routing> AddAsync(Routing entity)
         {
             await EnsureRoutingIsUniqueAsync(entity);
             await base.AddAsync(entity);
+            return entity;
         }
 
-        public override async Task UpdateAsync(Routing entity)
+        public override async Task<bool> UpdateAsync(Routing entity)
         {
             await EnsureRoutingIsUniqueForUpdateAsync(entity);
             await base.UpdateAsync(entity);
+            return true;
         }
 
         public async Task<Routing?> GetByIdWithDepartmentAsync(Guid id)

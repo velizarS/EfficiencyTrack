@@ -2,9 +2,11 @@
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.EntryViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
+[Authorize]
 public class EntryController : BaseCrudController<
     Entry,
     EntryViewModel,
@@ -148,6 +150,7 @@ public class EntryController : BaseCrudController<
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public override async Task<IActionResult> Create()
     {
         await LoadSelectLists();
@@ -156,6 +159,7 @@ public class EntryController : BaseCrudController<
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [AllowAnonymous]
     public override async Task<IActionResult> Create(EntryCreateViewModel model)
     {
         (Employee? employee, Routing? routing) = await PrepareAndValidateEntry(model);

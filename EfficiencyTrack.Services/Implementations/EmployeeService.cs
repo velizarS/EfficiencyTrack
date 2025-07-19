@@ -10,8 +10,6 @@ namespace EfficiencyTrack.Services.Implementations
 {
     public class EmployeeService : CrudService<Employee>, IEmployeeService
     {
-        private readonly EfficiencyTrackDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public EmployeeService(
@@ -20,14 +18,12 @@ namespace EfficiencyTrack.Services.Implementations
             UserManager<ApplicationUser> userManager)
             : base(context, httpContextAccessor)
         {
-            _context = context;
             _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<ApplicationUser>> GetAllShiftManagersAsync()
         {
-            IList<ApplicationUser> users = await _userManager.GetUsersInRoleAsync("ShiftLeader");
+            var users = await _userManager.GetUsersInRoleAsync("ShiftLeader");
             return users.ToList();
         }
 
@@ -50,33 +46,32 @@ namespace EfficiencyTrack.Services.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public override async Task AddAsync(Employee entity)
+        public override async Task<Employee> AddAsync(Employee entity)
         {
             if (entity == null)
-            {
                 throw new ArgumentNullException(nameof(entity));
-            }
 
             await EnsureEmployeeIsUniqueAsync(entity);
             await base.AddAsync(entity);
+            return entity;
         }
 
-        public override async Task UpdateAsync(Employee entity)
+        public override async Task<bool> UpdateAsync(Employee entity)
         {
             if (entity == null)
-            {
                 throw new ArgumentNullException(nameof(entity));
-            }
 
             await EnsureEmployeeIsUniqueForUpdateAsync(entity);
             await base.UpdateAsync(entity);
+            return true;
         }
 
         public async Task<Employee?> GetByCodeAsync(string employeeCode)
         {
-            return string.IsNullOrWhiteSpace(employeeCode)
-                ? null
-                : await _context.Employees
+            if (string.IsNullOrWhiteSpace(employeeCode))
+                return null;
+
+            return await _context.Employees
                 .AsNoTracking()
                 .Include(e => e.Department)
                 .FirstOrDefaultAsync(e => e.Code == employeeCode && !e.IsDeleted);
@@ -100,9 +95,10 @@ namespace EfficiencyTrack.Services.Implementations
 
         public async Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null)
         {
-            return string.IsNullOrWhiteSpace(code)
-                ? throw new ArgumentException("Code cannot be null or empty", nameof(code))
-                : !await _context.Employees
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentException("Code cannot be null or empty", nameof(code));
+
+            return !await _context.Employees
                 .AsNoTracking()
                 .AnyAsync(e => e.Code == code && (!excludeId.HasValue || e.Id != excludeId.Value) && !e.IsDeleted);
         }

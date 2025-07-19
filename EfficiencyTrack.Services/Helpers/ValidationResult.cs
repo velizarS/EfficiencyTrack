@@ -8,6 +8,22 @@ namespace EfficiencyTrack.Services.Helpers
     {
         public bool IsValid => Errors.Count == 0;
         public List<string> Errors { get; } = [];
+
+        public void Add(string errorMessage)
+        {
+            if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                Errors.Add(errorMessage.Trim());
+            }
+        }
+
+        public void AddRange(IEnumerable<string> messages)
+        {
+            foreach (var msg in messages)
+            {
+                Add(msg);
+            }
+        }
     }
 
     public class EntryValidator
@@ -25,14 +41,11 @@ namespace EfficiencyTrack.Services.Helpers
 
             if (await IsDuplicateEntry(entry))
             {
-                result.Errors.Add("Вече сте добавили тези данни през днешния ден. МОЛЯ НЕ ПРАВЕТЕ ДВОЙНИ ЗАПИСИ В СИСТЕМАТА.");
+                result.Add("Вече сте добавили тези данни през днешния ден. МОЛЯ НЕ ПРАВЕТЕ ДВОЙНИ ЗАПИСИ В СИСТЕМАТА.");
             }
 
-            ValidationResult shiftValidation = await ValidateShiftTimeAsync(entry);
-            result.Errors.AddRange(shiftValidation.Errors);
-
-            ValidationResult efficiencyValidation = await ValidateEfficiencyAsync(entry);
-            result.Errors.AddRange(efficiencyValidation.Errors);
+            result.AddRange((await ValidateShiftTimeAsync(entry)).Errors);
+            result.AddRange((await ValidateEfficiencyAsync(entry)).Errors);
 
             return result;
         }
@@ -52,27 +65,27 @@ namespace EfficiencyTrack.Services.Helpers
         {
             ValidationResult result = new();
 
-            Shift? shift = await _context.Shifts.AsNoTracking().FirstOrDefaultAsync(s => s.Id == entry.ShiftId);
+            var shift = await _context.Shifts.AsNoTracking().FirstOrDefaultAsync(s => s.Id == entry.ShiftId);
             if (shift == null)
             {
-                result.Errors.Add("Невалидна смяна (Shift).");
+                result.Add("Невалидна смяна (Shift).");
                 return result;
             }
 
-            int totalWorkedMinutes = (int)await _context.Entries
+            int workedSoFar = (int)await _context.Entries
                 .AsNoTracking()
                 .Where(x => x.EmployeeId == entry.EmployeeId && x.Date.Date == entry.Date.Date && !x.IsDeleted)
                 .SumAsync(x => x.WorkedMinutes);
 
-            int remainingMinutes = shift.DurationMinutes - totalWorkedMinutes;
+            int totalWithCurrent = (int)(workedSoFar + entry.WorkedMinutes);
 
-            if (entry.WorkedMinutes > remainingMinutes)
+            if (totalWithCurrent > shift.DurationMinutes)
             {
-                string message = remainingMinutes > 0
-                    ? $"Въведеното изработено време надвишава максимално допустимото. Оставащи минути за въвеждане: {remainingMinutes}."
-                    : $"Въведеното изработено време е повече от времето на работната смяна ({shift.DurationMinutes} минути).";
+                int remaining = shift.DurationMinutes - workedSoFar;
 
-                result.Errors.Add(message);
+                result.Add(remaining > 0
+                    ? $"Превишено време! Можете да добавите до {remaining} минути за тази смяна."
+                    : $"Вече сте изчерпали всички {shift.DurationMinutes} минути от смяната.");
             }
 
             return result;
@@ -82,17 +95,20 @@ namespace EfficiencyTrack.Services.Helpers
         {
             ValidationResult result = new();
 
-            Routing? routing = await _context.Routings.AsNoTracking().FirstOrDefaultAsync(r => r.Id == entry.RoutingId);
+            var routing = await _context.Routings.AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Id == entry.RoutingId);
+
             if (routing == null)
             {
-                result.Errors.Add("Невалиден RoutingId при проверка на ефективността.");
+                result.Add("Невалиден RoutingId при проверка на ефективността.");
                 return result;
             }
 
             int totalPieces = entry.Pieces + entry.Scrap;
+
             if (entry.WorkedMinutes <= 0 || totalPieces <= 0)
             {
-                result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
+                result.Add("Имате грешка при попълване на данните. Проверете въведените бройки и минути.");
                 return result;
             }
 
@@ -101,16 +117,7 @@ namespace EfficiencyTrack.Services.Helpers
 
             if (efficiency > 150)
             {
-                result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
-            }
-
-
-            requiredMinutes = totalPieces * routing.MinutesPerPiece;
-            efficiency = requiredMinutes / entry.WorkedMinutes * 100;
-
-            if (efficiency > 150)
-            {
-                result.Errors.Add("Имате грешка при попълване на данните, проверете въведените бройки и минути.");
+                result.Add("Изчислената ефективност е прекалено висока. Проверете отново въведените бройки и минути.");
             }
 
             return result;

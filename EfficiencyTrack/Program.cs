@@ -3,7 +3,9 @@ using EfficiencyTrack.Data.Identity;
 using EfficiencyTrack.Services.Helpers;
 using EfficiencyTrack.Services.Implementations;
 using EfficiencyTrack.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -28,7 +30,6 @@ builder.Services.AddScoped<IRoutingService, RoutingService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IGreetingService, GreetingService>();
 
-
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     {
@@ -45,6 +46,7 @@ builder.Services
     .AddEntityFrameworkStores<EfficiencyTrackDbContext>();
 
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddRazorPages();
 
 WebApplication app = builder.Build();

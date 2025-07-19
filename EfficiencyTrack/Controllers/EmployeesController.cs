@@ -1,11 +1,13 @@
 ﻿using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.EmployeeViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EfficiencyTrack.Controllers;
 
+[Authorize]
 public class EmployeesController : BaseCrudController<
     Employee,
     EmployeeViewModel,

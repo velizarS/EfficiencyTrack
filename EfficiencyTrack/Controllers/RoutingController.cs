@@ -1,12 +1,14 @@
 ﻿using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.RoutingViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfficiencyTrack.Controllers
 {
+    [Authorize]
     public class RoutingController : BaseCrudController<
      Routing,
      RoutingViewModel,

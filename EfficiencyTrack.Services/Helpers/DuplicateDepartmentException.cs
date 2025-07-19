@@ -4,5 +4,4 @@
     {
         public DuplicateDepartmentException(string message) : base(message) { }
     }
-
 }

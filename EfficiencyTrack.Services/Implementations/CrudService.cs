@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 public class CrudService<T> : ICrudService<T> where T : BaseEntity
 {
-    private readonly EfficiencyTrackDbContext _context;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    protected readonly EfficiencyTrackDbContext _context;
+    protected readonly IHttpContextAccessor _httpContextAccessor;
 
     public CrudService(EfficiencyTrackDbContext context, IHttpContextAccessor httpContextAccessor)
     {
@@ -30,85 +30,112 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
                              .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
     }
 
-    public virtual async Task AddAsync(T entity)
+    public virtual async Task<T> AddAsync(T entity)
     {
-        if (entity == null)
-        {
-            throw new ArgumentNullException(nameof(entity));
-        }
+        if (entity == null) throw new ArgumentNullException(nameof(entity));
 
-        entity.CreatedOn = DateTime.UtcNow;
-        entity.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+        SetAuditFields(entity, isNew: true);
 
-        _ = _context.Set<T>().Add(entity);
-        _ = await _context.SaveChangesAsync();
+        _context.Set<T>().Add(entity);
+        await _context.SaveChangesAsync();
+        return entity;
     }
 
-    public virtual async Task UpdateAsync(T entity)
+    public virtual async Task<bool> UpdateAsync(T entity)
     {
-        entity.ModifiedOn = DateTime.UtcNow;
-        entity.ModifiedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+        SetAuditFields(entity, isNew: false);
 
-        _ = _context.Set<T>().Update(entity);
-        _ = await _context.SaveChangesAsync();
+        _context.Set<T>().Update(entity);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
-    public virtual async Task DeleteAsync(Guid id)
+    public virtual async Task<bool> DeleteAsync(Guid id)
     {
-        T? entity = await _context.Set<T>().FindAsync(id);
-        if (entity != null)
-        {
-            entity.IsDeleted = true;
-            entity.DeletedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-            _ = await _context.SaveChangesAsync();
-        }
+        var entity = await _context.Set<T>().FindAsync(id);
+        if (entity == null) return false;
+
+        entity.IsDeleted = true;
+        entity.DeletedBy = GetCurrentUserName();
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public virtual async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(
-        string? searchTerm, string? sortBy, bool sortAsc, int pageNumber, int pageSize)
+        string? searchTerm = null,
+        string? sortBy = null,
+        bool sortAsc = true,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
-        if (pageNumber < 1)
-        {
-            pageNumber = 1;
-        }
-
-        if (pageSize < 1)
-        {
-            pageSize = 10;
-        }
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
 
         IQueryable<T> query = _context.Set<T>().AsNoTracking().Where(e => !e.IsDeleted);
 
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            query = query.Where(e => EF.Property<string>(e, "Name").Contains(searchTerm));
-        }
-
-        if (!string.IsNullOrWhiteSpace(sortBy))
-        {
-            try
-            {
-                query = sortAsc
-                    ? query.OrderBy(e => EF.Property<object>(e, sortBy))
-                    : query.OrderByDescending(e => EF.Property<object>(e, sortBy));
-            }
-            catch
-            {
-                query = query.OrderByDescending(e => e.CreatedOn);
-            }
-        }
-        else
-        {
-            query = query.OrderByDescending(e => e.CreatedOn);
-        }
+        query = ApplySearch(query, searchTerm);
+        query = ApplySorting(query, sortBy, sortAsc);
 
         int totalCount = await query.CountAsync();
 
-        List<T> items = await query
+        var items = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
         return (items, totalCount);
+    }
+
+    protected virtual IQueryable<T> ApplySearch(IQueryable<T> query, string? searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return query;
+
+        searchTerm = searchTerm.Trim();
+        var property = typeof(T).GetProperty("Name");
+        if (property == null || property.PropertyType != typeof(string))
+            return query;
+
+        return query.Where(e => EF.Functions.Like(EF.Property<string>(e, "Name"), $"%{searchTerm}%"));
+    }
+
+    protected virtual IQueryable<T> ApplySorting(IQueryable<T> query, string? sortBy, bool sortAsc)
+    {
+        if (string.IsNullOrWhiteSpace(sortBy))
+            return query.OrderByDescending(e => e.CreatedOn);
+
+        try
+        {
+            return sortAsc
+                ? query.OrderBy(e => EF.Property<object>(e, sortBy))
+                : query.OrderByDescending(e => EF.Property<object>(e, sortBy));
+        }
+        catch
+        {
+            return query.OrderByDescending(e => e.CreatedOn);
+        }
+    }
+
+    private void SetAuditFields(T entity, bool isNew)
+    {
+        var now = DateTime.UtcNow;
+        var user = GetCurrentUserName();
+
+        if (isNew)
+        {
+            entity.CreatedOn = now;
+            entity.CreatedBy = user;
+        }
+        else
+        {
+            entity.ModifiedOn = now;
+            entity.ModifiedBy = user;
+        }
+    }
+
+    private string GetCurrentUserName()
+    {
+        return _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
     }
 }
