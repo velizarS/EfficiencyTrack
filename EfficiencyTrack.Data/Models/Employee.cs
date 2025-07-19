@@ -6,6 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EfficiencyTrack.Data.Models
 {
     [Comment("Represents an employee in the system.")]
+    [Index(nameof(Code), IsUnique = true)]
+    [Index(nameof(ApplicationUserId), IsUnique = true)]
     public class Employee : BaseEntity
     {
         [Required]
@@ -51,7 +53,7 @@ namespace EfficiencyTrack.Data.Models
         public Department Department { get; set; } = null!;
 
         [InverseProperty(nameof(Entry.Employee))]
-        public ICollection<Entry> Entries { get; set; } = [];
+        public virtual ICollection<Entry> Entries { get; set; } = new HashSet<Entry>();
 
         [Display(Name = "Application User")]
         [Comment("Reference to the associated application user.")]

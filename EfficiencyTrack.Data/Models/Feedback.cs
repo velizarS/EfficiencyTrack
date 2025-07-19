@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace EfficiencyTrack.Data.Models
 {
     [Comment("Represents user feedback in the system.")]
+    [Index(nameof(IsHandled))]
     public class Feedback
     {
         [Key]

@@ -62,7 +62,6 @@ namespace EfficiencyTrack.Controllers
             return View();
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Create(TCreateModel model)

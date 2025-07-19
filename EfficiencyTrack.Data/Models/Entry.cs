@@ -54,7 +54,7 @@ namespace EfficiencyTrack.Data.Models
         [Display(Name = "Required Minutes")]
         [Comment("Theoretical required time for this operation.")]
         [Column(TypeName = "decimal(10,4)")]
-        public decimal RequiredMinutes => (Pieces + Scrap) * (Routing?.MinutesPerPiece ?? 0);
+        public decimal RequiredMinutes { get; set; }
 
         [Range(0.01, 200, ErrorMessage = "Efficiency must be between 0.01 and 200.")]
         [Display(Name = "Efficiency (%)")]

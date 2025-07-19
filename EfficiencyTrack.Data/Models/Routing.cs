@@ -16,13 +16,13 @@ namespace EfficiencyTrack.Data.Models
         [Display(Name = "Description")]
         [Comment("The description of the routing operation.")]
         [StringLength(200, ErrorMessage = "Description cannot be longer than 200 characters.")]
-        public string Description { get; set; } = string.Empty;
+        public string Description { get; set; } = null!;
 
         [Required]
         [Display(Name = "Zone")]
         [Comment("The zone where the routing operation is performed.")]
         [StringLength(100, ErrorMessage = "Zone name cannot be longer than 100 characters.")]
-        public string Zone { get; set; } = string.Empty;
+        public string Zone { get; set; } = null!;
 
         [Required]
         [Display(Name = "Minutes Per Piece")]
@@ -39,6 +39,6 @@ namespace EfficiencyTrack.Data.Models
         [ForeignKey(nameof(DepartmentId))]
         public Department Department { get; set; } = null!;
 
-        public ICollection<Entry> Entries { get; set; } = [];
+        public virtual ICollection<Entry> Entries { get; set; } = new HashSet<Entry>();
     }
 }

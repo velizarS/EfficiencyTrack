@@ -94,8 +94,10 @@ namespace EfficiencyTrack.Services.Implementations
             }
 
             decimal requiredMinutes = (entry.Pieces + entry.Scrap) * routing.MinutesPerPiece;
+            entry.RequiredMinutes = requiredMinutes;
             entry.EfficiencyForOperation = CalculateEfficiency(requiredMinutes, entry.WorkedMinutes);
         }
+
 
         private decimal CalculateEfficiency(decimal requiredMinutes, decimal workedMinutes)
         {

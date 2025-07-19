@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace EfficiencyTrack.Data.Models
 {
     [Comment("Represents a department within the organization.")]
+    [Index(nameof(Name), IsUnique = true)]
     public class Department : BaseEntity
     {
         [Required]
@@ -12,6 +13,7 @@ namespace EfficiencyTrack.Data.Models
         [Comment("The name of the department.")]
         public string Name { get; set; } = null!;
 
-        public ICollection<Employee> Employees { get; set; } = [];
+        [Comment("Collection of employees in this department.")]
+        public virtual ICollection<Employee> Employees { get; set; } = new HashSet<Employee>();
     }
 }
