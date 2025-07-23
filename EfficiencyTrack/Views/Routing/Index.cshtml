@@ -6,100 +6,115 @@
     var sortBy = ViewBag.SortBy as string;
     var sortAsc = ViewBag.SortAsc as bool? ?? true;
 
-    string GetSortIcon(string field) => sortBy == field
-        ? (sortAsc ? "▲" : "▼")
-        : "";
+    string GetSortIcon(string field) => sortBy == field ? (sortAsc ? "▲" : "▼") : "";
 }
 
-<main class="max-w-5xl mx-auto px-4 py-8">
-    <header class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
-    </header>
+<main class="container py-5">
+    <h1 class="mb-4 text-center text-primary">@ViewData["Title"]</h1>
 
-    <section class="mb-4" aria-label="Търсене">
-        <form asp-action="Index" method="get" role="search" class="d-flex flex-wrap gap-2 align-items-center">
-            <input type="text" name="searchTerm" value="@searchTerm"
-                   class="form-control flex-grow-1"
-                   placeholder="Търси по код или отдел..." aria-label="Търси по код или отдел" />
-            <button type="submit" class="btn btn-primary d-flex align-items-center gap-1">
+    <form asp-action="Index" method="get" class="row g-2 mb-4 align-items-center">
+        <div class="col-md-6">
+            <input type="text" name="searchTerm" value="@searchTerm" class="form-control" placeholder="Търси по код или отдел..." />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">
                 <i class="bi bi-search"></i> Търси
             </button>
-            <a asp-action="Index" class="btn btn-secondary d-flex align-items-center gap-1">
+            <a asp-action="Index" class="btn btn-secondary">
                 <i class="bi bi-x-circle"></i> Изчисти
             </a>
-        </form>
-    </section>
+        </div>
+    </form>
 
-    <div class="mb-4">
-        <a asp-action="Create" class="btn btn-success d-inline-flex align-items-center gap-1">
+    <div class="mb-3 text-end">
+        <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-lg"></i> Нов рутинг
         </a>
     </div>
 
-    <section aria-label="Списък с рутинги">
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped text-sm">
-                <caption class="sr-only">Списък с рутинги</caption>
-                <thead class="table-light text-start">
-                    <tr>
-                        <th>
-                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                               asp-route-sortBy="code"
-                               asp-route-sortAsc="@(sortBy == "code" ? !sortAsc : true)"
-                               class="text-decoration-none">
-                                Код @GetSortIcon("code")
-                            </a>
-                        </th>
-                        <th>
-                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                               asp-route-sortBy="minutes"
-                               asp-route-sortAsc="@(sortBy == "minutes" ? !sortAsc : true)"
-                               class="text-decoration-none">
-                                Мин./бр. @GetSortIcon("minutes")
-                            </a>
-                        </th>
-                        <th>
-                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                               asp-route-sortBy="department"
-                               asp-route-sortAsc="@(sortBy == "department" ? !sortAsc : true)"
-                               class="text-decoration-none">
-                                Отдел @GetSortIcon("department")
-                            </a>
-                        </th>
-                        <th>
-                            <a asp-action="Index" asp-route-searchTerm="@searchTerm"
-                               asp-route-sortBy="zone"
-                               asp-route-sortAsc="@(sortBy == "zone" ? !sortAsc : true)"
-                               class="text-decoration-none">
-                                Зона @GetSortIcon("zone")
-                            </a>
-                        </th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Routings)
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="code" asp-route-sortAsc="@(sortBy == "code" ? !sortAsc : true)">
+                            Код @GetSortIcon("code")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="minutes" asp-route-sortAsc="@(sortBy == "minutes" ? !sortAsc : true)">
+                            Мин./бр. @GetSortIcon("minutes")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="department" asp-route-sortAsc="@(sortBy == "department" ? !sortAsc : true)">
+                            Отдел @GetSortIcon("department")
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-searchTerm="@searchTerm"
+                           asp-route-sortBy="zone" asp-route-sortAsc="@(sortBy == "zone" ? !sortAsc : true)">
+                            Зона @GetSortIcon("zone")
+                        </a>
+                    </th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Routings.Any())
+                {
+                    foreach (var item in Model.Routings)
                     {
                         <tr>
                             <td>@item.Code</td>
                             <td>@item.MinutesPerPiece</td>
                             <td>@item.DepartmentName</td>
                             <td>@item.Zone</td>
-                            <td class="d-flex gap-2">
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info d-inline-flex align-items-center gap-1">
+                            <td class="d-flex gap-2 flex-wrap">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">
                                     <i class="bi bi-info-circle"></i> Детайли
                                 </a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
                                     <i class="bi bi-pencil"></i> Редакция
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1">
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
                                     <i class="bi bi-trash"></i> Изтриване
                                 </a>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        </div>
-    </section>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Няма намерени рутинги.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Навигация по страници" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-route-page="@(Model.CurrentPage - 1)" asp-route-searchTerm="@searchTerm" asp-route-sortBy="@sortBy" asp-route-sortAsc="@sortAsc">Назад</a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" asp-route-page="@i" asp-route-searchTerm="@searchTerm" asp-route-sortBy="@sortBy" asp-route-sortAsc="@sortAsc">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-route-page="@(Model.CurrentPage + 1)" asp-route-searchTerm="@searchTerm" asp-route-sortBy="@sortBy" asp-route-sortAsc="@sortAsc">Напред</a>
+                </li>
+            </ul>
+        </nav>
+    }
 </main>

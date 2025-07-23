@@ -1,0 +1,290 @@
+﻿/* --- Основно тяло и цветове --- */
+body {
+    overflow-x: hidden;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+/* --- Навигация (navbar) --- */
+.navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+}
+
+/* --- Сайдбар --- */
+#sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 220px;
+    height: calc(100vh - 56px);
+    background-color: #f1f3f5;
+    padding: 1rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1040;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.05);
+    overflow-y: auto;
+}
+
+#sidebar.show {
+    transform: translateX(0);
+}
+
+#sidebar .nav-link {
+    color: #495057;
+    border-left: 4px solid transparent;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s, border-left 0.2s;
+    display: flex;
+    align-items: center;
+}
+#sidebarToggle {
+    background-color: transparent;
+    color: #343a40;
+    border: 1px solid #343a40;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    cursor: pointer;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#sidebar .nav-link i {
+    font-size: 1.1rem;
+    margin-right: 8px;
+}
+
+#sidebar .nav-link.active,
+#sidebar .nav-link:hover {
+    color: #212529;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #00b894;
+    text-decoration: none;
+}
+
+/* --- Основно съдържание --- */
+#content {
+    margin-left: 0;
+    transition: margin-left 0.3s ease-in-out;
+    padding: 2rem 1.5rem;
+    background-color: #ffffff;
+    min-height: calc(100vh - 56px - 56px); 
+}
+
+#sidebar.show ~ #content {
+    margin-left: 220px;
+}
+
+/* --- Футър --- */
+footer {
+    background-color: #ffffff;
+    color: #6c757d;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    border-top: 1px solid #dee2e6;
+}
+
+/* --- Бутон за смяна на тема --- */
+#toggleThemeBtn {
+    background-color: transparent;
+    color: #343a40;
+    border: 1px solid #343a40;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    cursor: pointer;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#toggleThemeBtn i {
+    margin-right: 6px;
+    font-size: 1.2rem;
+}
+
+#toggleThemeBtn:hover,
+#toggleThemeBtn:focus {
+    background-color: #00b894;
+    color: white;
+    border-color: #00b894;
+    outline: none;
+}
+
+/* --- Форми --- */
+form {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+    color: #212529;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+    background-color: white;
+    color: #212529;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #00b894;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0,184,148,0.25);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* --- Бутони --- */
+.btn-primary {
+    background-color: #00b894;
+    border-color: #00b894;
+    font-weight: 600;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #019870;
+    border-color: #019870;
+    outline: none;
+    box-shadow: 0 0 8px rgba(1,152,112,0.6);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    font-weight: 600;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #5a6268;
+    border-color: #5a6268;
+    outline: none;
+    box-shadow: 0 0 6px rgba(90,98,104,0.6);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    font-weight: 600;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: #b02a37;
+    border-color: #b02a37;
+    outline: none;
+    box-shadow: 0 0 8px rgba(176,42,55,0.6);
+}
+
+/* --- Таблици --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #212529;
+}
+
+thead {
+    background-color: #e9ecef;
+}
+
+thead th {
+    font-weight: 700;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+tbody tr:hover {
+    background-color: rgba(0, 184, 148, 0.1);
+}
+
+tbody td {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* --- Фокус за достъпност --- */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 3px solid #00b894;
+    outline-offset: 2px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 991.98px) {
+    #sidebar.show::after {
+        content: "";
+        position: fixed;
+        top: 56px;
+        left: 220px;
+        width: calc(100% - 220px);
+        height: calc(100vh - 56px);
+        background: rgba(0, 0, 0, 0.2);
+        z-index: -1;
+    }
+
+    #sidebar.show ~ #content {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    #content {
+        padding: 1rem;
+    }
+
+    #sidebar {
+        width: 180px;
+    }
+
+    #sidebar.show {
+        transform: translateX(0);
+    }
+}

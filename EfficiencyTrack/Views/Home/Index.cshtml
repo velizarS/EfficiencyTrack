@@ -8,6 +8,14 @@
 
                 @if (Model.Top10Today.Any())
                 {
+                    var firstToday = Model.Top10Today.First();
+                    <div class="mb-3 p-3 border rounded bg-light d-flex align-items-center gap-3">
+                        <span class="fs-3 text-warning">🏆</span>
+                        <div>
+                            <div class="fw-bold fs-4">@firstToday.FullName  @firstToday.EfficiencyPercentage.ToString("F2") %</div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered align-middle mb-0">
                             <thead class="table-light text-uppercase small">
@@ -20,10 +28,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model.Top10Today)
+                                @foreach (var (item, index) in Model.Top10Today.Select((val, idx) => (val, idx + 1)))
                                 {
-                                    <tr>
-                                        <td class="fw-semibold">@item.FullName</td>
+                                    <tr class="@(index == 1 ? "table-warning" : index <= 3 ? "table-info" : "")">
+                                        <td class="fw-semibold">
+                                            @(index == 1 ? "🥇 " : index == 2 ? "🥈 " : index == 3 ? "🥉 " : "")@item.FullName
+                                        </td>
                                         <td class="text-end">@item.EfficiencyPercentage.ToString("F2")</td>
                                         <td>@item.ShiftName</td>
                                         <td>@item.DepartmentName</td>
@@ -47,6 +57,14 @@
 
                 @if (Model.Top10ThisMonth.Any())
                 {
+                    var firstMonth = Model.Top10ThisMonth.First();
+                    <div class="mb-3 p-3 border rounded bg-light d-flex align-items-center gap-3">
+                        <span class="fs-3 text-warning">🏆</span>
+                        <div>
+                            <div class="fw-bold fs-4">@firstMonth.FullName  @firstMonth.EfficiencyPercentage.ToString("F2") %</div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered align-middle mb-0">
                             <thead class="table-light text-uppercase small">
@@ -58,10 +76,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model.Top10ThisMonth)
+                                @foreach (var (item, index) in Model.Top10ThisMonth.Select((val, idx) => (val, idx + 1)))
                                 {
-                                    <tr>
-                                        <td class="fw-semibold">@item.FullName</td>
+                                    <tr class="@(index == 1 ? "table-warning" : index <= 3 ? "table-info" : "")">
+                                        <td class="fw-semibold">
+                                            @(index == 1 ? "🥇 " : index == 2 ? "🥈 " : index == 3 ? "🥉 " : "")@item.FullName
+                                        </td>
                                         <td class="text-end">@item.EfficiencyPercentage.ToString("F2")</td>
                                         <td>@item.DepartmentName</td>
                                         <td>@item.ShiftManagerName</td>

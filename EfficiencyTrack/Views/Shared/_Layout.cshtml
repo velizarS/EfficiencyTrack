@@ -1,99 +1,129 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using EfficiencyTrack.Data.Identity
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="bg">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - EfficiencyTrack</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EfficiencyTrack.styles.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link id="themeStylesheet" href="~/css/sitedark.css" rel="stylesheet" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EfficiencyTrack</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+    <nav class="navbar navbar-expand-lg border-bottom">
+        <div class="container-fluid">
+            <button class="btn btn-outline-light me-2" id="sidebarToggle" aria-label="Превключи менюто">
+                <i class="bi bi-list"></i>
+            </button>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="DailyEfficiency" asp-action="Index">DailyEfficiency</a>
-                        </li>
+            <a class="navbar-brand d-flex align-items-center text-light" asp-area="" asp-controller="Home" asp-action="Index">
+                <img id="logoImg" src="~/images/Logo2.png" alt="EfficiencyTrack logo" width="120" height="50" class="me-2" />
+            </a>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Department" asp-action="Index">Departments</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Department" asp-action="Create">Department</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Employees" asp-action="Create">Employe</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Entry" asp-action="Index">Entries</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Entry" asp-action="Create">Entry</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Shift" asp-action="Index">Shifts</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Shift" asp-action="Create">Shift</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Routing" asp-action="Index">Routings</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Routing" asp-action="Create">Routing</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Feedback" asp-action="Index">Feedbacks</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Feedback" asp-action="Create">Feedback</a>
-                        </li>
-
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
+            <div class="collapse navbar-collapse justify-content-end">
+                <partial name="_LoginPartial" />
             </div>
+        </div>
+    </nav>
+
+    <div id="sidebar" class="d-flex flex-column">
+        <nav class="nav flex-column">
+            <a class="nav-link mb-2" asp-controller="DailyEfficiency" asp-action="Index"><i class="bi bi-graph-up me-2"></i>Дневна ефективност</a>
+            <a class="nav-link mb-2" asp-controller="Entry" asp-action="Create"><i class="bi bi-plus-circle me-2"></i>Създай запис</a>
+            <a class="nav-link mb-2" asp-controller="Feedback" asp-action="Create"><i class="bi bi-chat-dots me-2"></i>Обратна връзка</a>
+
+            @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+            {
+                <a class="nav-link mb-2" asp-controller="Department" asp-action="Index"><i class="bi bi-diagram-3 me-2"></i>Отдели</a>
+                <a class="nav-link mb-2" asp-controller="Department" asp-action="Create">Създай отдел</a>
+                <a class="nav-link mb-2" asp-controller="Employees" asp-action="Index"><i class="bi bi-people me-2"></i>Служители</a>
+                <a class="nav-link mb-2" asp-controller="Employees" asp-action="Create">Създай служител</a>
+                <a class="nav-link mb-2" asp-controller="Entry" asp-action="Index">Записи</a>
+                <a class="nav-link mb-2" asp-controller="Shift" asp-action="Index">Смените</a>
+                <a class="nav-link mb-2" asp-controller="Shift" asp-action="Create">Създай смяна</a>
+                <a class="nav-link mb-2" asp-controller="Routing" asp-action="Index">Рутинги</a>
+                <a class="nav-link mb-2" asp-controller="Routing" asp-action="Create">Създай рутинг</a>
+                <a class="nav-link mb-2" asp-controller="Feedback" asp-action="Index">Обратна връзка</a>
+            }
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+        <div class="mt-auto pt-3 border-top">
+            <button class="btn btn-outline-light w-100" id="toggleThemeBtn">
+                <i class="bi bi-circle-half"></i> Смени тема
+            </button>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - EfficiencyTrack - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main id="content">
+        <div class="container-fluid pt-4">
+            @RenderBody()
         </div>
+    </main>
+
+    <footer class="border-top text-center py-3">
+        &copy; 2025 - EfficiencyTrack - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-light">Поверителност</a>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const content = document.getElementById('content');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            content.classList.toggle('shifted');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('show');
+                content.classList.remove('shifted');
+            }
+        });
+
+        const themeBtn = document.getElementById('toggleThemeBtn');
+        const themeLink = document.getElementById('themeStylesheet');
+        const logoImg = document.getElementById('logoImg');
+
+        function setTheme(theme) {
+            if (theme === 'light') {
+                themeLink.href = '/css/sitelight.css';
+                logoImg.src = '/images/Logo1.png';
+            } else {
+                themeLink.href = '/css/sitedark.css';
+                logoImg.src = '/images/Logo2.png';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const current = localStorage.getItem('theme') || 'dark';
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(savedTheme);
+
+            const message = "@((TempData["Message"] as string)?.Replace("`", "\\`").Replace("\"", "\\\""))";
+            if (message && message.length > 0) {
+                const decodedMessage = `@Html.Raw((TempData["Message"] as string)?.Replace("`", "\\`").Replace("\"", "\\\""))`;
+                alert(decodedMessage);
+                setTimeout(function () {
+                    window.location.href = '@Url.Action("Index")';
+                }, 5000);
+            }
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
