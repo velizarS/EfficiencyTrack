@@ -186,7 +186,7 @@ public class EntryController : BaseCrudController<
         {
             await _entryService.AddAsync(entity);
             TempData["Message"] = await _greetingService.GetGreetingMessageAsync(entity);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Home");
         }
         catch (InvalidOperationException ex)
         {

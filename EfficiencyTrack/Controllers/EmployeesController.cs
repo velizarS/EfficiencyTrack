@@ -135,7 +135,7 @@ public class EmployeesController : BaseCrudController<
             return View(model);
         }
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction("Index", "Home");
     }
 
     [HttpGet]
