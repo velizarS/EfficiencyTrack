@@ -111,9 +111,38 @@ namespace EfficiencyTrack.Controllers
 
             List<SelectListItem> zoneItems =
             [
-                new("Zone A", "Zone A"),
-                new("Zone B", "Zone B"),
-                new("Zone C", "Zone C")
+                new("Assembly", "1"),
+                new("AUX", "2"),
+                new("CMC-assembling", "3"),
+                new("CMC-testing", "4"),
+                new("Final-Assembly", "5"),
+                new("Finalization", "6"),
+                new("Finalization manual table", "7"),
+                new("G1", "8"),
+                new("G2", "9"),
+                new("Kinematik", "10"),
+                new("Magnetic", "11"),
+                new("Magnetic Epson", "12"),
+                new("Main bimetal ", "13"),
+                new("Main Epson ", "14"),
+                new("Multiple ass", "15"),
+                new("Neutrals", "16"),
+                new("NMCB Automatic Lines", "17"),
+                new("OPF", "18"),
+                new("Pre - finalization", "19"),
+                new("Pre-Assembly", "20"),
+                new("ProM", "21"),
+                new("QC", "22"),
+                new("QS/T1V", "23"),
+                new("Selective", "24"),
+                new("Sockets", "25"),
+                new("T2", "26"),
+                new("Testing", "27"),
+                new("Testing line", "28"),
+                new("Testing sockets", "29"),
+                new("Titan Pos.1", "30"),
+                new("Visualization", "31"),
+                new("Weldings", "32")
             ];
 
             switch (model)
@@ -129,21 +158,49 @@ namespace EfficiencyTrack.Controllers
             }
         }
 
+        //public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
+        //{
+        //    IQueryable<Routing> query = _routingService.GetFilteredRoutings(searchTerm, sortBy, sortAsc);
+        //    List<Routing> entities = await query.AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        //    List<RoutingViewModel> viewModels = entities.Select(MapToViewModel).ToList();
+        //    RoutingListViewModel listModel = BuildListViewModel(viewModels);
+
+        //    ViewBag.SearchTerm = searchTerm;
+        //    ViewBag.SortBy = sortBy;
+        //    ViewBag.SortAsc = sortAsc;
+        //    ViewBag.Page = page;
+        //    ViewBag.PageSize = pageSize;
+
+        //    return View(listModel);
+        //}
         public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
             IQueryable<Routing> query = _routingService.GetFilteredRoutings(searchTerm, sortBy, sortAsc);
-            List<Routing> entities = await query.AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            int totalCount = await query.CountAsync();
+            List<Routing> entities = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .AsNoTracking()
+                .ToListAsync();
+
             List<RoutingViewModel> viewModels = entities.Select(MapToViewModel).ToList();
-            RoutingListViewModel listModel = BuildListViewModel(viewModels);
+
+            var listModel = new RoutingListViewModel
+            {
+                Routings = viewModels,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.SortBy = sortBy;
             ViewBag.SortAsc = sortAsc;
-            ViewBag.Page = page;
-            ViewBag.PageSize = pageSize;
 
             return View(listModel);
         }
+
 
         public override async Task<IActionResult> Details(Guid id)
         {
