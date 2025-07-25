@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Error";
+    int code = (int)ViewBag.Code;
+}
+
+<h1 class="text-warning">Oops!</h1>
+
+@if (code == 404)
+{
+    <p>The page you're looking for was not found (404).</p>
+}
+else if (code == 403)
+{
+    <p>Access denied (403).</p>
+}
+else
+{
+    <p>An error occurred (status code: @code).</p>
+}

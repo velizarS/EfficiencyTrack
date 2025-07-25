@@ -26,9 +26,6 @@
                 <img id="logoImg" src="~/images/Logo2.png" alt="EfficiencyTrack logo" width="120" height="50" class="me-2" />
             </a>
 
-            <div class="collapse navbar-collapse justify-content-end">
-                <partial name="_LoginPartial" />
-            </div>
         </div>
     </nav>
 
@@ -38,7 +35,7 @@
             <a class="nav-link mb-2" asp-controller="Entry" asp-action="Create"><i class="bi bi-plus-circle me-2"></i>Създай запис</a>
             <a class="nav-link mb-2" asp-controller="Feedback" asp-action="Create"><i class="bi bi-chat-dots me-2"></i>Обратна връзка</a>
 
-            @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+            @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("ShiftLeader")))
             {
                 <a class="nav-link mb-2" asp-controller="Department" asp-action="Index"><i class="bi bi-diagram-3 me-2"></i>Отдели</a>
                 <a class="nav-link mb-2" asp-controller="Department" asp-action="Create">Създай отдел</a>
@@ -53,12 +50,17 @@
             }
         </nav>
 
-        <div class="mt-auto pt-3 border-top">
+        <div class="px-3 mt-4 border-top">
+            <partial name="_LoginPartial" />
+        </div>
+
+        <div class="mt-auto pt-3 border-top px-3">
             <button class="btn btn-outline-light w-100" id="toggleThemeBtn">
                 <i class="bi bi-circle-half"></i> Смени тема
             </button>
         </div>
     </div>
+
 
     <main id="content">
         <div class="container-fluid pt-4">

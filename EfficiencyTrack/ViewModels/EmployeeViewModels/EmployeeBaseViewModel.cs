@@ -12,18 +12,18 @@ namespace EfficiencyTrack.ViewModels.EmployeeViewModels
 
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^[a-zA-Z\d\s\-']+$")]
+        [RegularExpression(@"^[\p{L}\d\s\-']+$")]
         [Display(Name = "Име")]
         public string FirstName { get; set; } = null!;
 
         [StringLength(100)]
-        [RegularExpression(@"^[a-zA-Z\d\s\-']+$")]
+        [RegularExpression(@"^[\p{L}\d\s\-']+$")]
         [Display(Name = "Презиме")]
         public string? MiddleName { get; set; }
 
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^[a-zA-Z\d\s\-']+$")]
+        [RegularExpression(@"^[\p{L}\d\s\-']+$")]
         [Display(Name = "Фамилия")]
         public string LastName { get; set; } = null!;
 

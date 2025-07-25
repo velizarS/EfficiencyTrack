@@ -47,24 +47,35 @@ builder.Services
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";    
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
+
+
+
 builder.Services.AddRazorPages();
 
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    _ = app.UseMigrationsEndPoint();
+    app.UseDeveloperExceptionPage();
 }
 else
 {
-    _ = app.UseExceptionHandler("/Home/Error");
-    _ = app.UseHsts();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -73,7 +73,7 @@ namespace EfficiencyTrack.Controllers
 
             T entity = MapToEntity(model);
             await _service.AddAsync(entity);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Home");
         }
 
         public virtual async Task<IActionResult> Edit(Guid id)

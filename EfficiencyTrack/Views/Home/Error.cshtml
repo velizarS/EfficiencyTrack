@@ -1,0 +1,13 @@
+﻿@model EfficiencyTrack.ViewModels.ErrorViewModel
+
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">An unexpected error occurred</h1>
+<p>Please try again later.</p>
+
+@if (!string.IsNullOrEmpty(Model?.RequestId))
+{
+    <p><strong>Request ID:</strong> @Model.RequestId</p>
+}

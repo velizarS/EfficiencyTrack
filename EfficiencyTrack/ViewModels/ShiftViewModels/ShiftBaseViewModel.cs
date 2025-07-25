@@ -7,7 +7,7 @@ namespace EfficiencyTrack.ViewModels.ShiftViewModels
         [Required]
         [StringLength(20)]
         [Display(Name = "Смяна")]
-        [RegularExpression(@"^[a-zA-Z\d\s\-']+$", ErrorMessage = "Името може да съдържа само букви, цифри, интервали, тирета и апострофи.")]
+        [RegularExpression(@"^[\p{L}\d\s\-']+$", ErrorMessage = "Името може да съдържа само букви, цифри, интервали, тирета и апострофи.")]
         public string Name { get; set; } = null!;
 
         [Required]

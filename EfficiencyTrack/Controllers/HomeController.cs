@@ -49,10 +49,15 @@ namespace EfficiencyTrack.Controllers
             return View(viewModel);
         }
 
-
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public IActionResult StatusCode(int code)
+        {
+            ViewBag.Code = code;
+            return View(); 
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
