@@ -158,21 +158,6 @@ namespace EfficiencyTrack.Controllers
             }
         }
 
-        //public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
-        //{
-        //    IQueryable<Routing> query = _routingService.GetFilteredRoutings(searchTerm, sortBy, sortAsc);
-        //    List<Routing> entities = await query.AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-        //    List<RoutingViewModel> viewModels = entities.Select(MapToViewModel).ToList();
-        //    RoutingListViewModel listModel = BuildListViewModel(viewModels);
-
-        //    ViewBag.SearchTerm = searchTerm;
-        //    ViewBag.SortBy = sortBy;
-        //    ViewBag.SortAsc = sortAsc;
-        //    ViewBag.Page = page;
-        //    ViewBag.PageSize = pageSize;
-
-        //    return View(listModel);
-        //}
         public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
             IQueryable<Routing> query = _routingService.GetFilteredRoutings(searchTerm, sortBy, sortAsc);
@@ -200,7 +185,6 @@ namespace EfficiencyTrack.Controllers
 
             return View(listModel);
         }
-
 
         public override async Task<IActionResult> Details(Guid id)
         {
@@ -233,5 +217,14 @@ namespace EfficiencyTrack.Controllers
             await PrepareDropdownsAsync(model);
             return View(model);
         }
+
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public override async Task<IActionResult> DeleteConfirmed(Guid id)
+        //{
+        //    await _routingService.DeleteAsync(id);
+        //    return RedirectToAction(nameof(Index));
+        //}
+
     }
 }

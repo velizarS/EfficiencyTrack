@@ -38,7 +38,7 @@
         </dl>
     </section>
 
-    <form asp-action="DeleteConfirmed" method="post" class="mt-8 d-flex gap-3">
+    <form asp-action="Delete" method="post">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
         <button type="submit" class="btn btn-danger d-inline-flex align-items-center gap-1">

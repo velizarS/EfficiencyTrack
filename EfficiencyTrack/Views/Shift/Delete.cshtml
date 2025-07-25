@@ -17,7 +17,7 @@
             <p><strong>Продължителност:</strong> @Model.DurationMinutes минути</p>
         </div>
 
-        <form asp-action="DeleteConfirmed" method="post" class="d-flex gap-3">
+        <form asp-action="Delete" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
             <button type="submit" class="btn btn-danger">

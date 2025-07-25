@@ -6,6 +6,8 @@ body {
     color: #212529;
     line-height: 1.5;
     font-size: 16px;
+    margin: 0;
+    padding: 0;
 }
 
 /* --- Навигация (navbar) --- */
@@ -287,4 +289,53 @@ textarea:focus {
     #sidebar.show {
         transform: translateX(0);
     }
+}
+
+.error-wrapper {
+    max-width: 500px;
+    margin: 80px auto;
+    padding: 30px;
+    border-radius: 10px;
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #856404;
+    text-align: center;
+}
+
+    .error-wrapper h1 {
+        font-size: 72px;
+        margin-bottom: 15px;
+    }
+
+    .error-wrapper p {
+        font-size: 18px;
+        margin-bottom: 25px;
+    }
+
+.btn-home {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #856404;
+    color: #fff;
+    border-radius: 5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-home:hover {
+        background-color: #704e03;
+    }
+
+@media (max-width: 480px) {
+    .error-wrapper {
+        margin: 40px 20px;
+        padding: 20px;
+    }
+
+        .error-wrapper h1 {
+            font-size: 48px;
+        }
 }
