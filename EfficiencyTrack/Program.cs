@@ -43,7 +43,9 @@ builder.Services
         options.SignIn.RequireConfirmedAccount = false;
     })
     .AddRoles<IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<EfficiencyTrackDbContext>();
+    .AddEntityFrameworkStores<EfficiencyTrackDbContext>()
+    .AddDefaultTokenProviders(); 
+
 
 builder.Services.AddControllersWithViews();
 

@@ -1,19 +1,22 @@
 ﻿@{
     ViewData["Title"] = "Error";
-    int code = (int)ViewBag.Code;
+    int code = (int)(ViewBag.Code ?? 500);
+    string message = code switch
+    {
+        404 => "The page you're looking for was not found (404).",
+        403 => "Access denied (403).",
+        401 => "Unauthorized access (401).",
+        500 => "An internal server error occurred (500).",
+        _ => $"An error occurred (status code: {code})."
+    };
 }
 
-<h1 class="text-warning">Oops!</h1>
+<style>
+    
+</style>
 
-@if (code == 404)
-{
-    <p>The page you're looking for was not found (404).</p>
-}
-else if (code == 403)
-{
-    <p>Access denied (403).</p>
-}
-else
-{
-    <p>An error occurred (status code: @code).</p>
-}
+<div class="error-wrapper" role="alert" aria-live="assertive" aria-atomic="true">
+    <h1>Oops!</h1>
+    <p>@message</p>
+    <a href="~/" class="btn-home" aria-label="Go to Home Page">Back to Home</a>
+</div>

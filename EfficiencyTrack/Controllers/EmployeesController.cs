@@ -79,6 +79,17 @@ public class EmployeesController : BaseCrudController<
         };
     }
 
+    // 🔧 Добавеният метод
+    private void MapToEntity(EmployeeEditViewModel model, Employee entity)
+    {
+        entity.Code = model.Code;
+        entity.FirstName = model.FirstName;
+        entity.MiddleName = model.MiddleName;
+        entity.LastName = model.LastName;
+        entity.DepartmentId = model.DepartmentId;
+        entity.ShiftManagerUserId = model.ShiftManagerUserId;
+    }
+
     protected override EmployeeEditViewModel MapToEditModel(Employee e)
     {
         return new()
@@ -175,11 +186,12 @@ public class EmployeesController : BaseCrudController<
             return NotFound();
         }
 
-        Employee entity = MapToEntity(model);
+        // 🛠️ Важно — това мапва стойностите върху вече траквания обект:
+        MapToEntity(model, existing);
 
         try
         {
-            await _service.UpdateAsync(entity);
+            await _employeeService.UpdateAsync(existing);
         }
         catch (InvalidOperationException ex)
         {

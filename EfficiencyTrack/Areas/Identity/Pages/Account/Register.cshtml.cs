@@ -86,6 +86,10 @@ namespace EfficiencyTrack.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required]
+            [Display(Name = "Registration Code")]
+            public string RegistrationCode { get; set; }
         }
 
 
@@ -99,7 +103,7 @@ namespace EfficiencyTrack.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && Input.RegistrationCode == "ABB" + DateTime.Now.Day.ToString())
             {
                 ApplicationUser user = CreateUser();
 
