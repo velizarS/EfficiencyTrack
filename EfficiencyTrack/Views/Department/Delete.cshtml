@@ -1,16 +1,18 @@
 ﻿@model EfficiencyTrack.ViewModels.DepartmentViewModels.DepartmentDetailViewModel
 
 @{
-    ViewData["Title"] = "Потвърди изтриване";
+    ViewData["Title"] = "Изтриване на отдел";
 }
 
-<main class="container mt-5">
-    <header class="mb-4">
-        <h1 class="text-danger">Потвърди изтриване</h1>
-        <p class="lead">Сигурен ли си, че искаш да изтриеш този отдел?</p>
-    </header>
+<main class="max-w-xl mx-auto px-4 py-5">
+    <div class="formDiv">
+        <header class="mb-4">
+            <h1 class="text-danger">Потвърди изтриване</h1>
+            <p class="lead ">Сигурни ли сте, че искате да изтриете този  отдел?</p>
+        </header>
 
-    <section aria-labelledby="department-info">
+
+        <section class="border-danger mb-4">
         <dl class="row">
             <dt class="col-sm-3">Име на отдел</dt>
             <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Name) ? Model.Name : "-")</dd>
@@ -43,4 +45,5 @@
             <a asp-action="Index" class="btn btn-secondary">Отказ</a>
         </footer>
     </form>
+    </div>
 </main>

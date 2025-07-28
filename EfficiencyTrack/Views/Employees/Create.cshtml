@@ -4,11 +4,13 @@
     ViewData["Title"] = "Създаване на служител";
 }
 
-<main class="max-w-3xl mx-auto px-4 py-8">
-    <header class="mb-5">
-        <h1 class="text-2xl font-semibold">Създаване на нов служител</h1>
+<main class="max-w-xl mx-auto px-4 py-5">
+    <header class="mb-4">
+        <h1 class="h3">@ViewData["Title"]</h1>
     </header>
 
+    <section>
+        <div class="formDiv">
     <form asp-action="Create" method="post" class="needs-validation" novalidate>
         <div class="mb-4">
             <label asp-for="Code" class="form-label"></label>
@@ -55,6 +57,8 @@
             </a>
         </footer>
     </form>
+    </div>
+    </section>
 </main>
 
 @section Scripts {

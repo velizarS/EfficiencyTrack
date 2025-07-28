@@ -4,10 +4,14 @@
     ViewData["Title"] = "Редакция на запис";
 }
 
-<main class="max-w-5xl mx-auto px-4 py-8">
-    <header class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">@ViewData["Title"]</h1>
+<main class="max-w-xl mx-auto px-4 py-6">
+    <header class="mb-4">
+        <h1 class="text-2xl fw-bold text-primary">@ViewData["Title"]</h1>
     </header>
+
+    <section aria-label="Форма за редакция">
+        <div class="formDiv">
+
 
     @if (TempData["Message"] != null)
     {
@@ -67,6 +71,9 @@
             </a>
         </div>
     </form>
+    </div>
+    </section>
+    
 </main>
 
 @section Scripts {

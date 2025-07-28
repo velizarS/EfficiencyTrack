@@ -4,12 +4,14 @@
     ViewData["Title"] = "Детайли за служител";
 }
 
-<main class="max-w-3xl mx-auto px-4 py-8">
-    <header class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">@ViewData["Title"]</h1>
-    </header>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <div class="formDiv">
+        <section aria-labelledby="details-heading" role="region">
 
-    <section class="mb-5">
+            <h1 id="details-heading">
+                @ViewData["Title"]
+            </h1>
+
         <dl class="row">
             <dt class="col-sm-4 fw-semibold">@Html.DisplayNameFor(m => m.Code)</dt>
             <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Code) ? Model.Code : "-")</dd>
@@ -25,12 +27,13 @@
         </dl>
     </section>
 
-    <div class="d-flex gap-2">
-        <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
-            <i class="bi bi-arrow-left"></i> Обратно към списъка
-        </a>
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary d-inline-flex align-items-center gap-1">
-            <i class="bi bi-pencil"></i> Редактирай
-        </a>
+        <footer class="mt-4 d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning d-inline-flex align-items-center gap-1">
+                <i class="bi bi-pencil-square"></i> Редактирай
+            </a>
+            <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Назад
+            </a>
+        </footer>
     </div>
 </main>

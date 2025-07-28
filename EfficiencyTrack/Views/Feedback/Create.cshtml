@@ -4,12 +4,14 @@
     ViewData["Title"] = "Нова обратна връзка";
 }
 
-<main class="container py-4">
+<main class="max-w-xl mx-auto px-4 py-5">
     <header class="mb-4">
-        <h1 class="h3">Нова обратна връзка</h1>
+        <h1 class="h3">@ViewData["Title"]</h1>
     </header>
+    <div class="formDiv">
+    <section>
+       
 
-    <section class="card shadow-sm">
         <div class="card-body">
             <form asp-action="Create" method="post" novalidate>
                 <fieldset>
@@ -41,6 +43,7 @@
             </form>
         </div>
     </section>
+    </div>
 </main>
 
 @section Scripts {

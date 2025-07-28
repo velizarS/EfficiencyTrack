@@ -10,6 +10,7 @@
     </header>
 
     <section>
+        <div class="formDiv">
         <form asp-action="Edit" method="post" class="needs-validation" novalidate>
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
@@ -37,7 +38,7 @@
                     Отказ
                 </a>
             </div>
-        </form>
+        </form></div>
     </section>
 </main>
 

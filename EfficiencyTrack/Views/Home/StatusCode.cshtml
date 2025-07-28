@@ -1,22 +1,21 @@
 ﻿@{
     ViewData["Title"] = "Error";
-    int code = (int)(ViewBag.Code ?? 500);
+    int code = ViewBag.Code is int c ? c : 500;
+
     string message = code switch
     {
-        404 => "The page you're looking for was not found (404).",
-        403 => "Access denied (403).",
-        401 => "Unauthorized access (401).",
-        500 => "An internal server error occurred (500).",
-        _ => $"An error occurred (status code: {code})."
+        404 => "Страницата не беше намерена (404).",
+        403 => "Нямате достъп до тази страница (403).",
+        401 => "Неоторизиран достъп (401).",
+        500 => "Възникна вътрешна грешка в сървъра (500).",
+        _ => $"Възникна грешка (статус код: {code})."
     };
 }
+<link href="~/css/StyleSheet.css" rel="stylesheet" />
 
-<style>
-    
-</style>
-
-<div class="error-wrapper" role="alert" aria-live="assertive" aria-atomic="true">
-    <h1>Oops!</h1>
-    <p>@message</p>
-    <a href="~/" class="btn-home" aria-label="Go to Home Page">Back to Home</a>
+<div class="card">
+    <div class="stars"></div>
+    <img src="https://uiverse.io/astronaut.png" alt="Astronaut" class="image" />
+    <div class="heading">@message</div>
+    <a href="~/" class="btn-home">Обратно към началната страница</a>
 </div>

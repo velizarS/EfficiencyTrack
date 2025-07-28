@@ -4,10 +4,14 @@
     ViewData["Title"] = "Редактиране на служител";
 }
 
-<main class="max-w-3xl mx-auto px-4 py-8">
-    <header class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-800">@ViewData["Title"]</h1>
+<main class="max-w-xl mx-auto px-4 py-6">
+    <header class="mb-4">
+        <h1 class="text-2xl fw-bold text-primary">@ViewData["Title"]</h1>
     </header>
+
+    <section aria-label="Форма за редакция">
+        <div class="formDiv">
+
 
     <form asp-action="Edit" method="post" class="needs-validation" novalidate>
         <input type="hidden" asp-for="Id" />
@@ -57,6 +61,8 @@
             </a>
         </div>
     </form>
+    </div>
+    </section>
 </main>
 
 @section Scripts {

@@ -10,23 +10,25 @@
     </header>
 
     <section>
-        <form asp-action="Create" method="post" class="card shadow-sm border-0 p-4">
+        <div class="formDiv">
+
+        <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
-                <label asp-for="Code" class="form-label fw-semibold"></label>
+                <label asp-for="Code" class="form-label "></label>
                 <input asp-for="Code" class="form-control" />
                 <span asp-validation-for="Code" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Description" class="form-label fw-semibold"></label>
+                <label asp-for="Description" class="form-label "></label>
                 <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Description" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Zone" class="form-label fw-semibold"></label>
+                <label asp-for="Zone" class="form-label "></label>
                 <select asp-for="Zone" class="form-select" asp-items="Model.AvailableZones">
                     <option value="">-- Избери зона --</option>
                 </select>
@@ -34,13 +36,13 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="MinutesPerPiece" class="form-label fw-semibold"></label>
+                <label asp-for="MinutesPerPiece" class="form-label "></label>
                 <input asp-for="MinutesPerPiece" class="form-control" type="number" step="0.01" min="0.01" placeholder="0.1" />
                 <span asp-validation-for="MinutesPerPiece" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="DepartmentId" class="form-label fw-semibold"></label>
+                <label asp-for="DepartmentId" class="form-label"></label>
                 <select asp-for="DepartmentId" class="form-select" asp-items="Model.AvailableDepartments">
                     <option value="">-- Избери отдел --</option>
                 </select>
@@ -56,6 +58,7 @@
                 </a>
             </footer>
         </form>
+        </div>
     </section>
 </main>
 

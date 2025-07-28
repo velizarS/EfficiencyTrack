@@ -3,7 +3,7 @@
     background-color: #1f1f1f;
     color: #fff;
     position: fixed;
-    top: 56px; /* под navbar-а */
+    top: 56px; 
     bottom: 0;
     left: 0;
     padding: 1rem;
@@ -25,7 +25,7 @@
         margin-left: 240px;
     }
 
-#sidebar .nav-link {
+/*#sidebar .nav-link {
     display: block;
     color: #eee;
     padding: 0.75rem 1rem;
@@ -47,9 +47,9 @@
 
 #toggleThemeBtn {
     margin-top: 1rem;
-}
+}*/
 
-body {
+/*body {
     background-color: #121212;
     color: #f5f5f5;
-}
+}*/

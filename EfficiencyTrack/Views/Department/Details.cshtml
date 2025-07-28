@@ -4,13 +4,15 @@
     ViewData["Title"] = "Детайли за отдел";
 }
 
-<main class="container mt-4">
-    <header class="mb-4">
-        <h1 class="h3">Детайли за отдел</h1>
-    </header>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <div class="formDiv">
+        <section aria-labelledby="details-heading" role="region">
 
-    <section class="mb-4">
-        <dl class="row">
+            <h1 id="details-heading">
+                @ViewData["Title"]
+            </h1>
+
+            <dl class="row mb-4">
             <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
             <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Name) ? Model.Name : "-")</dd>
 
@@ -31,10 +33,14 @@
                 }
             </dd>
         </dl>
-    </section>
-
-    <div class="d-flex gap-2">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
-        <a asp-action="Index" class="btn btn-secondary">Обратно</a>
+        </section>
+        <footer class="mt-4 d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning d-inline-flex align-items-center gap-1">
+                <i class="bi bi-pencil-square"></i> Редактирай
+            </a>
+            <a asp-action="Index" class="btn btn-secondary d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Назад
+            </a>
+        </footer>
     </div>
 </main>

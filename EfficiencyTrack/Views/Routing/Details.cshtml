@@ -4,35 +4,32 @@
     ViewData["Title"] = "Детайли за рутинг";
 }
 
-<main class="max-w-xl mx-auto px-4 py-6">
-    <header class="mb-4">
-        <h1 class="text-2xl fw-bold text-primary">@ViewData["Title"]</h1>
-    </header>
+<main class="max-w-5xl mx-auto px-4 py-8">
+    <div class="formDiv">
+        <section aria-labelledby="details-heading" role="region">
 
-    <section class="card shadow-sm">
-        <div class="card-body">
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Код:</h6>
-                <p class="mb-0">@Model.Code</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Описание:</h6>
-                <p class="mb-0">@Model.Description</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Зона:</h6>
-                <p class="mb-0">@Model.Zone</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Мин./бройка:</h6>
-                <p class="mb-0">@Model.MinutesPerPiece</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Отдел:</h6>
-                <p class="mb-0">@Model.DepartmentName</p>
-            </div>
-        </div>
+            <h1 id="details-heading">
+                @ViewData["Title"]
+            </h1>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.Code)</dt>
+                <dd class="col-sm-8 ">@Model.Code</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.Description)</dt>
+                <dd class="col-sm-8 ">@Model.Description</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.Zone)</dt>
+                <dd class="col-sm-8 ">@Model.Zone</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.MinutesPerPiece)</dt>
+                <dd class="col-sm-8 ">@Model.MinutesPerPiece</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.DepartmentName)</dt>
+                <dd class="col-sm-8 ">@Model.DepartmentName</dd>
+            </dl>
     </section>
+   
 
     <footer class="mt-4 d-flex gap-2">
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning d-inline-flex align-items-center gap-1">
@@ -42,4 +39,5 @@
             <i class="bi bi-arrow-left-circle"></i> Назад
         </a>
     </footer>
+    </div>
 </main>

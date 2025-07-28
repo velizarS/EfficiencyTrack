@@ -1,16 +1,16 @@
-﻿/* --- Основно тяло и цветове --- */
-body {
-    overflow-x: hidden;
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
-    color: #212529;
-    line-height: 1.5;
-    font-size: 16px;
+﻿html, body, main {
     margin: 0;
     padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    color: #212529;
+    font-family: 'Times New Roman', Times, serif;
 }
 
-/* --- Навигация (navbar) --- */
+
+
 .navbar {
     background-color: #ffffff;
     border-bottom: 1px solid #dee2e6;
@@ -18,7 +18,7 @@ body {
     font-weight: 600;
 }
 
-/* --- Сайдбар --- */
+
 #sidebar {
     position: fixed;
     top: 56px;
@@ -75,11 +75,9 @@ body {
     text-decoration: none;
 }
 
-/* --- Основно съдържание --- */
 #content {
     margin-left: 0;
     transition: margin-left 0.3s ease-in-out;
-    padding: 2rem 1.5rem;
     background-color: #ffffff;
     min-height: calc(100vh - 56px - 56px); 
 }
@@ -87,8 +85,12 @@ body {
 #sidebar.show ~ #content {
     margin-left: 220px;
 }
+.pt-4 {
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-top: 0 !important;
+}
 
-/* --- Футър --- */
 footer {
     background-color: #ffffff;
     color: #6c757d;
@@ -98,7 +100,6 @@ footer {
     border-top: 1px solid #dee2e6;
 }
 
-/* --- Бутон за смяна на тема --- */
 #toggleThemeBtn {
     background-color: transparent;
     color: #343a40;
@@ -127,7 +128,6 @@ footer {
     outline: none;
 }
 
-/* --- Форми --- */
 form {
     max-width: 700px;
     margin: 0 auto;
@@ -175,7 +175,6 @@ textarea {
     margin-bottom: 1rem;
 }
 
-/* --- Бутони --- */
 .btn-primary {
     background-color: #00b894;
     border-color: #00b894;
@@ -220,7 +219,6 @@ textarea {
     box-shadow: 0 0 8px rgba(176,42,55,0.6);
 }
 
-/* --- Таблици --- */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -249,7 +247,6 @@ tbody td {
     border-bottom: 1px solid #dee2e6;
 }
 
-/* --- Фокус за достъпност --- */
 a:focus,
 button:focus,
 input:focus,
@@ -259,7 +256,6 @@ textarea:focus {
     outline-offset: 2px;
 }
 
-/* --- Responsive --- */
 @media (max-width: 991.98px) {
     #sidebar.show::after {
         content: "";

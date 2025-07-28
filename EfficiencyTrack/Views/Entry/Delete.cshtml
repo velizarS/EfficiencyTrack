@@ -1,39 +1,38 @@
 ﻿@model EfficiencyTrack.ViewModels.EntryViewModel.EntryDetailsViewModel
 
 @{
-    ViewData["Title"] = "Потвърждение за изтриване";
+    ViewData["Title"] = "Изтриване на запис";
 }
 
-<main class="max-w-5xl mx-auto px-4 py-8">
-    <header class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Изтриване на запис</h1>
-    </header>
+<main class="max-w-xl mx-auto px-4 py-5">
+    <div class="formDiv">
+        <header class="mb-4">
+            <h1 class="text-danger">Потвърди изтриване</h1>
+            <p class="lead ">Сигурни ли сте, че искате да изтриете този запис?</p>
+        </header>
 
-    <p class="text-danger fs-5 fw-semibold mb-6">
-        Сигурни ли сте, че искате да изтриете този запис? Това действие не може да бъде отменено.
-    </p>
 
-    <section>
+        <section class="border-danger mb-4">
         <dl class="row">
-            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Date)</dt>
+            <dt class="col-sm-3  fw-semibold">@Html.DisplayNameFor(m => m.Date)</dt>
             <dd class="col-sm-9">@Model.Date.ToString("dd.MM.yyyy")</dd>
 
-            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.EmployeeName)</dt>
+            <dt class="col-sm-3  fw-semibold">@Html.DisplayNameFor(m => m.EmployeeName)</dt>
             <dd class="col-sm-9">@Model.EmployeeName</dd>
 
-            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.RoutingName)</dt>
+            <dt class="col-sm-3  fw-semibold">@Html.DisplayNameFor(m => m.RoutingName)</dt>
             <dd class="col-sm-9">@Model.RoutingName</dd>
 
-            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Pieces)</dt>
+            <dt class="col-sm-3  fw-semibold">@Html.DisplayNameFor(m => m.Pieces)</dt>
             <dd class="col-sm-9">@Model.Pieces</dd>
 
-            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.Scrap)</dt>
+            <dt class="col-sm-3  fw-semibold">@Html.DisplayNameFor(m => m.Scrap)</dt>
             <dd class="col-sm-9">@Model.Scrap</dd>
 
-            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.WorkedMinutes)</dt>
+            <dt class="col-sm-3  fw-semibold">@Html.DisplayNameFor(m => m.WorkedMinutes)</dt>
             <dd class="col-sm-9">@Model.WorkedMinutes</dd>
 
-            <dt class="col-sm-3 text-muted fw-semibold">@Html.DisplayNameFor(m => m.EfficiencyForOperation)</dt>
+            <dt class="col-sm-3  fw-semibold">@Html.DisplayNameFor(m => m.EfficiencyForOperation)</dt>
             <dd class="col-sm-9">@Model.EfficiencyForOperation.ToString("0.##")%</dd>
         </dl>
     </section>
@@ -48,4 +47,5 @@
             <i class="bi bi-x-circle"></i> Отказ
         </a>
     </form>
+    </div>
 </main>

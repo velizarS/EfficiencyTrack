@@ -4,10 +4,13 @@
     ViewData["Title"] = "Създаване на отдел";
 }
 
-<main class="container mt-4">
+<main class="max-w-xl mx-auto px-4 py-5">
     <header class="mb-4">
-        <h1>Създаване на нов отдел</h1>
+        <h1 class="h3">@ViewData["Title"]</h1>
     </header>
+
+    <section>
+        <div class="formDiv">
 
     <form asp-action="Create" method="post" class="needs-validation" novalidate>
         <div class="mb-3">
@@ -21,6 +24,8 @@
             <a asp-action="Index" class="btn btn-secondary">Отказ</a>
         </footer>
     </form>
+        </div>
+    </section>
 </main>
 
 @section Scripts {

@@ -5,34 +5,30 @@
 }
 
 <main class="max-w-xl mx-auto px-4 py-5">
+    <div class="formDiv">
     <header class="mb-4">
         <h1 class="text-danger">Потвърди изтриване</h1>
-        <p class="lead text-muted">Сигурни ли сте, че искате да изтриете този рутинг?</p>
+        <p class="lead ">Сигурни ли сте, че искате да изтриете тази рутинг?</p>
     </header>
+   
 
-    <section class="card border-danger mb-4 shadow-sm">
-        <div class="card-body">
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Код:</h6>
-                <p class="mb-0">@Model.Code</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Описание:</h6>
-                <p class="mb-0">@Model.Description</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Зона:</h6>
-                <p class="mb-0">@Model.Zone</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Време за бройка:</h6>
-                <p class="mb-0">@Model.MinutesPerPiece мин.</p>
-            </div>
-            <div class="mb-3">
-                <h6 class="fw-bold text-muted">Отдел:</h6>
-                <p class="mb-0">@Model.DepartmentName</p>
-            </div>
-        </div>
+    <section class="border-danger mb-4">
+            <dl class="row mb-4">
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.Code)</dt>
+                <dd class="col-sm-8 ">@Model.Code</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.Description)</dt>
+                <dd class="col-sm-8 ">@Model.Description</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.Zone)</dt>
+                <dd class="col-sm-8 ">@Model.Zone</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.MinutesPerPiece)</dt>
+                <dd class="col-sm-8 ">@Model.MinutesPerPiece</dd>
+
+                <dt class="col-sm-4 ">@Html.DisplayNameFor(m => m.DepartmentName)</dt>
+                <dd class="col-sm-8 ">@Model.DepartmentName</dd>
+            </dl>
     </section>
 
     <form asp-action="Delete" method="post">
@@ -47,6 +43,6 @@
                 <i class="bi bi-arrow-left-circle"></i> Отказ
             </a>
         </footer>
-    </form>
-
+        </form>
+    </div>
 </main>

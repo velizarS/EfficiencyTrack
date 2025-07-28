@@ -4,10 +4,14 @@
     ViewData["Title"] = "Редакция на отдел";
 }
 
-<main class="container mt-4">
+<main class="max-w-xl mx-auto px-4 py-6">
     <header class="mb-4">
-        <h1 class="h3">Редактиране на отдел</h1>
+        <h1 class="text-2xl fw-bold text-primary">@ViewData["Title"]</h1>
     </header>
+
+    <section aria-label="Форма за редакция">
+        <div class="formDiv">
+
 
     <form asp-action="Edit" method="post" class="needs-validation" novalidate>
         @Html.AntiForgeryToken()
@@ -24,6 +28,8 @@
             <a asp-action="Index" class="btn btn-secondary">Отказ</a>
         </div>
     </form>
+    </div>
+    </section>
 </main>
 
 @section Scripts {
