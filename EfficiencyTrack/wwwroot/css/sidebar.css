@@ -1,4 +1,4 @@
-﻿#sidebar {
+﻿/*#sidebar {
     width: 240px;
     background-color: #1f1f1f;
     color: #fff;
@@ -23,7 +23,7 @@
 
     #content.shifted {
         margin-left: 240px;
-    }
+    }*/
 
 /*#sidebar .nav-link {
     display: block;
