@@ -218,13 +218,5 @@ namespace EfficiencyTrack.Controllers
             return View(model);
         }
 
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public override async Task<IActionResult> DeleteConfirmed(Guid id)
-        //{
-        //    await _routingService.DeleteAsync(id);
-        //    return RedirectToAction(nameof(Index));
-        //}
-
     }
 }

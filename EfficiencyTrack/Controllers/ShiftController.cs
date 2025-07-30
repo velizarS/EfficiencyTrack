@@ -90,5 +90,4 @@ public class ShiftController : BaseCrudController<
 
         return query.ToList();
     }
-
 }

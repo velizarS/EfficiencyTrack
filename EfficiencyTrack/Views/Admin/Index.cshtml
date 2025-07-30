@@ -1,0 +1,42 @@
+﻿@model List<EfficiencyTrack.ViewModels.AdminViewModels.UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "User Role Management";
+    var allRoles = ViewBag.AllRoles as List<string>;
+}
+
+<h2>Управление на роли</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Текуща роля</th>
+            <th>Нова роля</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@user.CurrentRole</td>
+                <td>
+                    <form asp-action="ChangeRole" method="post" class="d-flex">
+                        <input type="hidden" name="userId" value="@user.UserId" />
+                        <select name="newRole" class="form-select me-2">
+                            @foreach (var role in allRoles)
+                            {
+                                <option value="@role" selected="@(role == user.CurrentRole)">
+                                    @role
+                                </option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Промени</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

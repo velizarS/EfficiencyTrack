@@ -79,7 +79,6 @@ public class EmployeesController : BaseCrudController<
         };
     }
 
-    // 🔧 Добавеният метод
     private void MapToEntity(EmployeeEditViewModel model, Employee entity)
     {
         entity.Code = model.Code;
@@ -186,7 +185,6 @@ public class EmployeesController : BaseCrudController<
             return NotFound();
         }
 
-        // 🛠️ Важно — това мапва стойностите върху вече траквания обект:
         MapToEntity(model, existing);
 
         try

@@ -53,14 +53,13 @@ builder.Services
     .AddEntityFrameworkStores<EfficiencyTrackDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddControllersWithViews();
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Identity/Account/Login";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
 
+builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 WebApplication app = builder.Build();

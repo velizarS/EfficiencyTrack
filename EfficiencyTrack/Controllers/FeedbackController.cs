@@ -104,7 +104,6 @@ namespace EfficiencyTrack.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-
         public async Task<IActionResult> Delete(Guid id)
         {
             Feedback? feedback = await _service.GetFeedbackByIdAsync(id);
