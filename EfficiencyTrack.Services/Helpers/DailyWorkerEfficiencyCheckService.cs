@@ -48,27 +48,44 @@ namespace EfficiencyTrack.Services.Helpers
                     var dbContext = scope.ServiceProvider.GetRequiredService<EfficiencyTrackDbContext>();
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-                    bool alreadySent = await dbContext.SentEfficiencyReports.AnyAsync(e => e.DateSent == nowUtc.Date, stoppingToken);
+                    bool alreadySent = await dbContext.SentEfficiencyReports
+                        .AsNoTracking()
+                        .AnyAsync(e => e.DateSent == nowUtc.Date, stoppingToken);
+
                     if (nowUtc >= scheduledTimeUtc && !alreadySent)
                     {
                         _logger.LogInformation("Започвам проверка за служители без записи - {TimeUtc}", nowUtc);
 
                         var shiftLeaders = await userManager.GetUsersInRoleAsync("ShiftLeader");
 
-                        var workersByLeader = new Dictionary<string, List<Employee>>();
+                        var shiftLeaderIds = shiftLeaders
+                            .Where(l => !string.IsNullOrWhiteSpace(l.Email))
+                            .Select(l => new { l.Id, l.Email })
+                            .ToList();
+
                         var previousDay = nowUtc.AddDays(-1).Date;
 
-                        foreach (var leader in shiftLeaders)
-                        {
-                            if (string.IsNullOrWhiteSpace(leader.Email))
-                                continue;
+                        var employees = await dbContext.Employees
+                            .AsNoTracking()
+                            .Where(e => shiftLeaderIds.Select(l => l.Id).Contains(e.ShiftManagerUserId ?? Guid.Empty))
+                            .ToListAsync(stoppingToken);
 
-                            var workers = await GetWorkersWithoutEfficiencyRecordByShiftLeaderId(dbContext, leader.Id, previousDay);
-                            if (workers.Any())
-                            {
-                                workersByLeader[leader.Email] = workers;
-                            }
-                        }
+                        var existingCodes = await dbContext.DailyEfficiencies
+                            .AsNoTracking()
+                            .Where(e => e.Date == previousDay)
+                            .Select(e => e.Employee.Code)
+                            .ToListAsync(stoppingToken);
+
+                        var workersByLeader = shiftLeaderIds.ToDictionary(
+                            l => l.Email,
+                            l => employees
+                                .Where(e => e.ShiftManagerUserId == l.Id && !existingCodes.Contains(e.Code))
+                                .ToList()
+                        );
+
+                        workersByLeader = workersByLeader
+                            .Where(kvp => kvp.Value.Any())
+                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
                         foreach (var kvp in workersByLeader)
                         {
@@ -122,18 +139,8 @@ namespace EfficiencyTrack.Services.Helpers
                 {
                     await Task.Delay(delay, stoppingToken);
                 }
-                catch (TaskCanceledException)
-                {
-                }
+                catch (TaskCanceledException) { }
             }
-        }
-
-        private async Task<List<Employee>> GetWorkersWithoutEfficiencyRecordByShiftLeaderId(EfficiencyTrackDbContext dbContext, Guid shiftLeaderUserId, DateTime dateToCheck)
-        {
-            return await dbContext.Employees
-                .Where(w => w.ShiftManagerUserId == shiftLeaderUserId &&
-                            !dbContext.DailyEfficiencies.Any(e => e.Employee.Code == w.Code && e.Date == dateToCheck))
-                .ToListAsync();
         }
 
         private async Task SendEmail(string recipientEmail, string subject, string body)

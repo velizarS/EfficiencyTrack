@@ -19,15 +19,13 @@ namespace EfficiencyTrack.Controllers
         }
 
         protected virtual async Task<(List<TViewModel> Items, int TotalCount)> GetPagedAsync(
-            string? searchTerm, string? sortBy, bool sortAsc, int page = 1, int pageSize = 20)
+             string? searchTerm, string? sortBy, bool sortAsc, int page = 1, int pageSize = 20)
         {
-            IEnumerable<T> allItems = await _service.GetAllAsync();
-            List<TViewModel> vmItems = allItems.Select(MapToViewModel).ToList();
-
-            List<TViewModel> filteredSorted = FilterAndSort(vmItems, searchTerm, sortBy, sortAsc);
-
-            return (filteredSorted, filteredSorted.Count);
+            var (entities, totalCount) = await _service.GetPagedAsync(searchTerm, sortBy, sortAsc, page, pageSize);
+            var vmItems = entities.Select(MapToViewModel).ToList();
+            return (vmItems, totalCount);
         }
+
 
         public virtual async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
