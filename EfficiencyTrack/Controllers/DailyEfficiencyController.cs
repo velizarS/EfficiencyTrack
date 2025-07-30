@@ -29,7 +29,7 @@ namespace EfficiencyTrack.Controllers
             {
                 efficiencies = await _dailyEfficiencyService.GetAllAsync();
             }
-            else if (User.IsInRole("ShiftManager"))
+            else if (User.IsInRole("ShiftLeader"))
             {
                 var user = await _userManager.GetUserAsync(User);
                 efficiencies = user != null

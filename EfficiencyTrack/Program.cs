@@ -1,5 +1,6 @@
 using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Identity;
+using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Helpers;
 using EfficiencyTrack.Services.Implementations;
 using EfficiencyTrack.Services.Interfaces;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,10 @@ builder.Services.AddScoped<IRoutingService, RoutingService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IGreetingService, GreetingService>();
 
+builder.Services.AddHostedService<DailyWorkerEfficiencyCheckService>();
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     {
@@ -44,18 +51,15 @@ builder.Services
     })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<EfficiencyTrackDbContext>()
-    .AddDefaultTokenProviders(); 
-
+    .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Identity/Account/Login";    
+    options.LoginPath = "/Identity/Account/Login";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
-
-
 
 builder.Services.AddRazorPages();
 
@@ -70,7 +74,6 @@ else
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -95,12 +98,11 @@ using (IServiceScope scope = app.Services.CreateScope())
     {
         await SeedRolesAsync(services);
         await SeedUsersAsync(services);
-
     }
     catch (Exception ex)
     {
         ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding roles.");
+        logger.LogError(ex, "An error occurred while seeding roles or users.");
     }
 }
 
@@ -108,11 +110,11 @@ await app.RunAsync();
 
 static async Task SeedRolesAsync(IServiceProvider serviceProvider)
 {
-    RoleManager<IdentityRole<Guid>> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
     string[] roles = new[] { "Manager", "Admin", "UnitResponsible", "ShiftLeader", "User" };
 
-    foreach (string? role in roles)
+    foreach (string role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
@@ -123,8 +125,8 @@ static async Task SeedRolesAsync(IServiceProvider serviceProvider)
 
 static async Task SeedUsersAsync(IServiceProvider serviceProvider)
 {
-    UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    ILogger<Program> logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
     async Task<ApplicationUser> CreateUserIfNotExists(string email, string role)
     {
@@ -137,7 +139,7 @@ static async Task SeedUsersAsync(IServiceProvider serviceProvider)
                 Email = email,
                 EmailConfirmed = true,
             };
-            IdentityResult result = await userManager.CreateAsync(user, "Password123!");
+            var result = await userManager.CreateAsync(user, "Password123!");
             if (result.Succeeded)
             {
                 _ = await userManager.AddToRoleAsync(user, role);
@@ -155,30 +157,27 @@ static async Task SeedUsersAsync(IServiceProvider serviceProvider)
         return user;
     }
 
-    ApplicationUser admin = await CreateUserIfNotExists("admin@example.com", "Admin");
-    ApplicationUser manager = await CreateUserIfNotExists("manager@example.com", "Manager");
-
-    List<ApplicationUser> unitResponsibles = [];
+    List<ApplicationUser> unitResponsibles = new List<ApplicationUser>();
     for (int i = 1; i <= 2; i++)
     {
-        ApplicationUser unitResp = await CreateUserIfNotExists($"unitresp{i}@example.com", "UnitResponsible");
+        var unitResp = await CreateUserIfNotExists($"unitresp{i}@example.com", "UnitResponsible");
         unitResponsibles.Add(unitResp);
     }
 
-    List<ApplicationUser> shiftLeaders = [];
+    List<ApplicationUser> shiftLeaders = new List<ApplicationUser>();
     int shiftLeaderCounter = 1;
-    foreach (ApplicationUser unitResp in unitResponsibles)
+    foreach (var unitResp in unitResponsibles)
     {
         for (int i = 1; i <= 2; i++)
         {
-            ApplicationUser shiftLeader = await CreateUserIfNotExists($"shiftleader{shiftLeaderCounter}@example.com", "ShiftLeader");
+            var shiftLeader = await CreateUserIfNotExists($"shiftleader{shiftLeaderCounter}@example.com", "ShiftLeader");
             shiftLeaders.Add(shiftLeader);
             shiftLeaderCounter++;
         }
     }
 
     int userCounter = 1;
-    foreach (ApplicationUser shiftLeader in shiftLeaders)
+    foreach (var shiftLeader in shiftLeaders)
     {
         for (int i = 1; i <= 2; i++)
         {

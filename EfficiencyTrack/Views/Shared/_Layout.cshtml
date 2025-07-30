@@ -23,7 +23,7 @@
             </button>
 
             <a class="navbar-brand d-flex align-items-center text-light" asp-area="" asp-controller="Home" asp-action="Index">
-                <img id="logoImg" src="~/images/Logo2.png" alt="EfficiencyTrack logo" width="120" height="50" class="me-2" />
+                <img id="logoImg" src="~/images/darkLogo.jpeg" alt="EfficiencyTrack logo" width="120" height="60" class="me-2" />
             </a>
 
         </div>
@@ -98,10 +98,10 @@
         function setTheme(theme) {
             if (theme === 'light') {
                 themeLink.href = '/css/sitelight.css';
-                logoImg.src = '/images/Logo1.png';
+                logoImg.src = '/images/LightLogo.png';
             } else {
                 themeLink.href = '/css/sitedark.css';
-                logoImg.src = '/images/Logo2.png';
+                logoImg.src = '/images/darkLogo.jpeg';
             }
             localStorage.setItem('theme', theme);
         }

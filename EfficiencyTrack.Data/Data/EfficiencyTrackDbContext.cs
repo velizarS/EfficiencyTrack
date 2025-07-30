@@ -19,6 +19,7 @@ namespace EfficiencyTrack.Data.Data
         public DbSet<Shift> Shifts { get; set; } = null!;
         public DbSet<DailyEfficiency> DailyEfficiencies { get; set; } = null!;
         public DbSet<Feedback> Feedbacks { get; set; } = null!;
+        public DbSet<SentEfficiencyReport> SentEfficiencyReports { get; set; }
 
         public EfficiencyTrackDbContext(
             DbContextOptions<EfficiencyTrackDbContext> options,
