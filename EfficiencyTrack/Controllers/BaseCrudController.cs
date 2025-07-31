@@ -26,7 +26,6 @@ namespace EfficiencyTrack.Controllers
             return (vmItems, totalCount);
         }
 
-
         public virtual async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
             (List<TViewModel> items, int totalCount) = await GetPagedAsync(searchTerm, sortBy, sortAsc, page, pageSize);

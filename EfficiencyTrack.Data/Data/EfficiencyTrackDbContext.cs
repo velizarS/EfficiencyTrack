@@ -43,12 +43,23 @@ namespace EfficiencyTrack.Data.Data
 
         private void ApplyAuditInformation()
         {
-            string userName = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Unknown";
+            string userName = "Unknown";
 
+            try
+            {
+                userName = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "Unknown";
+            }
+            catch
+            {
+                
+            }
             IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BaseEntity>> entries = ChangeTracker.Entries<BaseEntity>();
 
-            foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<BaseEntity> entry in entries)
+            foreach (var entry in entries)
             {
+                if (entry.Entity == null)
+                    continue;  
+
                 switch (entry.State)
                 {
                     case EntityState.Added:
@@ -70,6 +81,7 @@ namespace EfficiencyTrack.Data.Data
                 }
             }
         }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

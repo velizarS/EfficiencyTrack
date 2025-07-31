@@ -18,7 +18,6 @@ namespace EfficiencyTrack.Controllers
             _roleManager = roleManager;
         }
 
-
         public async Task<IActionResult> Index()
         {
             var users = _userManager.Users.ToList();

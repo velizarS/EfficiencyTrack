@@ -1,182 +1,141 @@
-﻿using EfficiencyTrack.Data.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using EfficiencyTrack.Data.Data;
 using EfficiencyTrack.Data.Identity;
 using EfficiencyTrack.Data.Models;
+using EfficiencyTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace EfficiencyTrack.Services.Helpers
+public class DailyWorkerEfficiencyCheckService : IHostedService, IDisposable
 {
-    public class DailyWorkerEfficiencyCheckService : BackgroundService
+    private Timer _timer;
+    private readonly string _adminEmail = "velizar.stankov@bg.abb.com";
+
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<DailyWorkerEfficiencyCheckService> _logger;
+
+    public DailyWorkerEfficiencyCheckService(
+        IServiceScopeFactory scopeFactory,
+        ILogger<DailyWorkerEfficiencyCheckService> logger)
     {
-        private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly EmailSettings _emailSettings;
-        private readonly ILogger<DailyWorkerEfficiencyCheckService> _logger;
-        private readonly string _adminEmail = "velizar.stankov@bg.abb.com";
+        _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public DailyWorkerEfficiencyCheckService(
-            IServiceScopeFactory serviceScopeFactory,
-            IOptions<EmailSettings> emailSettings,
-            ILogger<DailyWorkerEfficiencyCheckService> logger)
+
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _timer = new Timer(async _ => await CheckAndSendReportsAsync(DateTime.UtcNow, cancellationToken),
+                           null, TimeSpan.Zero, TimeSpan.FromHours(1));
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _timer?.Change(Timeout.Infinite, 0);
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+
+    public async Task CheckAndSendReportsAsync(DateTime nowUtc, CancellationToken cancellationToken)
+    {
+        if (nowUtc.Hour < 7)
         {
-            _serviceScopeFactory = serviceScopeFactory;
-            _emailSettings = emailSettings?.Value ?? throw new ArgumentNullException(nameof(emailSettings));
-            _logger = logger;
+            _logger.LogInformation("Все още не е достигнат часът за проверка на ефективност: {Time}", nowUtc);
+            return;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<EfficiencyTrackDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+
+        var today = nowUtc.Date;
+
+        if (await dbContext.SentEfficiencyReports.AnyAsync(r => r.DateSent == today, cancellationToken))
         {
-            while (!stoppingToken.IsCancellationRequested)
+            _logger.LogInformation("Докладът за ефективност за {Date} вече е изпратен.", today);
+            return;
+        }
+
+        var shiftLeaders = await userManager.GetUsersInRoleAsync("ShiftLeader");
+
+        var reportData = new Dictionary<string, List<Employee>>();
+
+        foreach (var leader in shiftLeaders)
+        {
+            var workers = await dbContext.Employees
+                .Where(e => e.ShiftManagerUserId == leader.Id)
+                .ToListAsync(cancellationToken);
+
+            var yesterday = today.AddDays(-1);
+
+            var recordedIds = await dbContext.DailyEfficiencies
+                .Where(de => de.Date == yesterday)
+                .Select(de => de.EmployeeId)
+                .ToListAsync(cancellationToken);
+
+            var missingWorkers = workers
+                .Where(w => !recordedIds.Contains(w.Id))
+                .ToList();
+
+            if (missingWorkers.Any())
             {
-                try
-                {
-                    var nowUtc = DateTime.UtcNow;
-                    var scheduledTimeUtc = nowUtc.Date.AddHours(7);
+                var body = BuildWorkerListText(missingWorkers);
+                await emailSender.SendEmailAsync(leader.Email, "Липсващи записи за ефективност", body);
 
-                    using var scope = _serviceScopeFactory.CreateScope();
-                    var dbContext = scope.ServiceProvider.GetRequiredService<EfficiencyTrackDbContext>();
-                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                _logger.LogInformation("Изпратен имейл на {Email} за {Count} работника без записи.", leader.Email, missingWorkers.Count);
 
-                    bool alreadySent = await dbContext.SentEfficiencyReports
-                        .AsNoTracking()
-                        .AnyAsync(e => e.DateSent == nowUtc.Date, stoppingToken);
-
-                    if (nowUtc >= scheduledTimeUtc && !alreadySent)
-                    {
-                        _logger.LogInformation("Започвам проверка за служители без записи - {TimeUtc}", nowUtc);
-
-                        var shiftLeaders = await userManager.GetUsersInRoleAsync("ShiftLeader");
-
-                        var shiftLeaderIds = shiftLeaders
-                            .Where(l => !string.IsNullOrWhiteSpace(l.Email))
-                            .Select(l => new { l.Id, l.Email })
-                            .ToList();
-
-                        var previousDay = nowUtc.AddDays(-1).Date;
-
-                        var employees = await dbContext.Employees
-                            .AsNoTracking()
-                            .Where(e => shiftLeaderIds.Select(l => l.Id).Contains(e.ShiftManagerUserId ?? Guid.Empty))
-                            .ToListAsync(stoppingToken);
-
-                        var existingCodes = await dbContext.DailyEfficiencies
-                            .AsNoTracking()
-                            .Where(e => e.Date == previousDay)
-                            .Select(e => e.Employee.Code)
-                            .ToListAsync(stoppingToken);
-
-                        var workersByLeader = shiftLeaderIds.ToDictionary(
-                            l => l.Email,
-                            l => employees
-                                .Where(e => e.ShiftManagerUserId == l.Id && !existingCodes.Contains(e.Code))
-                                .ToList()
-                        );
-
-                        workersByLeader = workersByLeader
-                            .Where(kvp => kvp.Value.Any())
-                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-                        foreach (var kvp in workersByLeader)
-                        {
-                            await SendEmail(kvp.Key, "Работници без записи за вашата смяна", BuildWorkerListText(kvp.Value));
-                            _logger.LogInformation("Изпратен имейл до началник смяна: {Email} с {Count} работници без записи", kvp.Key, kvp.Value.Count);
-                        }
-
-                        if (workersByLeader.Any())
-                        {
-                            var allWorkersText = new StringBuilder();
-                            foreach (var kvp in workersByLeader)
-                            {
-                                allWorkersText.AppendLine($"Началник смяна: {kvp.Key}");
-                                allWorkersText.AppendLine(BuildWorkerListText(kvp.Value));
-                                allWorkersText.AppendLine();
-                            }
-
-                            await SendEmail(_adminEmail, "Всички служители без записи - обобщение", allWorkersText.ToString());
-                            _logger.LogInformation("Изпратен обобщен имейл до администратор: {Email}", _adminEmail);
-                        }
-                        else
-                        {
-                            _logger.LogInformation("Няма служители без записи за предходния ден.");
-                        }
-
-                        dbContext.SentEfficiencyReports.Add(new SentEfficiencyReport { DateSent = nowUtc.Date });
-                        await dbContext.SaveChangesAsync(stoppingToken);
-                    }
-                    else if (alreadySent)
-                    {
-                        _logger.LogInformation("Отчет за деня {Date} вече е изпратен.", nowUtc.Date);
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Все още не е достигнат часът за изпращане. Текущ час UTC: {Hour}", nowUtc.Hour);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Грешка при изпълнение на DailyWorkerEfficiencyCheckService");
-                }
-
-                var nextRunLocal = DateTime.Today.AddDays(1).AddHours(9);
-                var nextRunUtc = nextRunLocal.ToUniversalTime();
-                var delay = nextRunUtc - DateTime.UtcNow;
-
-                if (delay < TimeSpan.Zero)
-                    delay = TimeSpan.Zero;
-
-                try
-                {
-                    await Task.Delay(delay, stoppingToken);
-                }
-                catch (TaskCanceledException) { }
+                reportData.Add($"{leader.Email}", missingWorkers);
             }
         }
 
-        private async Task SendEmail(string recipientEmail, string subject, string body)
+        if (reportData.Any())
         {
-            if (string.IsNullOrWhiteSpace(_emailSettings.SenderEmail))
-                throw new ArgumentException("Sender email is not configured.", nameof(_emailSettings.SenderEmail));
+            var summaryBuilder = new StringBuilder();
+            summaryBuilder.AppendLine("Обобщен отчет за служители без записи за предходния ден:");
+            summaryBuilder.AppendLine();
 
-            if (string.IsNullOrWhiteSpace(recipientEmail))
-                throw new ArgumentException("Recipient email is null or empty.", nameof(recipientEmail));
-
-            using var message = new MailMessage();
-            message.From = new MailAddress(_emailSettings.SenderEmail);
-            message.To.Add(new MailAddress(recipientEmail));
-            message.Subject = subject;
-            message.Body = body;
-            message.IsBodyHtml = false;
-
-            using var client = new SmtpClient(_emailSettings.SmtpHost, _emailSettings.SmtpPort)
+            foreach (var kvp in reportData)
             {
-                EnableSsl = _emailSettings.EnableSsl,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.SenderPassword)
-            };
-
-            await client.SendMailAsync(message);
-        }
-
-        private string BuildWorkerListText(List<Employee> workers)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("Следните работници нямат записи за предходния ден:");
-            foreach (var w in workers)
-            {
-                sb.AppendLine($"Име: {w.FirstName} {w.LastName}, Код: {w.Code}");
+                summaryBuilder.AppendLine($"Началник смяна: {kvp.Key}");
+                summaryBuilder.AppendLine(BuildWorkerListText(kvp.Value));
+                summaryBuilder.AppendLine();
             }
-            return sb.ToString();
+
+            await emailSender.SendEmailAsync(_adminEmail, "Обобщен отчет: служители без записи", summaryBuilder.ToString());
+            _logger.LogInformation("Изпратен обобщен имейл на администратора: {Email}", _adminEmail);
         }
+        else
+        {
+            _logger.LogInformation("Няма служители без записи за предходния ден.");
+        }
+
+        dbContext.SentEfficiencyReports.Add(new SentEfficiencyReport { DateSent = today });
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public string BuildWorkerListText(List<Employee> workers)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("Следните работници нямат записи за предходния ден:");
+        foreach (var worker in workers)
+        {
+            sb.AppendLine($"Име: {worker.FirstName} {worker.LastName}, Код: {worker.Code}");
+        }
+        return sb.ToString();
     }
 }

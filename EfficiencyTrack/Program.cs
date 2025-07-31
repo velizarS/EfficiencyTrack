@@ -32,10 +32,10 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IRoutingService, RoutingService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IGreetingService, GreetingService>();
-
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 builder.Services.AddHostedService<DailyWorkerEfficiencyCheckService>();
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
+
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>

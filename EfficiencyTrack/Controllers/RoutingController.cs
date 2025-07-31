@@ -217,6 +217,5 @@ namespace EfficiencyTrack.Controllers
             await PrepareDropdownsAsync(model);
             return View(model);
         }
-
     }
 }
