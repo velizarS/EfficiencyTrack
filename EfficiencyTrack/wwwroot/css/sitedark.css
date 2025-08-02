@@ -25,6 +25,7 @@ html, body {
     background: var(--bg-dark-gradient);
     color: var(--color-text);
     font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
 }
 
 body {
@@ -247,6 +248,7 @@ textarea:focus {
         height: calc(100vh - 56px);
         background: rgba(0, 0, 0, 0.3);
         z-index: 1039;
+        font-size: 14px;
     }
 
     #sidebar.show ~ #content {
@@ -261,6 +263,7 @@ textarea:focus {
 
     #sidebar {
         width: 180px;
+        font-size: 13px;
     }
 
         #sidebar.show {
