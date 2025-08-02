@@ -11,6 +11,6 @@ namespace EfficiencyTrack.ViewModels.DailyEfficiencyViewModels
         public decimal TotalNeededMinutes { get; set; }
 
         [DisplayName("Детайли на операциите")]
-        public List<EntryDetailsViewModel> DetailEntries { get; set; } = [];
+        public List<EntryDetailsViewModel> DetailEntries { get; set; } = new List<EntryDetailsViewModel>();
     }
 }

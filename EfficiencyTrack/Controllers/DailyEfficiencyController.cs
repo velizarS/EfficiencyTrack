@@ -21,7 +21,21 @@ namespace EfficiencyTrack.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
+        private DailyEfficiencyViewModel MapToViewModel(Data.Models.DailyEfficiency entity)
+        {
+            return new DailyEfficiencyViewModel
+            {
+                Id = entity.Id,
+                Date = entity.Date,
+                EmployeeCode = entity.Employee?.Code ?? "N/A",
+                EmployeeFullName = $"{entity.Employee?.FirstName ?? ""} {entity.Employee?.LastName ?? ""}".Trim(),
+                TotalWorkedMinutes = entity.TotalWorkedMinutes,
+                ShiftName = entity.Shift?.Name ?? "N/A",
+                EfficiencyPercentage = entity.EfficiencyPercentage
+            };
+        }
+
+        public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
             IEnumerable<Data.Models.DailyEfficiency> efficiencies;
 
@@ -36,7 +50,7 @@ namespace EfficiencyTrack.Controllers
                     ? await _dailyEfficiencyService.GetByShiftManagerIdAsync(user.Id)
                     : Enumerable.Empty<Data.Models.DailyEfficiency>();
             }
-            else 
+            else
             {
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
@@ -49,29 +63,30 @@ namespace EfficiencyTrack.Controllers
                 }
             }
 
-            List<DailyEfficiencyViewModel> viewModels = efficiencies.Select(e => new DailyEfficiencyViewModel
-            {
-                Id = e.Id,
-                Date = e.Date,
-                EmployeeCode = e.Employee?.Code ?? "N/A",
-                EmployeeFullName = string.Join(" ", e.Employee?.FirstName, e.Employee?.MiddleName, e.Employee?.LastName).Trim(),
-                TotalWorkedMinutes = e.TotalWorkedMinutes,
-                ShiftName = e.Shift?.Name ?? "N/A",
-                EfficiencyPercentage = e.EfficiencyPercentage
-            }).ToList();
+            var viewModels = efficiencies.Select(MapToViewModel).ToList();
 
-            List<DailyEfficiencyViewModel> filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+            viewModels = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+
+            int totalCount = viewModels.Count();
+
+            var pagedViewModels = viewModels
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var listModel = new DailyEfficiencyListViewModel
+            {
+                DailyEfficiencies = pagedViewModels,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
 
             ViewBag.SearchTerm = searchTerm;
             ViewBag.SortBy = sortBy;
             ViewBag.SortAsc = sortAsc;
 
-            DailyEfficiencyListViewModel listViewModel = new()
-            {
-                DailyEfficiencies = filteredSorted
-            };
-
-            return View(listViewModel);
+            return View(listModel);
         }
 
         public async Task<IActionResult> Details(Guid id)
@@ -82,7 +97,7 @@ namespace EfficiencyTrack.Controllers
                 return NotFound();
             }
 
-            DailyDetailEfficiencyViewModel viewModel = new()
+            var viewModel = new DailyDetailEfficiencyViewModel
             {
                 Id = dto.Id,
                 Date = dto.Date,
@@ -138,7 +153,7 @@ namespace EfficiencyTrack.Controllers
                     ? items.OrderBy(x => x.EfficiencyPercentage).ToList()
                     : items.OrderByDescending(x => x.EfficiencyPercentage).ToList(),
 
-                _ => items.OrderByDescending(x => x.Date).ToList(),
+                _ => items.OrderByDescending(x => x.Date).ToList(), // default sort
             };
 
             return items;

@@ -18,13 +18,18 @@ namespace EfficiencyTrack.Controllers
             _service = service;
         }
 
-        public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true)
+        public async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
         {
             IQueryable<Feedback> query = _service.GetFilteredFeedbacks(searchTerm, sortBy, sortAsc);
 
-            List<Feedback> feedbackEntities = await query.ToListAsync();
+            int totalCount = await query.CountAsync();
 
-            List<FeedbackViewModel> feedbacks = feedbackEntities
+            var feedbackEntities = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var feedbacks = feedbackEntities
                 .Select(f => new FeedbackViewModel
                 {
                     Id = f.Id,
@@ -35,9 +40,12 @@ namespace EfficiencyTrack.Controllers
                 })
                 .ToList();
 
-            FeedbackListViewModel viewModel = new()
+            var viewModel = new FeedbackListViewModel
             {
-                Feedbacks = feedbacks
+                Feedbacks = feedbacks,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
             };
 
             ViewBag.SearchTerm = searchTerm;
@@ -45,7 +53,6 @@ namespace EfficiencyTrack.Controllers
             ViewBag.SortAsc = sortAsc;
 
             return View(viewModel);
-
         }
 
         [HttpPost]

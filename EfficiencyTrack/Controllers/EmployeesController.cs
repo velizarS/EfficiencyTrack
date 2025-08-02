@@ -1,9 +1,12 @@
-﻿using EfficiencyTrack.Data.Models;
+﻿using EfficiencyTrack.Data.Identity;
+using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.EmployeeViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace EfficiencyTrack.Controllers;
 
@@ -18,11 +21,13 @@ public class EmployeesController : BaseCrudController<
 {
     private readonly IEmployeeService _employeeService;
     private readonly ICrudService<Department> _departmentService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public EmployeesController(IEmployeeService employeeService, ICrudService<Department> departmentService) : base(employeeService)
+    public EmployeesController(IEmployeeService employeeService, ICrudService<Department> departmentService, UserManager<ApplicationUser> userManager) : base(employeeService)
     {
         _employeeService = employeeService;
         _departmentService = departmentService;
+        _userManager = userManager;
     }
 
     protected override EmployeeViewModel MapToViewModel(Employee e)
@@ -106,6 +111,81 @@ public class EmployeesController : BaseCrudController<
     protected override EmployeeListViewModel BuildListViewModel(List<EmployeeViewModel> employees)
     {
         return new() { Employees = employees };
+    }
+
+    public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
+    {
+        IQueryable<Employee> query;
+
+        if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            query = _employeeService.GetFilteredEmployees(searchTerm, sortBy, sortAsc);
+        }
+        else if (User.IsInRole("ShiftLeader"))
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                query = Enumerable.Empty<Employee>().AsQueryable();
+            }
+            else
+            {
+                query = _employeeService.GetFilteredEmployees(searchTerm, sortBy, sortAsc)
+                    .Where(e => e.ShiftManagerUserId == user.Id);
+            }
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var employee = await _employeeService.GetByCodeAsync(searchTerm);
+                if (employee != null && !employee.IsDeleted)
+                {
+                    query = new List<Employee> { employee }.AsQueryable();
+                }
+                else
+                {
+                    query = Enumerable.Empty<Employee>().AsQueryable();
+                    ViewBag.Warning = "Няма служител с въведения код.";
+                }
+            }
+            else
+            {
+                query = Enumerable.Empty<Employee>().AsQueryable();
+                ViewBag.Warning = "Моля, въведете служебния си код за достъп.";
+            }
+        }
+
+        int totalCount = await query.CountAsync();
+
+        var employees = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var viewModels = employees.Select(emp => new EmployeeViewModel
+        {
+            Id = emp.Id,
+            Code = emp.Code,
+            FullName = $"{emp.FirstName} {emp.MiddleName} {emp.LastName}".Replace("  ", " ").Trim(),
+            DepartmentName = emp.Department?.Name ?? "-",
+            ShiftManagerUserName = emp.ShiftManagerUser?.UserName ?? "-"
+        }).ToList();
+
+        var listModel = new EmployeeListViewModel
+        {
+            Employees = viewModels,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+
+        ViewBag.SearchTerm = searchTerm;
+        ViewBag.SortBy = sortBy;
+        ViewBag.SortAsc = sortAsc;
+
+        return View(listModel);
     }
 
     [HttpGet]

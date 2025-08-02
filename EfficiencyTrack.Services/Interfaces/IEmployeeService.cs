@@ -10,5 +10,6 @@ namespace EfficiencyTrack.Services.Interfaces
         Task<List<Employee>> GetByShiftManagerUserIdAsync(Guid leaderId);
         Task<bool> IsEmployeeCodeUniqueAsync(string code, Guid? excludeId = null);
         Task<Employee?> GetByCodeAsync(string employeeCode);
+        IQueryable<Employee> GetFilteredEmployees(string? searchTerm, string? sortBy, bool sortAsc);
     }
 }

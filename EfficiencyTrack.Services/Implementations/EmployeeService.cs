@@ -124,5 +124,43 @@ namespace EfficiencyTrack.Services.Implementations
                 throw new InvalidOperationException($"Employee with code '{entity.Code}' already exists.");
             }
         }
+
+        public IQueryable<Employee> GetFilteredEmployees(string? searchTerm, string? sortBy, bool sortAsc)
+        {
+            IQueryable<Employee> query = _context.Employees
+                .Include(e => e.Department)
+                .Include(e => e.ShiftManagerUser)
+                .Where(e => !e.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                string lowerTerm = searchTerm.ToLower();
+                query = query.Where(e =>
+                    e.Code.ToLower().Contains(lowerTerm) ||
+                    (e.FirstName != null && e.FirstName.ToLower().Contains(lowerTerm)) ||
+                    (e.LastName != null && e.LastName.ToLower().Contains(lowerTerm)) ||
+                    (e.Department != null && e.Department.Name.ToLower().Contains(lowerTerm)) ||
+                    (e.ShiftManagerUser != null && e.ShiftManagerUser.UserName.ToLower().Contains(lowerTerm))
+                );
+            }
+
+            query = (sortBy?.ToLower()) switch
+            {
+                "code" => sortAsc ? query.OrderBy(e => e.Code) : query.OrderByDescending(e => e.Code),
+                "fullname" => sortAsc
+                    ? query.OrderBy(e => e.FirstName).ThenBy(e => e.LastName)
+                    : query.OrderByDescending(e => e.FirstName).ThenByDescending(e => e.LastName),
+                "department" => sortAsc
+                    ? query.OrderBy(e => e.Department!.Name)
+                    : query.OrderByDescending(e => e.Department!.Name),
+                "shiftmanager" => sortAsc
+                    ? query.OrderBy(e => e.ShiftManagerUser!.UserName)
+                    : query.OrderByDescending(e => e.ShiftManagerUser!.UserName),
+                _ => query.OrderBy(e => e.Code)
+            };
+
+            return query;
+        }
+
     }
 }

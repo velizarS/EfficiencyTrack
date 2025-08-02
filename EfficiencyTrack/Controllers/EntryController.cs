@@ -1,10 +1,13 @@
 ﻿using EfficiencyTrack.Controllers;
+using EfficiencyTrack.Data.Identity;
 using EfficiencyTrack.Data.Models;
 using EfficiencyTrack.Services.Interfaces;
 using EfficiencyTrack.ViewModels.EntryViewModel;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 [Authorize]
 public class EntryController : BaseCrudController<
@@ -20,13 +23,17 @@ public class EntryController : BaseCrudController<
     private readonly IRoutingService _routingService;
     private readonly ICrudService<Shift> _shiftService;
     private readonly IGreetingService _greetingService;
+    private readonly UserManager<ApplicationUser> _userManager;
+
 
     public EntryController(
         IEntryService entryService,
         IEmployeeService employeeService,
         IRoutingService routingService,
         ICrudService<Shift> shiftService,
-        IGreetingService greetingService)
+        IGreetingService greetingService,
+        UserManager<ApplicationUser> userManager
+)
         : base(entryService)
     {
         _entryService = entryService;
@@ -34,6 +41,7 @@ public class EntryController : BaseCrudController<
         _routingService = routingService;
         _shiftService = shiftService;
         _greetingService = greetingService;
+        _userManager = userManager;
     }
 
     protected override EntryViewModel MapToViewModel(Entry entity)
@@ -122,25 +130,76 @@ public class EntryController : BaseCrudController<
         return new() { Entries = items };
     }
 
-    public override async Task<IActionResult> Index(string? searchTerm, string? sortBy, bool sortAsc = true, int page = 1, int pageSize = 20)
+    public override async Task<IActionResult> Index(string? searchTerm, string? sortBy,bool sortAsc = true,int page = 1, int pageSize = 20)
     {
-        List<Entry> entries = await _entryService.GetAllWithIncludesAsync();
-        List<EntryViewModel> viewModels = entries.Select(MapToViewModel).ToList();
-        List<EntryViewModel> filteredSorted = FilterAndSort(viewModels, searchTerm, sortBy, sortAsc);
+        IQueryable<Entry> query;
 
-        List<EntryViewModel> pagedItems = filteredSorted
+        if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            query = _entryService.GetFilteredEntries(searchTerm, sortBy, sortAsc);
+        }
+        else if (User.IsInRole("ShiftLeader"))
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                query = Enumerable.Empty<Entry>().AsQueryable();
+                ViewBag.Warning = "Неуспешна идентификация на потребител.";
+            }
+            else
+            {
+                query = _entryService.GetFilteredEntries(searchTerm, sortBy, sortAsc)
+                    .Where(e => e.Employee.ShiftManagerUserId == user.Id);
+            }
+        }
+        else 
+        {
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var employee = await _employeeService.GetByCodeAsync(searchTerm);
+                if (employee != null && !employee.IsDeleted)
+                {
+                    query = _entryService.GetFilteredEntries(null, sortBy, sortAsc)
+                        .Where(e => e.EmployeeId == employee.Id);
+                }
+                else
+                {
+                    query = Enumerable.Empty<Entry>().AsQueryable();
+                    ViewBag.Warning = "Няма служител с въведения код.";
+                }
+            }
+            else
+            {
+                query = Enumerable.Empty<Entry>().AsQueryable();
+                ViewBag.Warning = "Моля, въведете служебния си код за достъп.";
+            }
+        }
+
+        int totalCount = await query.CountAsync();
+
+        var entries = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var viewModels = entries
+            .Select(MapToViewModel)
             .ToList();
+
+        var listModel = new EntryListViewModel
+        {
+            Entries = viewModels,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
 
         ViewBag.SearchTerm = searchTerm;
         ViewBag.SortBy = sortBy;
         ViewBag.SortAsc = sortAsc;
-        ViewBag.Page = page;
-        ViewBag.PageSize = pageSize;
-        ViewBag.TotalCount = filteredSorted.Count;
 
-        return View(BuildListViewModel(pagedItems));
+        return View(listModel);
     }
 
     public override async Task<IActionResult> Details(Guid id)

@@ -2,7 +2,7 @@
 {
     public class RoutingListViewModel
     {
-        public List<RoutingViewModel> Routings { get; set; } = [];
+        public List<RoutingViewModel> Routings { get; set; } = new List<RoutingViewModel>();
 
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }

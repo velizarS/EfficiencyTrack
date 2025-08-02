@@ -49,6 +49,48 @@ namespace EfficiencyTrack.Services.Implementations
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
         }
 
+        public IQueryable<Entry> GetFilteredEntries(string? searchTerm, string? sortBy, bool sortAsc)
+        {
+            IQueryable<Entry> query = _context.Entries
+                .AsNoTracking()
+                .Include(e => e.Employee)
+                .Include(e => e.Routing)
+                .Where(e => !e.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                string term = searchTerm.Trim().ToLower();
+                query = query.Where(e =>
+                    e.Employee.Code.ToLower().Contains(term) ||
+                    (e.Employee.FirstName + " " + e.Employee.LastName).ToLower().Contains(term) ||
+                    e.Routing.Code.ToLower().Contains(term));
+            }
+
+            query = (sortBy?.ToLower()) switch
+            {
+                "date" => sortAsc
+                    ? query.OrderBy(e => e.Date)
+                    : query.OrderByDescending(e => e.Date),
+
+                "employee" => sortAsc
+                    ? query.OrderBy(e => e.Employee.FirstName).ThenBy(e => e.Employee.LastName)
+                    : query.OrderByDescending(e => e.Employee.FirstName).ThenByDescending(e => e.Employee.LastName),
+
+                "routing" => sortAsc
+                    ? query.OrderBy(e => e.Routing.Code)
+                    : query.OrderByDescending(e => e.Routing.Code),
+
+                "pieces" => sortAsc
+                    ? query.OrderBy(e => e.Pieces)
+                    : query.OrderByDescending(e => e.Pieces),
+
+                _ =>
+                    query.OrderByDescending(e => e.Date)
+            };
+
+            return query;
+        }
+
         public override async Task<Entry> AddAsync(Entry entity)
         {
             if (entity == null)

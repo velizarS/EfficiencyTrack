@@ -2,6 +2,6 @@
 {
     public class DepartmentListViewModel
     {
-        public List<DepartmentViewModel> Departments { get; set; } = [];
+        public List<DepartmentViewModel> Departments { get; set; } = new List<DepartmentViewModel>();
     }
 }

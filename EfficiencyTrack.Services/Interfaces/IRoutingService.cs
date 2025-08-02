@@ -8,6 +8,5 @@ namespace EfficiencyTrack.Services.Interfaces
         Task<Routing?> GetByIdWithDepartmentAsync(Guid id);
         Task<IEnumerable<Routing>> GetAllWithDepartmentsAsync();
         IQueryable<Routing> GetFilteredRoutings(string? searchTerm, string? sortBy, bool sortAsc);
-
     }
 }

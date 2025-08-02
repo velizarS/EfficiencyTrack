@@ -111,4 +111,23 @@
             </table>
         </div>
     </section>
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Навигация по страници" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-route-page="@(Model.CurrentPage - 1)" asp-route-searchTerm="@searchTerm" asp-route-sortBy="@sortBy" asp-route-sortAsc="@sortAsc">Назад</a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" asp-route-page="@i" asp-route-searchTerm="@searchTerm" asp-route-sortBy="@sortBy" asp-route-sortAsc="@sortAsc">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-route-page="@(Model.CurrentPage + 1)" asp-route-searchTerm="@searchTerm" asp-route-sortBy="@sortBy" asp-route-sortAsc="@sortAsc">Напред</a>
+                </li>
+            </ul>
+        </nav>
+    }
 </main>
