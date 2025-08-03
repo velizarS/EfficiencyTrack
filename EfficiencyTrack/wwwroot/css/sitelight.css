@@ -258,6 +258,8 @@ textarea:focus {
         z-index: 1045;
         backdrop-filter: blur(4px);
         font-size: 14px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     #sidebar.show ~ #content {
@@ -274,6 +276,8 @@ textarea:focus {
         width: 180px;
         border-radius: 0 10px 10px 0;
         font-size: 13px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
         #sidebar.show {
