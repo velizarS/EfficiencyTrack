@@ -1,0 +1,168 @@
+```mermaid
+erDiagram
+  AspNetRoleClaims {
+    Id int PK
+    RoleId uniqueidentifier FK
+    ClaimType nvarchar(max)(NULL) 
+    ClaimValue nvarchar(max)(NULL) 
+  }
+  AspNetRoleClaims }o--|| AspNetRoles : FK_AspNetRoleClaims_AspNetRoles_RoleId
+  AspNetRoles {
+    Id uniqueidentifier PK
+    Name nvarchar(256)(NULL) 
+    NormalizedName nvarchar(256)(NULL) 
+    ConcurrencyStamp nvarchar(max)(NULL) 
+  }
+  AspNetUserClaims {
+    Id int PK
+    UserId uniqueidentifier FK
+    ClaimType nvarchar(max)(NULL) 
+    ClaimValue nvarchar(max)(NULL) 
+  }
+  AspNetUserClaims }o--|| AspNetUsers : FK_AspNetUserClaims_AspNetUsers_UserId
+  AspNetUserLogins {
+    LoginProvider nvarchar(450) PK
+    ProviderKey nvarchar(450) PK
+    ProviderDisplayName nvarchar(max)(NULL) 
+    UserId uniqueidentifier FK
+  }
+  AspNetUserLogins }o--|| AspNetUsers : FK_AspNetUserLogins_AspNetUsers_UserId
+  AspNetUserRoles {
+    UserId uniqueidentifier PK,FK
+    RoleId uniqueidentifier PK,FK
+  }
+  AspNetUserRoles }o--|| AspNetRoles : FK_AspNetUserRoles_AspNetRoles_RoleId
+  AspNetUserRoles }o--|| AspNetUsers : FK_AspNetUserRoles_AspNetUsers_UserId
+  AspNetUsers {
+    Id uniqueidentifier PK
+    UserName nvarchar(256)(NULL) 
+    NormalizedUserName nvarchar(256)(NULL) 
+    Email nvarchar(256)(NULL) 
+    NormalizedEmail nvarchar(256)(NULL) 
+    EmailConfirmed bit 
+    PasswordHash nvarchar(max)(NULL) 
+    SecurityStamp nvarchar(max)(NULL) 
+    ConcurrencyStamp nvarchar(max)(NULL) 
+    PhoneNumber nvarchar(max)(NULL) 
+    PhoneNumberConfirmed bit 
+    TwoFactorEnabled bit 
+    LockoutEnd datetimeoffset(NULL) 
+    LockoutEnabled bit 
+    AccessFailedCount int 
+    CreatedOn datetime2 
+    ModifiedOn datetime2(NULL) 
+  }
+  AspNetUserTokens {
+    UserId uniqueidentifier PK,FK
+    LoginProvider nvarchar(450) PK
+    Name nvarchar(450) PK
+    Value nvarchar(max)(NULL) 
+  }
+  AspNetUserTokens }o--|| AspNetUsers : FK_AspNetUserTokens_AspNetUsers_UserId
+  DailyEfficiencies {
+    Id uniqueidentifier PK
+    Date datetime2 
+    EmployeeId uniqueidentifier FK
+    TotalWorkedMinutes decimal(10-4) 
+    EfficiencyPercentage decimal(10-4) 
+    CreatedOn datetime2 
+    CreatedBy nvarchar(max) 
+    ModifiedOn datetime2(NULL) 
+    ModifiedBy nvarchar(max)(NULL) 
+    IsDeleted bit 
+    DeletedBy nvarchar(max)(NULL) 
+    ComputedOn datetime2 
+    ShiftId uniqueidentifier FK
+    TotalNeededMinutes decimal(10-4) 
+  }
+  DailyEfficiencies }o--|| Employees : FK_DailyEfficiencies_Employees_EmployeeId
+  DailyEfficiencies }o--|| Shifts : FK_DailyEfficiencies_Shifts_ShiftId
+  Departments {
+    Id uniqueidentifier PK
+    Name nvarchar(50) 
+    CreatedOn datetime2 
+    CreatedBy nvarchar(max) 
+    ModifiedOn datetime2(NULL) 
+    ModifiedBy nvarchar(max)(NULL) 
+    IsDeleted bit 
+    DeletedBy nvarchar(max)(NULL) 
+  }
+  Employees {
+    Id uniqueidentifier PK
+    Code nvarchar(20) 
+    FirstName nvarchar(100) 
+    MiddleName nvarchar(100)(NULL) 
+    LastName nvarchar(100) 
+    DepartmentId uniqueidentifier FK
+    ApplicationUserId uniqueidentifier(NULL) FK
+    CreatedOn datetime2 
+    CreatedBy nvarchar(max) 
+    ModifiedOn datetime2(NULL) 
+    ModifiedBy nvarchar(max)(NULL) 
+    IsDeleted bit 
+    DeletedBy nvarchar(max)(NULL) 
+    ShiftManagerUserId uniqueidentifier(NULL) FK
+  }
+  Employees }o--|| AspNetUsers : FK_Employees_AspNetUsers_ApplicationUserId
+  Employees }o--|| AspNetUsers : FK_Employees_AspNetUsers_ShiftManagerUserId
+  Employees }o--|| Departments : FK_Employees_Departments_DepartmentId
+  Entries {
+    Id uniqueidentifier PK
+    Date datetime2 
+    EmployeeId uniqueidentifier FK
+    RoutingId uniqueidentifier FK
+    ShiftId uniqueidentifier FK
+    Pieces int 
+    Scrap int 
+    WorkedMinutes decimal(10-4) 
+    EfficiencyForOperation decimal(10-4) 
+    CreatedOn datetime2 
+    CreatedBy nvarchar(max) 
+    ModifiedOn datetime2(NULL) 
+    ModifiedBy nvarchar(max)(NULL) 
+    IsDeleted bit 
+    DeletedBy nvarchar(max)(NULL) 
+    RequiredMinutes decimal(10-4) 
+  }
+  Entries }o--|| Employees : FK_Entries_Employees_EmployeeId
+  Entries }o--|| Routings : FK_Entries_Routings_RoutingId
+  Entries }o--|| Shifts : FK_Entries_Shifts_ShiftId
+  Feedbacks {
+    Id uniqueidentifier PK
+    Message nvarchar(4000) 
+    CreatedAt datetime2 
+    IsHandled bit 
+    HandledAt datetime2(NULL) 
+    EmployeeName nvarchar(100)(NULL) 
+  }
+  Routings {
+    Id uniqueidentifier PK
+    Code nvarchar(20) 
+    Description nvarchar(200) 
+    Zone nvarchar(100) 
+    MinutesPerPiece decimal(10-4) 
+    DepartmentId uniqueidentifier FK
+    CreatedOn datetime2 
+    CreatedBy nvarchar(max) 
+    ModifiedOn datetime2(NULL) 
+    ModifiedBy nvarchar(max)(NULL) 
+    IsDeleted bit 
+    DeletedBy nvarchar(max)(NULL) 
+  }
+  Routings }o--|| Departments : FK_Routings_Departments_DepartmentId
+  SentEfficiencyReports {
+    Id uniqueidentifier PK
+    DateSent datetime2 
+  }
+  Shifts {
+    Id uniqueidentifier PK
+    Name nvarchar(20) 
+    DurationMinutes int 
+    CreatedOn datetime2 
+    CreatedBy nvarchar(max) 
+    ModifiedOn datetime2(NULL) 
+    ModifiedBy nvarchar(max)(NULL) 
+    IsDeleted bit 
+    DeletedBy nvarchar(max)(NULL) 
+  }
+```
