@@ -70,4 +70,4 @@ To run locally:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/velizarS/efficiencytrack.git
+https://github.com/velizarS/EfficiencyTrack.git
