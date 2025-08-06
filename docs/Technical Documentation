@@ -1,0 +1,118 @@
+## 🛠 Technical Documentation for Developers
+
+This document is aimed at developers who want to understand, extend, or maintain the **EfficiencyTrack** application. 
+It complements the [Project Architecture](architecture.md) and provides deeper insights into the project's structure, practices, and development guidelines.
+
+---
+
+### 📦 Project Structure (High-Level)
+
+```plaintext
+EfficiencyTrack/
+├── Common/                     # Application-wide constants
+├── EfficiencyTrack.Data/       # EF Core models, config, DbContext
+├── EfficiencyTrack.Services/   # Business logic layer
+├── EfficiencyTrack/            # Main ASP.NET Core MVC app (web)
+├── EfficiencyTrack.Tests/      # Unit tests
+└── docs                        # Technical documentation
+```
+
+---
+
+### ⚙️ Setup Instructions
+
+1. **Database Setup**:
+
+   * Uses Entity Framework Core.
+   * Connection string: `appsettings.json`
+   * Run `Update-Database` to apply migrations.
+
+2. **Running the App**:
+
+   * Set `EfficiencyTrack` as the startup project.
+   * Run via Visual Studio or `dotnet run`.
+
+3. **Initial Users and Roles**:
+
+   * Seed roles: Admin, Manager, ShiftManager, Worker.
+   * If not seeded, add via Identity or SQL directly.
+
+---
+
+### 🧪 Testing Guidelines
+
+* Located in `EfficiencyTrack.Tests`
+* Use in-memory database for isolation.
+* Grouped by:
+
+  * `HelperTests`
+  * `MainServiceTests`
+
+**To run tests:**
+
+```bash
+cd EfficiencyTrack.Tests
+ dotnet test
+```
+
+---
+
+### 🧰 Technologies Used
+
+* ASP.NET Core MVC
+* Entity Framework Core
+* Bootstrap (customized)
+* Identity (for authentication/authorization)
+* xUnit for testing
+
+---
+
+### 🗂 Naming Conventions
+
+* ViewModels: `FeatureActionViewModel` (e.g. `EmployeeCreateViewModel`)
+* Services: `IFeatureService` / `FeatureService`
+* Views: Razor pages follow folder structure by controller name
+
+---
+
+### 🔒 Role-Based Access (Simplified)
+
+* Admin: Full access
+* Manager: Full access
+* ShiftManager: Limited to their team
+* Worker: Can submit/view own data only
+
+---
+
+### 📤 Email Sending
+
+* Implemented via `SmtpEmailSender`
+* Configured through `appsettings.json > EmailSettings`
+* Used in greetings and feedback notifications
+
+---
+
+### 📈 Efficiency Calculation
+
+* `DailyWorkerEfficiencyCheckService` calculates daily KPIs
+* Tied to shift, routing, and entry data
+* Used in services and analytics pages
+
+---
+
+### 🔁 CRUD Operations
+
+* Most controllers inherit from `BaseCrudController`
+* Shared logic extracted to `CrudService`
+* All entities follow standard Create/Edit/Delete/List patterns
+
+---
+
+### 🧱 Migrations and Updates
+
+* Migrations are in `EfficiencyTrack.Data/Migrations`
+* Use `Add-Migration` and `Update-Database` when modifying models
+
+---
+
+*Last updated: August 2025*
