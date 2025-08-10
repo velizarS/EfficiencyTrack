@@ -1,0 +1,11 @@
+# 🔐 Roles and Permissions
+
+| Role             | Description                                     |
+|------------------|-------------------------------------------------|
+| Admin            | Full access to all resources and management     |
+| Manager          | Can manage data and users                       |
+| UnitResponsible  | Can view data by department                     |
+| ShiftLeader      | Can view and edit data of their assigned workers|
+| User (Worker)    | Can submit entries and view own effectiveness   |
+
+> Role restrictions are enforced via [Authorize] attributes and service logic.

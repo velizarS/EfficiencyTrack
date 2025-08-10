@@ -1,0 +1,18 @@
+# ⚙️ Project Setup
+
+## Requirements
+
+- .NET 8 SDK or later
+- SQL Server
+- Visual Studio / Rider
+
+## Steps
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/velizarS/efficiencytrack.git
+2. Configure appsettings.json:
+3. Database connection
+4. SMTP (optional)
+5. Apply EF migrations:
+6. dotnet ef database update
