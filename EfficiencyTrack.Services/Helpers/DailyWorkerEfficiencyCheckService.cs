@@ -78,7 +78,7 @@ public class DailyWorkerEfficiencyCheckService : IHostedService, IDisposable
         foreach (var leader in shiftLeaders)
         {
             var workers = await dbContext.Employees
-                .Where(e => e.ShiftManagerUserId == leader.Id)
+                .Where(e => e.ShiftManagerUserId == leader.Id && !e.IsDeleted)
                 .ToListAsync(cancellationToken);
 
             var yesterday = today.AddDays(-1);

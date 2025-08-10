@@ -96,7 +96,6 @@ using (IServiceScope scope = app.Services.CreateScope())
     try
     {
         await SeedRolesAsync(services);
-        await SeedUsersAsync(services);
     }
     catch (Exception ex)
     {
@@ -118,70 +117,6 @@ static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         if (!await roleManager.RoleExistsAsync(role))
         {
             _ = await roleManager.CreateAsync(new IdentityRole<Guid>(role));
-        }
-    }
-}
-
-static async Task SeedUsersAsync(IServiceProvider serviceProvider)
-{
-    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-
-    async Task<ApplicationUser> CreateUserIfNotExists(string email, string role)
-    {
-        ApplicationUser? user = await userManager.FindByEmailAsync(email);
-        if (user == null)
-        {
-            user = new ApplicationUser
-            {
-                UserName = email,
-                Email = email,
-                EmailConfirmed = true,
-            };
-            var result = await userManager.CreateAsync(user, "Password123!");
-            if (result.Succeeded)
-            {
-                _ = await userManager.AddToRoleAsync(user, role);
-                logger.LogInformation($"User '{email}' created and assigned to role '{role}'.");
-            }
-            else
-            {
-                logger.LogError($"Failed to create user '{email}'. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-        }
-        else
-        {
-            logger.LogInformation($"User '{email}' already exists.");
-        }
-        return user;
-    }
-
-    List<ApplicationUser> unitResponsibles = new List<ApplicationUser>();
-    for (int i = 1; i <= 2; i++)
-    {
-        var unitResp = await CreateUserIfNotExists($"unitresp{i}@example.com", "UnitResponsible");
-        unitResponsibles.Add(unitResp);
-    }
-
-    List<ApplicationUser> shiftLeaders = new List<ApplicationUser>();
-    int shiftLeaderCounter = 1;
-    foreach (var unitResp in unitResponsibles)
-    {
-        for (int i = 1; i <= 2; i++)
-        {
-            var shiftLeader = await CreateUserIfNotExists($"shiftleader{shiftLeaderCounter}@example.com", "ShiftLeader");
-            shiftLeaders.Add(shiftLeader);
-            shiftLeaderCounter++;
-        }
-    }
-
-    int userCounter = 1;
-    foreach (var shiftLeader in shiftLeaders)
-    {
-        for (int i = 1; i <= 2; i++)
-        {
-            _ = await CreateUserIfNotExists($"user{userCounter}@example.com", "User");
-            userCounter++;
         }
     }
 }

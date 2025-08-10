@@ -115,7 +115,7 @@ namespace EfficiencyTrack.Services.Helpers
             decimal requiredMinutes = totalPieces * routing.MinutesPerPiece;
             decimal efficiency = requiredMinutes / entry.WorkedMinutes * 100;
 
-            if (efficiency > 150)
+            if (efficiency >= 200)
             {
                 result.Add("Изчислената ефективност е прекалено висока. Проверете отново въведените бройки и минути.");
             }

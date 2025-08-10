@@ -43,12 +43,23 @@ public class CrudService<T> : ICrudService<T> where T : BaseEntity
 
     public virtual async Task<bool> UpdateAsync(T entity)
     {
+        var existingEntity = await _context.Set<T>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == entity.Id);
+
+        if (existingEntity == null)
+            return false;
+
+        entity.CreatedBy = existingEntity.CreatedBy;
+        entity.CreatedOn = existingEntity.CreatedOn;
+
         SetAuditFields(entity, isNew: false);
 
         _context.Set<T>().Update(entity);
         await _context.SaveChangesAsync();
         return true;
     }
+
 
     public virtual async Task<bool> DeleteAsync(Guid id)
     {

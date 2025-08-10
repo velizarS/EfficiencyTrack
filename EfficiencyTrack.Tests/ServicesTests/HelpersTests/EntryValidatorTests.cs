@@ -170,7 +170,7 @@ namespace EfficiencyTrack.Tests.ServicesTests.HelpersTest
                 ShiftId = shift.Id,
                 EmployeeId = Guid.NewGuid(),
                 Date = DateTime.UtcNow.Date,
-                RoutingId = Guid.NewGuid(), // несъществуващ
+                RoutingId = Guid.NewGuid(), 
                 WorkedMinutes = 60,
                 Pieces = 10,
             };
@@ -206,7 +206,7 @@ namespace EfficiencyTrack.Tests.ServicesTests.HelpersTest
                 RoutingId = routing.Id,
                 WorkedMinutes = 10,
                 Pieces = 10,
-                Scrap = 10 // total 20 * 1 / 10 * 100 = 200%
+                Scrap = 10 
             };
 
             // Act
